@@ -1,12 +1,30 @@
 #pragma once
 
-class Point
-{
-public:
-	Point(double x, double y);
-	double getX() const;
-	double getY() const;
-private:
-	double x;
-	double y;
-};
+#include "Vector.h"
+
+namespace drcheck::geometry {
+	enum class Orientation {
+		Clockwise,
+		CounterClockwise,
+		Collinear
+	};
+
+	class Point
+	{
+	public:
+		Point(double x, double y);
+
+		double getX() const;
+		double getY() const;
+		
+		// STATIC METHODS (UTILITY FUNCTIONS)
+		static Vector vectorBetween(const Point& from, const Point& to);
+
+		static double orientationValue(const Point& a, const Point& b, const Point& c);
+
+		static Orientation getOrientation(const Point& a, const Point& b, const Point& c);
+	private:
+		double x;
+		double y;
+	};
+}

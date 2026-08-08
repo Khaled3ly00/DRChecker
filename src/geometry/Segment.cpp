@@ -2,26 +2,78 @@
 
 #include <algorithm>
 
-Segment::Segment(const Point& start, const Point& end)
-	: start(start), end(end)
-{
-}
+namespace drcheck::geometry {
+	Segment::Segment(const Point& start, const Point& end)
+		: start(start), end(end)
+	{
+	}
 
-const Point& Segment::getStart() const
-{
-	return start;
-}
+	const Point& Segment::getStart() const
+	{
+		return start;
+	}
 
-const Point& Segment::getEnd() const
-{
-	return end;
-}
+	const Point& Segment::getEnd() const
+	{
+		return end;
+	}
 
-BoundingBox Segment::getBoundingBox() const
-{
-	double minX = std::min(start.getX(), end.getX());
-	double minY = std::min(start.getY(), end.getY());
-	double maxX = std::max(start.getX(), end.getX());
-	double maxY = std::max(start.getY(), end.getY());
-	return BoundingBox(minX, minY, maxX, maxY);
+	BoundingBox Segment::getBoundingBox() const
+	{
+		double minX = std::min(start.getX(), end.getX());
+		double minY = std::min(start.getY(), end.getY());
+		double maxX = std::max(start.getX(), end.getX());
+		double maxY = std::max(start.getY(), end.getY());
+		return BoundingBox(minX, minY, maxX, maxY);
+	}
+
+	// Check if point lies on the segment
+	bool Segment::contains(const Point& point) const
+	{	
+		constexpr double EPS = 1e-9;
+		// Point is not on the same line
+		if (!(Point::getOrientation(start, end, point) == Orientation::Collinear)) {
+			return false;
+		}
+		// Point is collinear, so check whether it lies
+		// between the two endpoints.
+		return (point.getX() >= std::min(start.getX(), end.getX()) - EPS &&
+				point.getX() <= std::max(start.getX(), end.getX()) + EPS &&
+				point.getY() >= std::min(start.getY(), end.getY()) - EPS &&
+				point.getY() <= std::max(start.getY(), end.getY()) + EPS);
+		
+	}
+
+	// Check if two segments intersect (Deep check)
+	bool Segment::properIntersection(const Segment& other) const
+	{
+		const Orientation o1 = Point::getOrientation(start, end, other.start); // AB x AC
+		const Orientation o2 = Point::getOrientation(start, end, other.end);	// AB x AD
+		const Orientation o3 = Point::getOrientation(other.start, other.end, start); // CD x CA
+		const Orientation o4 = Point::getOrientation(other.start, other.end, end); // CD x CB
+		
+		const bool otherCrossesThis =	(o1 == Orientation::CounterClockwise && o2 == Orientation::Clockwise) ||
+										(o1 == Orientation::Clockwise && o2 == Orientation::CounterClockwise);
+		const bool thisCrossesOther =	(o3 == Orientation::CounterClockwise && o4 == Orientation::Clockwise) ||
+										(o3 == Orientation::Clockwise && o4 == Orientation::CounterClockwise);
+		return otherCrossesThis && thisCrossesOther;
+	}
+
+	bool Segment::intersects(const Segment& other) const
+	{
+		// First check if bounding boxes overlap (Broad check)
+		if (!getBoundingBox().overlaps(other.getBoundingBox())) {
+			return false;
+		}
+		// If bounding boxes overlap, do a deeper check
+		// Normal crossing case.
+		if (properIntersection(other)) {
+			return true;
+		}
+		// Handle endpoint touching and collinear overlap.
+		if (contains(other.start) || contains(other.end) || other.contains(start) || other.contains(end)) {
+			return true;
+		}
+		return false;
+	}
 }
