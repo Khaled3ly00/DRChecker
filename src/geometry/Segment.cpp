@@ -75,4 +75,31 @@ namespace drcheck::geometry {
 		}
 		return false;
 	}
+	// Calculate the shortest distance from a point to the segment
+	double Segment::distanceTo(const Point& point) const
+	{
+		// Vector from start to end of the segment
+		Vector segVector = Point::vectorBetween(start, end);
+		// Vector from start to the point
+		Vector pointVector = Point::vectorBetween(start, point);
+		double segLengthSquared = segVector.dot(segVector);
+		if (segLengthSquared < EPSILON) {
+			// The segment is a point so return the distance from start to point
+			return Point::vectorBetween(start, point).length();
+		}
+		// Project pointVector onto segVector and find the projection scalar
+		double t = pointVector.dot(segVector) / segLengthSquared;
+		if (t < 0.0) {
+			// Closest to start point
+			return Point::vectorBetween(start, point).length();
+		}
+		else if (t > 1.0) {
+			// Closest to end point
+			return Point::vectorBetween(end, point).length();
+		}
+		else {
+			// Projection falls on the segment
+			return std::abs(segVector.cross(pointVector)) / segVector.length();
+		}
+	}
 }

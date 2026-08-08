@@ -16,6 +16,7 @@ namespace drcheck::geometry {
 		
 		bool contains(const Point& point) const;
 		bool intersects(const Segment& other) const;
+		double distanceTo(const Point& point) const;
 	private:
 		Point start;
 		Point end;
