@@ -107,4 +107,25 @@ namespace drcheck::geometry {
 		}
 		return inside;
 	}
+
+	bool Polygon::intersects(const Polygon& other) const
+	{
+		// First check if the bounding boxes (Broad-phase rejection) of the two polygons overlap
+		if (!getBoundingBox().overlaps(other.getBoundingBox())) {
+			return false;
+		}
+		// Check for edge intersections between the two polygons
+		for (const Segment& edge1 : getEdges()) {
+			for (const Segment& edge2 : other.getEdges()) {
+				if (edge1.intersects(edge2)) {
+					return true;
+				}
+			}
+		}
+		// If no edges intersect, check if one polygon is contained within the other
+		if (contains(other.getVertices()[0]) || other.contains(getVertices()[0])) {
+			return true;
+		}
+		return false;
+	}
 }

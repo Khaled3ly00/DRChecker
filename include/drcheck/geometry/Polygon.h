@@ -20,6 +20,7 @@ namespace drcheck::geometry {
 		Orientation getOrientation() const;
 		BoundingBox getBoundingBox() const;
 		bool contains(const Point& point) const;
+		bool intersects(const Polygon& other) const;
 	private:
 		std::vector<Point> vertices;
 	};
