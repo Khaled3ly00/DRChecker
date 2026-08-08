@@ -21,6 +21,7 @@ add_library(drchecker
     src/geometry/Vector.cpp
     src/geometry/BoundingBox.cpp
     src/geometry/Segment.cpp
+    src/geometry/Polygon.cpp
 )
 
 target_include_directories(drchecker
@@ -56,6 +57,7 @@ add_executable(drchecker_tests
     tests/geometry/VectorTest.cpp
     tests/geometry/BoundingBoxTest.cpp
     tests/geometry/SegmentTest.cpp
+    tests/geometry/PolygonTest.cpp
 )
 
 target_link_libraries(drchecker_tests

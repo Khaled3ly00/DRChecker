@@ -1,5 +1,5 @@
 #include "drcheck/geometry/Segment.h"
-
+#include "drcheck/geometry/Constants.h"
 #include <algorithm>
 
 namespace drcheck::geometry {
@@ -30,17 +30,16 @@ namespace drcheck::geometry {
 	// Check if point lies on the segment
 	bool Segment::contains(const Point& point) const
 	{	
-		constexpr double EPS = 1e-9;
 		// Point is not on the same line
 		if (!(Point::getOrientation(start, end, point) == Orientation::Collinear)) {
 			return false;
 		}
 		// Point is collinear, so check whether it lies
 		// between the two endpoints.
-		return (point.getX() >= std::min(start.getX(), end.getX()) - EPS &&
-				point.getX() <= std::max(start.getX(), end.getX()) + EPS &&
-				point.getY() >= std::min(start.getY(), end.getY()) - EPS &&
-				point.getY() <= std::max(start.getY(), end.getY()) + EPS);
+		return (point.getX() >= std::min(start.getX(), end.getX()) - EPSILON &&
+				point.getX() <= std::max(start.getX(), end.getX()) + EPSILON &&
+				point.getY() >= std::min(start.getY(), end.getY()) - EPSILON &&
+				point.getY() <= std::max(start.getY(), end.getY()) + EPSILON);
 		
 	}
 

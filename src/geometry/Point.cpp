@@ -1,4 +1,5 @@
 #include "drcheck/geometry/Point.h"
+#include "drcheck/geometry/Constants.h"
 #include <cmath>
 
 namespace drcheck::geometry {
@@ -24,8 +25,7 @@ namespace drcheck::geometry {
 	}
 	Orientation Point::getOrientation(const Point& a, const Point& b, const Point& c) {
 		double val = orientationValue(a, b, c);
-		constexpr double EPS = 1e-9;
-		if (std::abs(val) < EPS) return Orientation::Collinear;
+		if (std::abs(val) < EPSILON) return Orientation::Collinear;
 		return (val > 0) ? Orientation::CounterClockwise : Orientation::Clockwise;
 	}
 }
