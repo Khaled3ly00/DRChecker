@@ -14,12 +14,12 @@ namespace drcheck::geometry {
 
 		BoundingBox getBoundingBox() const;
 		
+		bool contains(const Point& point) const;
 		bool intersects(const Segment& other) const;
 	private:
 		Point start;
 		Point end;
 
-		bool contains(const Point& point) const; // THINK ABOUT THIS: SHOULD THIS BE PRIVATE?
 		bool properIntersection(const Segment& other) const; // DEEP INTERSECTION CHECK IF BOUNDING BOXES OVERLAP
 	};
 }

@@ -99,3 +99,81 @@ TEST(PolygonTest, CalculatesBoundingBox)
     EXPECT_DOUBLE_EQ(box.getMinY(), 1.0);
     EXPECT_DOUBLE_EQ(box.getMaxY(), 9.0);
 }
+
+TEST(PolygonTest, ContainsPointInside)
+{
+    Polygon polygon({
+        Point(0.0, 0.0),
+        Point(10.0, 0.0),
+        Point(10.0, 5.0),
+        Point(0.0, 5.0)
+        });
+
+    Point point(5.0, 2.0);
+
+    EXPECT_TRUE(polygon.contains(point));
+}
+
+TEST(PolygonTest, RejectsPointOutside)
+{
+    Polygon polygon({
+        Point(0.0, 0.0),
+        Point(10.0, 0.0),
+        Point(10.0, 5.0),
+        Point(0.0, 5.0)
+        });
+
+    Point point(15.0, 2.0);
+
+    EXPECT_FALSE(polygon.contains(point));
+}
+
+TEST(PolygonTest, ContainsPointAtVertex)
+{
+    Polygon polygon({
+        Point(0.0, 0.0),
+        Point(10.0, 0.0),
+        Point(10.0, 5.0),
+        Point(0.0, 5.0)
+        });
+
+    Point point(10.0, 5.0);
+
+    EXPECT_TRUE(polygon.contains(point));
+}
+
+TEST(PolygonTest, ContainsPointOnEdge)
+{
+	Polygon polygon({
+		Point(0.0, 0.0),
+		Point(10.0, 0.0),
+		Point(10.0, 5.0),
+		Point(0.0, 5.0)
+		});
+	Point point(5.0, 0.0);
+	EXPECT_TRUE(polygon.contains(point));
+}
+
+TEST(PolygonTest, ContainsPointInConcavePolygon) {
+	Polygon polygon({
+		Point(0.0, 0.0),
+		Point(5.0, 5.0),
+		Point(10.0, 0.0),
+		Point(10.0, 10.0),
+		Point(0.0, 10.0)
+		});
+	Point point(4.0, 4.0);
+	EXPECT_TRUE(polygon.contains(point));
+}
+
+TEST(PolygonTest, DoesNotContainPointInConcavePolygon) {
+    Polygon polygon({
+        Point(0.0, 0.0),
+        Point(5.0, 5.0),
+        Point(10.0, 0.0),
+        Point(10.0, 10.0),
+        Point(0.0, 10.0)
+        });
+    Point point(5.0, 2.0);
+    EXPECT_FALSE(polygon.contains(point));
+}

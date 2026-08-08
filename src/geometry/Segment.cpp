@@ -57,7 +57,7 @@ namespace drcheck::geometry {
 										(o3 == Orientation::Clockwise && o4 == Orientation::CounterClockwise);
 		return otherCrossesThis && thisCrossesOther;
 	}
-
+	// Complete intersection check between two segments, including endpoint touching and collinear overlap.
 	bool Segment::intersects(const Segment& other) const
 	{
 		// First check if bounding boxes overlap (Broad check)

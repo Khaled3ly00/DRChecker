@@ -19,6 +19,7 @@ namespace drcheck::geometry {
 		double area() const { return std::abs(signedArea()); }
 		Orientation getOrientation() const;
 		BoundingBox getBoundingBox() const;
+		bool contains(const Point& point) const;
 	private:
 		std::vector<Point> vertices;
 	};

@@ -74,4 +74,37 @@ namespace drcheck::geometry {
 		}
 		return BoundingBox(minX, minY, maxX, maxY);
 	}
+
+	bool Polygon::contains(const Point& point) const
+	{
+		// First handle points exactly on the polygon edge.
+		for (const Segment& edge : getEdges()) {
+			if (edge.contains(point)) {
+				return true;
+			}
+		}
+		// Use the ray-casting algorithm to determine if the point is inside the polygon
+		bool inside = false;
+		size_t n = getVertexCount();
+		for (size_t i = 0; i < n; i++) {
+			const Point& a = vertices[i];
+			const Point& b = vertices[(i + 1) % n];
+			// Check if the point is within the y-range of the edge
+			bool crossesY = ((a.getY() > point.getY()) != (b.getY() > point.getY()));
+			if (!crossesY) {
+				continue;
+			}
+			// Calculate the x-coordinate of the intersection of the edge with the horizontal line at point.getY()
+			const double intersectionX =
+				a.getX() +
+				(point.getY() - a.getY()) *
+				(b.getX() - a.getX()) /
+				(b.getY() - a.getY());
+			// If the intersection is to the right of the point (Horizontal ray passes the edge), toggle the inside status (even-odd rule)
+			if (intersectionX > point.getX()) {
+				inside = !inside;
+			}
+		}
+		return inside;
+	}
 }
