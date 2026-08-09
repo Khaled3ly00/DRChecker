@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "drcheck/geometry/Polygon.h"
+#include "drcheck/geometry/Constants.h"
 
 using namespace drcheck::geometry;
 
@@ -312,4 +313,129 @@ TEST(PolygonTest, TouchingVertexCountsAsIntersection)
         });
 
     EXPECT_TRUE(first.intersects(second));
+}
+// HEAVY TESTS FOR POLYGON DISTANCE CALCULATION (MAINLY USED IN DRC)
+TEST(PolygonTest, CalculatesDistanceBetweenSeparatedPolygons)
+{
+    Polygon first({
+        Point(0.0, 0.0),
+        Point(5.0, 0.0),
+        Point(5.0, 5.0),
+        Point(0.0, 5.0)
+        });
+
+    Polygon second({
+        Point(8.0, 0.0),
+        Point(13.0, 0.0),
+        Point(13.0, 5.0),
+        Point(8.0, 5.0)
+        });
+
+    EXPECT_NEAR(first.distanceTo(second), 3.0, EPSILON);
+}
+
+TEST(PolygonTest, IntersectingPolygonsHaveZeroDistance)
+{
+    Polygon first({
+        Point(0.0, 0.0),
+        Point(6.0, 0.0),
+        Point(6.0, 6.0),
+        Point(0.0, 6.0)
+        });
+
+    Polygon second({
+        Point(4.0, 4.0),
+        Point(8.0, 4.0),
+        Point(8.0, 8.0),
+        Point(4.0, 8.0)
+        });
+
+    EXPECT_NEAR(first.distanceTo(second), 0.0, EPSILON);
+}
+
+TEST(PolygonTest, PolygonDistanceIsSymmetric)
+{
+	Polygon first({
+		Point(0.0, 0.0),
+		Point(5.0, 0.0),
+		Point(5.0, 5.0),
+		Point(0.0, 5.0)
+		});
+	Polygon second({
+		Point(8.0, 0.0),
+		Point(13.0, 0.0),
+		Point(13.0, 5.0),
+		Point(8.0, 5.0)
+		});
+
+    EXPECT_NEAR(first.distanceTo(second), second.distanceTo(first), EPSILON);
+}
+
+TEST(PolygonTest, DistanceToContainedPolygonIsZero)
+{
+	Polygon outer({
+		Point(0.0, 0.0),
+		Point(10.0, 0.0),
+		Point(10.0, 10.0),
+		Point(0.0, 10.0)
+		});
+	Polygon inner({
+		Point(3.0, 3.0),
+		Point(7.0, 3.0),
+		Point(7.0, 7.0),
+		Point(3.0, 7.0)
+		});
+	EXPECT_NEAR(outer.distanceTo(inner), 0.0, EPSILON);
+}
+
+TEST(PolygonTest, DistanceToTouchingPolygonsIsZero)
+{
+	Polygon first({
+		Point(0.0, 0.0),
+		Point(5.0, 0.0),
+		Point(5.0, 5.0),
+		Point(0.0, 5.0)
+		});
+	Polygon second({
+		Point(5.0, 0.0),
+		Point(10.0, 0.0),
+		Point(10.0, 5.0),
+		Point(5.0, 5.0)
+		});
+	EXPECT_NEAR(first.distanceTo(second), 0.0, EPSILON);
+}
+
+TEST(PolygonTest, DistanceToTouchingVertexPolygonsIsZero)
+{
+	Polygon first({
+		Point(0.0, 0.0),
+		Point(5.0, 0.0),
+		Point(5.0, 5.0),
+		Point(0.0, 5.0)
+		});
+	Polygon second({
+		Point(5.0, 5.0),
+		Point(9.0, 5.0),
+		Point(9.0, 9.0),
+		Point(5.0, 9.0)
+		});
+	EXPECT_NEAR(first.distanceTo(second), 0.0, EPSILON);
+}
+
+TEST(PolygonTest, DistanceToConcavePolygon)
+{
+	Polygon first({
+        Point(0.0, 11.0),
+        Point(10.0, 11.0),
+        Point(10.0, 15.0),
+        Point(0.0, 16.0)
+		});
+	Polygon second({
+        Point(0.0, 0.0),
+        Point(5.0, 5.0),
+        Point(10.0, 0.0),
+        Point(10.0, 10.0),
+        Point(0.0, 10.0)
+        });
+	EXPECT_NEAR(first.distanceTo(second), 1.0, EPSILON);
 }

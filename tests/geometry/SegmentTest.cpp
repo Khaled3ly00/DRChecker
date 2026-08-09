@@ -192,3 +192,61 @@ TEST(SegmentTest, CollinearPointDistanceToSegment) {
 
     EXPECT_NEAR(segment.distanceTo(point), 3.0, EPSILON);
 }
+
+TEST(SegmentTest, CalculatesDistanceBetweenParallelSegments)
+{
+    Segment first(
+        Point(0.0, 0.0),
+        Point(10.0, 0.0)
+    );
+
+    Segment second(
+        Point(0.0, 3.0),
+        Point(10.0, 3.0)
+    );
+
+    EXPECT_NEAR(first.distanceTo(second), 3.0, EPSILON);
+}
+
+TEST(SegmentTest, CalculatesDistanceBetweenNonIntersectingSegments)
+{
+	Segment first(
+		Point(0.0, 0.0),
+		Point(5.0, 0.0)
+	);
+	Segment second(
+		Point(8.0, 4.0),
+		Point(10.0, 4.0)
+	);
+	EXPECT_NEAR(first.distanceTo(second), 5.0, EPSILON);
+}
+
+TEST(SegmentTest, IntersectingSegmentsHaveZeroDistance)
+{
+    Segment first(
+        Point(0.0, 0.0),
+        Point(10.0, 10.0)
+    );
+
+    Segment second(
+        Point(0.0, 10.0),
+        Point(10.0, 0.0)
+    );
+
+    EXPECT_NEAR(first.distanceTo(second), 0.0, EPSILON);
+}
+
+TEST(SegmentTest, SegmentDistanceIsSymmetric)
+{
+    Segment first(
+        Point(0.0, 0.0),
+        Point(5.0, 0.0)
+    );
+
+    Segment second(
+        Point(8.0, 4.0),
+        Point(10.0, 4.0)
+    );
+
+    EXPECT_NEAR(first.distanceTo(second), second.distanceTo(first), EPSILON);
+}

@@ -102,4 +102,17 @@ namespace drcheck::geometry {
 			return std::abs(segVector.cross(pointVector)) / segVector.length();
 		}
 	}
+	// Calculate the shortest distance between two segments
+	double Segment::distanceTo(const Segment& other) const
+	{
+		if (intersects(other)) {
+			return 0.0; // Segments intersect, so distance is zero
+		}
+		// Calculate distances from endpoints of one segment to the other segment
+		double d1 = distanceTo(other.getStart());
+		double d2 = distanceTo(other.getEnd());
+		double d3 = other.distanceTo(start);
+		double d4 = other.distanceTo(end);
+		return std::min({ d1, d2, d3, d4 });
+	}
 }

@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <utility>
+#include <limits>
 
 namespace drcheck::geometry {
 
@@ -77,7 +78,11 @@ namespace drcheck::geometry {
 
 	bool Polygon::contains(const Point& point) const
 	{
-		// First handle points exactly on the polygon edge.
+		// Bounding box check (Broad-phase rejection).
+		if (!getBoundingBox().overlaps(BoundingBox(point.getX(), point.getY(), point.getX(), point.getY()))) {
+			return false;
+		}
+		// If the point is within the bounding box, check if it's on the polygon edge.
 		for (const Segment& edge : getEdges()) {
 			if (edge.contains(point)) {
 				return true;
@@ -107,7 +112,7 @@ namespace drcheck::geometry {
 		}
 		return inside;
 	}
-
+	// Check if two polygons intersect by checking for edge intersections and containment
 	bool Polygon::intersects(const Polygon& other) const
 	{
 		// First check if the bounding boxes (Broad-phase rejection) of the two polygons overlap
@@ -127,5 +132,20 @@ namespace drcheck::geometry {
 			return true;
 		}
 		return false;
+	}
+	// Calculate the minimum distance between two polygons by checking distances between edges
+	double Polygon::distanceTo(const Polygon& other) const
+	{
+		// If the polygons intersect, the distance is zero
+		if (intersects(other)) {
+			return 0.0;
+		}
+		double minDistance = std::numeric_limits<double>::max();
+		for (const Segment& edge1 : getEdges()) {
+			for (const Segment& edge2 : other.getEdges()) {
+				minDistance = std::min(minDistance, edge1.distanceTo(edge2));
+			}
+		}
+		return minDistance;
 	}
 }
