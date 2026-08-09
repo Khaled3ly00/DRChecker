@@ -29,6 +29,7 @@ namespace drcheck::geometry {
 		double minWidth() const;
 	private:
 		std::vector<Point> vertices;
+		bool hasSelfIntersection() const;
 		bool isAxisAlignedRectangle() const;
 	};
 }

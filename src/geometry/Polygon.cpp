@@ -12,8 +12,25 @@ namespace drcheck::geometry {
 	Polygon::Polygon(std::vector<Point> vertices)
 		: vertices(std::move(vertices)) // Use std::move to efficiently transfer ownership (pointer and value pointing to) of the vertices vector to the Polygon object
 	{
+		// Validate the polygon: it must have at least 3 vertices,
+		// No zero-length edges,
+		// The area must be greater than zero (non-degenerate polygon)
+		// The polygon must not self-intersect
 		if (this->vertices.size() < 3) {
 			throw std::invalid_argument("A polygon must have at least 3 vertices.");
+		}
+		for (std::size_t i = 0; i < this->vertices.size(); ++i)
+		{
+			const std::size_t next = (i + 1) % this->vertices.size();
+			if (this->vertices[i]==(this->vertices[next])) {
+				throw std::invalid_argument ("Polygon contains a zero-length edge");
+			}
+		}
+		if (std::abs(signedArea()) < EPSILON) {
+			throw std::invalid_argument ("Polygon area must be greater than zero");
+		}
+		if (hasSelfIntersection()) {
+			throw std::invalid_argument ("Polygon must not self-intersect");
 		}
 	}
 
@@ -199,5 +216,22 @@ namespace drcheck::geometry {
 			previousHorizontal = horizontal;
 		}
 		return true;
+	}
+	// Check if the polygon has self-intersections by checking for intersections between non-adjacent edges
+	bool Polygon::hasSelfIntersection() const
+	{
+		const auto edges = getEdges();
+		for (std::size_t i = 0; i < edges.size(); ++i) {
+			for (std::size_t j = i + 1; j < edges.size(); ++j) {
+				// Skip adjacent edges (they share a vertex)
+				if (j == (i + 1) % edges.size() || i == (j + 1) % edges.size()) {
+					continue;
+				}
+				if (edges[i].intersects(edges[j])) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

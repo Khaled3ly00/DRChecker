@@ -16,7 +16,9 @@ namespace drcheck::geometry {
 
 		double getX() const;
 		double getY() const;
-		
+		// Overload the equality operator to compare two points
+		bool operator==(const Point& other) const;
+
 		// STATIC METHODS (UTILITY FUNCTIONS)
 		static Vector vectorBetween(const Point& from, const Point& to);
 

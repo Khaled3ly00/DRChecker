@@ -155,13 +155,12 @@ TEST(SegmentTest, PointOnSegmentHasZeroDistance)
     EXPECT_NEAR(segment.distanceTo(point), 0.0, EPSILON);
 }
 
-TEST(SegmentTest, PointDistanceToDegeneratedSegment) {
-	Segment segment(
-		Point(2.0, 2.0),
-		Point(2.0, 2.0) // Degenerated segment (point)
-	);
-	Point point(5.0, 6.0);
-	EXPECT_NEAR(segment.distanceTo(point), 5.0, EPSILON);
+TEST(SegmentTest, DegeneratedSegmentsThrowsException) {
+
+	EXPECT_THROW(Segment segment(
+                    Point(2.0, 2.0),
+                    Point(2.0, 2.0));, 
+                std::invalid_argument);
 }
 
 TEST(SegmentTest, PointDistanceToVerticalSegment) {
@@ -249,4 +248,16 @@ TEST(SegmentTest, SegmentDistanceIsSymmetric)
     );
 
     EXPECT_NEAR(first.distanceTo(second), second.distanceTo(first), EPSILON);
+}
+
+TEST(SegmentTest, SegmentIntersectionIsSymmetric) {
+	Segment first(
+		Point(0.0, 0.0),
+		Point(5.0, 5.0)
+	);
+	Segment second(
+		Point(0.0, 5.0),
+		Point(5.0, 0.0)
+	);
+	EXPECT_EQ(first.intersects(second), second.intersects(first));
 }

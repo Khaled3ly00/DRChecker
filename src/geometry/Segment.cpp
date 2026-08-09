@@ -1,11 +1,16 @@
 #include "drcheck/geometry/Segment.h"
 #include "drcheck/geometry/Constants.h"
+#include <stdexcept>
 #include <algorithm>
 
 namespace drcheck::geometry {
 	Segment::Segment(const Point& start, const Point& end)
 		: start(start), end(end)
 	{
+		// Validate that the segment endpoints are distinct points
+		if (start == end) {
+			throw std::invalid_argument("Segment endpoints must be distinct points.");
+		}
 	}
 
 	const Point& Segment::getStart() const
@@ -83,10 +88,6 @@ namespace drcheck::geometry {
 		// Vector from start to the point
 		Vector pointVector = Point::vectorBetween(start, point);
 		double segLengthSquared = segVector.dot(segVector);
-		if (segLengthSquared < EPSILON) {
-			// The segment is a point so return the distance from start to point
-			return Point::vectorBetween(start, point).length();
-		}
 		// Project pointVector onto segVector and find the projection scalar
 		double t = pointVector.dot(segVector) / segLengthSquared;
 		if (t < 0.0) {

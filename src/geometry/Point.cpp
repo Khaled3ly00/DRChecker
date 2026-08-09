@@ -17,6 +17,10 @@ namespace drcheck::geometry {
 	{
 		return y;
 	}
+	bool Point::operator==(const Point& other) const
+	{
+		return std::abs(x - other.x) < EPSILON && std::abs(y - other.y) < EPSILON;
+	}
 	Vector Point::vectorBetween(const Point& from, const Point& to) {
 		return Vector(to.x - from.x, to.y - from.y);
 	}

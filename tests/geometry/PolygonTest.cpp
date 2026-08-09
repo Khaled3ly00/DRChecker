@@ -29,6 +29,44 @@ TEST(PolygonTest, RejectsFewerThanThreeVertices)
     );
 }
 
+TEST(PolygonTest, RejectsZeroLengthEdges)
+{
+	EXPECT_THROW(
+		Polygon({
+			Point(0.0, 0.0),
+			Point(5.0, 0.0),
+			Point(5.0, 0.0), // Zero-length edge
+			Point(0.0, 5.0)
+			}),
+		std::invalid_argument
+	);
+}
+
+TEST(PolygonTest, RejectsSelfIntersectingPolygon)
+{
+	EXPECT_THROW(
+		Polygon({
+			Point(0.0, 0.0),
+			Point(5.0, 5.0),
+			Point(5.0, 0.0),
+			Point(0.0, 5.0)
+			}),
+		std::invalid_argument
+	);
+}
+
+TEST(PolygonTest, RejectsDegeneratePolygon)
+{
+	EXPECT_THROW(
+		Polygon({
+			Point(0.0, 0.0),
+			Point(5.0, 0.0),
+			Point(10.0, 0.0) // Collinear points
+			}),
+		std::invalid_argument
+	);
+}
+
 TEST(PolygonTest, GetsCorrectEdges)
 {
     std::vector<Point> vertices = {
