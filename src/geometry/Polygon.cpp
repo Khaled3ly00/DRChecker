@@ -8,7 +8,6 @@
 #include <limits>
 
 namespace drcheck::geometry {
-
 	Polygon::Polygon(std::vector<Point> vertices)
 		: vertices(std::move(vertices)) // Use std::move to efficiently transfer ownership (pointer and value pointing to) of the vertices vector to the Polygon object
 	{
@@ -49,6 +48,7 @@ namespace drcheck::geometry {
 	std::vector<Segment> Polygon::getEdges() const
 	{
 		std::vector<Segment> edges;
+		edges.reserve(vertices.size());
 		size_t n = vertices.size();
 		for (size_t i = 0; i < n; ++i) {
 			edges.emplace_back(vertices[i], vertices[(i + 1) % n]);
@@ -73,12 +73,7 @@ namespace drcheck::geometry {
 	// Determine the orientation of the polygon based on the signed area (positive vertices are counter-clockwise, negative vertices are clockwise)
 	Orientation Polygon::getOrientation() const
 	{
-		double area = signedArea();
-		if (std::abs(area) < EPSILON) {
-			return Orientation::Collinear;
-		}
-
-		return area > 0.0
+		return signedArea() > 0.0
 			? Orientation::CounterClockwise
 			: Orientation::Clockwise;
 	}
@@ -150,8 +145,11 @@ namespace drcheck::geometry {
 			return false;
 		}
 		// Check for edge intersections between the two polygons
-		for (const Segment& edge1 : getEdges()) {
-			for (const Segment& edge2 : other.getEdges()) {
+		const auto thisEdges = getEdges();
+		const auto otherEdges = other.getEdges();
+
+		for (const Segment& edge1 : thisEdges) {
+			for (const Segment& edge2 : otherEdges) {
 				if (edge1.intersects(edge2)) {
 					return true;
 				}
@@ -171,64 +169,15 @@ namespace drcheck::geometry {
 			return 0.0;
 		}
 		double minDistance = std::numeric_limits<double>::max();
-		for (const Segment& edge1 : getEdges()) {
-			for (const Segment& edge2 : other.getEdges()) {
+		const auto thisEdges = getEdges();
+		const auto otherEdges = other.getEdges();
+
+		for (const Segment& edge1 : thisEdges) {
+			for (const Segment& edge2 : otherEdges) {
 				minDistance = std::min(minDistance, edge1.distanceTo(edge2));
 			}
 		}
 		return minDistance;
-	}
-	// Calculate the minimum width (not minimum edge legnth) of the polygon (currently only supports axis-aligned rectangles)
-	double Polygon::minWidth() const
-	{
-		// Check if the polygon is an axis-aligned rectangle. If not, throw a logic error since minWidth currently only supports axis-aligned rectangles.
-		if (!isAxisAlignedRectangle()) {
-			throw std::logic_error(
-				"minWidth currently supports only "
-				"axis-aligned rectangles"
-			);
-		}
-		// Get the edges of the polygon and find the minimum length among them
-		const auto polygonEdges = getEdges();
-
-		return std::min(polygonEdges[0].length(), polygonEdges[1].length());
-	}
-
-	// Temporary restriction for the initial min-width implementation.
-	bool Polygon::isAxisAlignedRectangle() const
-	{
-		if (vertices.size() != 4) {
-			return false;
-		}
-		// Check if the edges are axis-aligned (horizontal or vertical)
-		bool previousHorizontal = false;
-		for (std::size_t i = 0; i < vertices.size(); ++i)
-		{
-			const std::size_t next = (i + 1) % vertices.size();
-
-			const Point& a = vertices[i];
-			const Point& b = vertices[next];
-
-			const bool horizontal = std::abs(a.getY() - b.getY()) < EPSILON;
-
-			const bool vertical = std::abs(a.getX() - b.getX()) < EPSILON;
-			// Is the edge neither horizontal nor vertical? If so, it's not an axis-aligned rectangle.
-			if (!horizontal && !vertical) {
-				return false;
-			}
-
-			// Zero-length edge:
-			if (horizontal && vertical) {
-				return false;
-			}
-			// Check if two consecutive edges are both horizontal or both vertical. If so, it's not an axis-aligned rectangle.
-			if (i > 0 && horizontal == previousHorizontal) {
-				return false;
-			}
-
-			previousHorizontal = horizontal;
-		}
-		return true;
 	}
 	// Check if the polygon has self-intersections by checking for intersections between non-adjacent edges
 	bool Polygon::hasSelfIntersection() const
@@ -246,5 +195,143 @@ namespace drcheck::geometry {
 			}
 		}
 		return false;
+	}
+	// Calculate the minimum local width of the polygon.
+	// Temporary restriction: This implementation is only valid for orthogonal polygons (polygons with edges aligned to the axes).
+	// Will be extended to handle non-orthogonal polygons (45 degrees) in the future.
+	double Polygon::minWidth() const
+	{
+		if (isOrthogonal()) {
+			return orthogonalMinWidth();
+		}
+
+		throw std::logic_error(
+			"Minimum width for non-orthogonal "
+			"polygons is not implemented yet"
+		);
+	}
+	double Polygon::orthogonalMinWidth() const
+	{
+		const auto polygonEdges = getEdges();
+
+		double minimumWidth = std::numeric_limits<double>::max();
+
+		for (std::size_t i = 0; i < polygonEdges.size(); ++i)
+		{
+			for (std::size_t j = i + 1; j < polygonEdges.size(); ++j)
+			{
+				const Segment& first = polygonEdges[i];
+				const Segment& second = polygonEdges[j];
+				// Horizontal edge pair
+				if (first.isHorizontal() && second.isHorizontal()) {
+					const double firstMinX = std::min(first.getStart().getX(), first.getEnd().getX());
+					const double firstMaxX = std::max(first.getStart().getX(), first.getEnd().getX());
+					const double secondMinX = std::min(second.getStart().getX(), second.getEnd().getX());
+					const double secondMaxX = std::max(second.getStart().getX(), second.getEnd().getX());
+
+					const auto overlap = positiveOverlapInterval(firstMinX, firstMaxX, secondMinX, secondMaxX);
+					// Is there a positive overlap interval between the two horizontal edges? If not, skip this pair.
+					if (!overlap) {
+						continue;
+					}
+
+					const double firstY = first.getStart().getY();
+					const double secondY = second.getStart().getY();
+					const double width = std::abs(firstY - secondY);
+
+					// Ignore coincident or tolerance-close boundaries.
+
+					if (width <= EPSILON) {
+						continue;
+					}
+
+					const double sampleX = (overlap->first + overlap->second) / 2.0;
+					const double sampleY = (firstY + secondY) / 2.0;
+
+					const Point samplePoint(sampleX, sampleY);
+
+					// The region between the two boundaries
+					// must lie inside the polygon.
+					if (!contains(samplePoint)) {
+						continue;
+					}
+
+					minimumWidth = std::min(minimumWidth, width);
+				}
+
+				// Vertical edge pair
+				else if (first.isVertical() && second.isVertical()) {
+					const double firstMinY = std::min(first.getStart().getY(), first.getEnd().getY());
+					const double firstMaxY = std::max(first.getStart().getY(), first.getEnd().getY());
+					const double secondMinY = std::min(second.getStart().getY(), second.getEnd().getY());
+					const double secondMaxY = std::max(second.getStart().getY(), second.getEnd().getY());
+
+					const auto overlap = positiveOverlapInterval(firstMinY, firstMaxY, secondMinY, secondMaxY);
+
+					if (!overlap) {
+						continue;
+					}
+
+					const double firstX = first.getStart().getX();
+					const double secondX = second.getStart().getX();
+					const double width = std::abs(firstX - secondX);
+
+					if (width <= EPSILON) {
+						continue;
+					}
+
+					const double sampleY = (overlap->first + overlap->second) / 2.0;
+					const double sampleX = (firstX + secondX) / 2.0;
+					const Point samplePoint(sampleX, sampleY);
+
+					if (!contains(samplePoint)) {
+						continue;
+					}
+					minimumWidth = std::min(minimumWidth, width);
+				}
+			}
+		}
+
+		if (minimumWidth == std::numeric_limits<double>::max())
+		{
+			throw std::logic_error(
+				"Unable to determine polygon minimum width"
+			);
+		}
+
+		return minimumWidth;
+	}
+
+	// Check if the polygon is orthogonal (all edges are either horizontal or vertical)
+	bool Polygon::isOrthogonal() const
+	{
+		const auto polygonEdges = getEdges();
+
+		for (const Segment& edge : polygonEdges)
+		{
+			if (!edge.isHorizontal() && !edge.isVertical())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	// Calculate the positive overlap interval between two ranges [minA, maxA] and [minB, maxB].
+	std::optional<std::pair<double, double>>Polygon::positiveOverlapInterval(double minA, double maxA, double minB, double maxB)
+	{
+		const double overlapMin = std::max(minA, minB);
+		const double overlapMax = std::min(maxA, maxB);
+
+		// No meaningful overlap.
+		// A single-point touch is not considered
+		// a positive overlap interval.
+		if (overlapMax - overlapMin <= EPSILON) {
+			return std::nullopt;
+		}
+
+		return std::make_pair(
+			overlapMin,
+			overlapMax
+		);
 	}
 }

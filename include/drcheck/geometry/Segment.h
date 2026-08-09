@@ -14,7 +14,9 @@ namespace drcheck::geometry {
 		double length() const { return Point::vectorBetween(start, end).length(); }
 
 		BoundingBox getBoundingBox() const;
-		
+		bool isHorizontal() const { return start.getY() == end.getY(); }
+		bool isVertical() const { return start.getX() == end.getX(); }
+
 		bool contains(const Point& point) const;
 		bool intersects(const Segment& other) const;
 		double distanceTo(const Point& point) const;

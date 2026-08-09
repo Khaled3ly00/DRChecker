@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cstddef>
 #include <vector>
+#include <optional>
+#include <utility>
 
 #include "drcheck/geometry/Segment.h"
 #include "drcheck/geometry/Point.h"
@@ -29,9 +31,11 @@ namespace drcheck::geometry {
 		double distanceTo(const Polygon& other) const;
 
 		double minWidth() const;
+		double orthogonalMinWidth() const;
 	private:
 		std::vector<Point> vertices;
 		bool hasSelfIntersection() const;
-		bool isAxisAlignedRectangle() const;
+		bool isOrthogonal() const;
+		static std::optional<std::pair<double, double>>positiveOverlapInterval(double minA, double maxA, double minB, double maxB);
 	};
 }

@@ -589,3 +589,114 @@ TEST(PolygonTest, MinimumWidthRejectsUnsupportedPolygon)
 
     EXPECT_THROW(polygon.minWidth(), std::logic_error);
 }
+
+// TESTS for Orthogonal (Manhatan) Polygon Minimum Width Calculation
+
+TEST(PolygonTest, CalculatesLShapeMinimumWidth)
+{
+    Polygon polygon({
+        Point(0.0, 0.0),
+        Point(4.0, 0.0),
+        Point(4.0, 5.0),
+        Point(10.0, 5.0),
+        Point(10.0, 8.0),
+        Point(0.0, 8.0)
+        });
+
+    EXPECT_NEAR(polygon.minWidth(), 3.0, EPSILON);
+}
+
+TEST(PolygonTest, CalculatesUShapeMinimumWidth)
+{
+	Polygon polygon({
+		Point(0.0, 0.0),
+		Point(10.0, 0.0),
+		Point(10.0, 3.0),
+		Point(4.0, 3.0),
+		Point(4.0, 7.0),
+		Point(10.0, 7.0),
+		Point(10.0, 10.0),
+		Point(0.0, 10.0)
+		});
+	EXPECT_NEAR(polygon.minWidth(), 3.0, EPSILON);
+}
+
+TEST(PolygonTest, CalculatesComplexOrthogonalPolygonMinimumWidth)
+{
+	Polygon polygon({
+		Point(0.0, 0.0),
+		Point(12.0, 0.0),
+		Point(12.0, 3.0),
+		Point(8.0, 3.0),
+		Point(8.0, 6.0),
+		Point(12.0, 6.0),
+		Point(12.0, 9.0),
+		Point(4.0, 9.0),
+		Point(4.0, 6.0),
+		Point(0.0, 6.0)
+		});
+	EXPECT_NEAR(polygon.minWidth(), 3.0, EPSILON);
+}
+
+TEST(PolygonTest, MinimumWidthRejectsNonOrthogonalPolygon)
+{
+	Polygon polygon({
+        Point(1.0, 1.0),
+        Point(5.0, 0.0),
+        Point(8.0, 3.0),
+        Point(6.0, 7.0),
+        Point(3.0, 6.0),
+        Point(0.0, 3.0)
+		});
+	EXPECT_THROW(polygon.minWidth(), std::logic_error);
+}
+
+TEST(PolygonTest, MinmumWidthPolygonWithANotch) {
+	Polygon polygon({
+        Point(0.0, 0.0),
+        Point(0.0, 6.0),
+        Point(6.0, 6.0),
+        Point(6.0, 0.0),
+        Point(4.0, 0.0),
+        Point(4.0, 2.0),
+        Point(2.0, 2.0),
+        Point(2.0, 0.0)
+		});
+	EXPECT_NEAR(polygon.minWidth(), 2.0, EPSILON);
+}
+
+TEST(PolygonTest, MinimumWidthOfPolygonWithMultipleConcavities) {
+	Polygon polygon({
+        Point(0.0, 0.0),
+        Point(0.0, 6.0),
+        Point(2.0, 6.0),
+        Point(2.0, 4.0),
+        Point(3.0, 4.0),
+        Point(3.0, 6.0),
+        Point(5.0, 6.0),
+        Point(5.0, 3.0),
+        Point(4.0, 3.0),
+        Point(4.0, 1.0),
+        Point(6.0, 1.0),
+        Point(6.0, 0.0)
+		});
+	EXPECT_NEAR(polygon.minWidth(), 1.0, EPSILON);
+}
+
+TEST(PolygonTest, MinimumWidthOfHPolygon) {
+    Polygon polygon({
+        Point(0.0, 0.0),
+        Point(6.0, 0.0),
+        Point(6.0, 2.0),
+        Point(4.0, 2.0),
+        Point(4.0, 4.0),
+        Point(6.0, 4.0),
+        Point(6.0, 6.0),
+        Point(0.0, 6.0),
+        Point(0.0, 4.0),
+        Point(3.0, 4.0),
+        Point(3.0, 2.0),
+        Point(0.0, 2.0)
+        });
+    EXPECT_NEAR(polygon.minWidth(), 1.0, EPSILON);
+}
