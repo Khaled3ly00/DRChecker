@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+#include <cstddef>
 #include <vector>
 
 #include "drcheck/geometry/Segment.h"

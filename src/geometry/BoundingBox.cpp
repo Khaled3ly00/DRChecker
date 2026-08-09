@@ -1,9 +1,16 @@
 #include "drcheck/geometry/BoundingBox.h"
 
+#include <stdexcept>
+
 namespace drcheck::geometry {
 	BoundingBox::BoundingBox(double minX, double minY, double maxX, double maxY)
 		: minX(minX), minY(minY), maxX(maxX), maxY(maxY)
 	{
+		if (minX > maxX || minY > maxY) {
+			throw std::invalid_argument(
+				"BoundingBox minimum coordinates must not exceed maximum coordinates"
+			);
+		}
 	}
 
 	double BoundingBox::getMinX() const
@@ -26,8 +33,18 @@ namespace drcheck::geometry {
 		return maxY;
 	}
 
-	bool BoundingBox::overlaps(const BoundingBox& other) const
+	bool BoundingBox::overlaps(const BoundingBox& other, double tolerance) const
 	{
-		return (maxX >= other.minX && minX <= other.maxX && maxY >= other.minY && minY <= other.maxY);
+		if (tolerance < 0.0) {
+			throw std::invalid_argument(
+				"BoundingBox overlap tolerance cannot be negative"
+			);
+		}
+
+		return
+			maxX + tolerance >= other.minX &&
+			minX - tolerance <= other.maxX &&
+			maxY + tolerance >= other.minY &&
+			minY - tolerance <= other.maxY;
 	}
 }

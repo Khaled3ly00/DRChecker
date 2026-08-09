@@ -3,6 +3,8 @@
 #include "drcheck/geometry/Polygon.h"
 #include "drcheck/geometry/Constants.h"
 
+#include <stdexcept>
+
 using namespace drcheck::geometry;
 
 TEST(PolygonTest, InitializesWithVerticesAndGetsCorrectVertexCount)
@@ -42,14 +44,14 @@ TEST(PolygonTest, RejectsZeroLengthEdges)
 	);
 }
 
-TEST(PolygonTest, RejectsSelfIntersectingPolygon)
+TEST(PolygonTest, RejectsNonZeroAreaSelfIntersectingPolygon)
 {
 	EXPECT_THROW(
 		Polygon({
 			Point(0.0, 0.0),
-			Point(5.0, 5.0),
-			Point(5.0, 0.0),
-			Point(0.0, 5.0)
+			Point(4.0, 4.0),
+			Point(0.0, 4.0),
+			Point(5.0, 0.0)
 			}),
 		std::invalid_argument
 	);
@@ -64,6 +66,17 @@ TEST(PolygonTest, RejectsDegeneratePolygon)
 			Point(10.0, 0.0) // Collinear points
 			}),
 		std::invalid_argument
+	);
+}
+
+TEST(PolygonTest, AcceptsSmallNonDegeneratePolygon)
+{
+	EXPECT_NO_THROW(
+		Polygon({
+			Point(0.0, 0.0),
+			Point(1e-5, 0.0),
+			Point(0.0, 1e-5)
+		})
 	);
 }
 
@@ -190,6 +203,23 @@ TEST(PolygonTest, ContainsPointOnEdge)
 		Point(0.0, 5.0)
 		});
 	Point point(5.0, 0.0);
+	EXPECT_TRUE(polygon.contains(point));
+}
+
+TEST(PolygonTest, ContainsPointWithinBoundaryTolerance)
+{
+	Polygon polygon({
+		Point(0.0, 0.0),
+		Point(10.0, 0.0),
+		Point(10.0, 5.0),
+		Point(0.0, 5.0)
+	});
+
+	const Point point(
+		10.0 + EPSILON * 0.5,
+		2.0
+	);
+
 	EXPECT_TRUE(polygon.contains(point));
 }
 
@@ -352,6 +382,29 @@ TEST(PolygonTest, TouchingVertexCountsAsIntersection)
 
     EXPECT_TRUE(first.intersects(second));
 }
+TEST(PolygonTest, NearTouchingPolygonsIntersectSymmetrically)
+{
+	Polygon first({
+		Point(0.0, 0.0),
+		Point(1.0, 0.0),
+		Point(1.0, 1.0),
+		Point(0.0, 1.0)
+	});
+
+	const double secondMinX = 1.0 + EPSILON * 0.5;
+	Polygon second({
+		Point(secondMinX, 0.0),
+		Point(2.0, 0.0),
+		Point(2.0, 1.0),
+		Point(secondMinX, 1.0)
+	});
+
+	EXPECT_TRUE(first.intersects(second));
+	EXPECT_TRUE(second.intersects(first));
+	EXPECT_NEAR(first.distanceTo(second), 0.0, EPSILON);
+	EXPECT_NEAR(second.distanceTo(first), 0.0, EPSILON);
+}
+
 // HEAVY TESTS FOR POLYGON DISTANCE CALCULATION (MAINLY USED IN DRC)
 TEST(PolygonTest, CalculatesDistanceBetweenSeparatedPolygons)
 {

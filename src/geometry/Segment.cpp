@@ -8,7 +8,7 @@ namespace drcheck::geometry {
 		: start(start), end(end)
 	{
 		// Validate that the segment endpoints are distinct points
-		if (start == end) {
+		if (start.isNear(end)) {
 			throw std::invalid_argument("Segment endpoints must be distinct points.");
 		}
 	}
@@ -66,7 +66,7 @@ namespace drcheck::geometry {
 	bool Segment::intersects(const Segment& other) const
 	{
 		// First check if bounding boxes overlap (Broad check)
-		if (!getBoundingBox().overlaps(other.getBoundingBox())) {
+		if (!getBoundingBox().overlaps(other.getBoundingBox(), EPSILON)) {
 			return false;
 		}
 		// If bounding boxes overlap, do a deeper check

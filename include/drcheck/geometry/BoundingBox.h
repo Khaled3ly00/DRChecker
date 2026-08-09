@@ -6,7 +6,7 @@ namespace drcheck::geometry {
 	public:
 		BoundingBox(double minX, double minY, double maxX, double maxY);
 
-		bool overlaps(const BoundingBox& other) const;
+		bool overlaps(const BoundingBox& other, double tolerance = 0.0) const;
 
 		double getMinX() const;
 		double getMinY() const;

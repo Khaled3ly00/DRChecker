@@ -3,6 +3,9 @@
 #include "drcheck/geometry/Segment.h"
 #include "drcheck/geometry/Constants.h"
 
+#include <cmath>
+#include <stdexcept>
+
 using namespace drcheck::geometry;
 
 TEST(SegmentTest, DetectsPointOnSegment) {
@@ -163,6 +166,17 @@ TEST(SegmentTest, DegeneratedSegmentsThrowsException) {
                 std::invalid_argument);
 }
 
+TEST(SegmentTest, EndpointsWithinToleranceThrowException)
+{
+	EXPECT_THROW(
+		Segment(
+			Point(2.0, 2.0),
+			Point(2.0 + EPSILON * 0.5, 2.0)
+		),
+		std::invalid_argument
+	);
+}
+
 TEST(SegmentTest, PointDistanceToVerticalSegment) {
 	Segment segment(
 		Point(3.0, 1.0),
@@ -233,6 +247,38 @@ TEST(SegmentTest, IntersectingSegmentsHaveZeroDistance)
     );
 
     EXPECT_NEAR(first.distanceTo(second), 0.0, EPSILON);
+}
+
+TEST(SegmentTest, NearTouchingSegmentsIntersectSymmetrically)
+{
+	Segment first(
+		Point(0.0, 0.0),
+		Point(1.0, 0.0)
+	);
+
+	Segment second(
+		Point(1.0 + EPSILON * 0.5, 0.0),
+		Point(2.0, 0.0)
+	);
+
+	EXPECT_TRUE(first.intersects(second));
+	EXPECT_TRUE(second.intersects(first));
+}
+
+TEST(SegmentTest, SeparatedSegmentIntersectionIsSymmetric)
+{
+	Segment first(
+		Point(0.0, 0.0),
+		Point(5.0, 0.0)
+	);
+
+	Segment second(
+		Point(0.0, 3.0),
+		Point(5.0, 3.0)
+	);
+
+	EXPECT_FALSE(first.intersects(second));
+	EXPECT_FALSE(second.intersects(first));
 }
 
 TEST(SegmentTest, SegmentDistanceIsSymmetric)

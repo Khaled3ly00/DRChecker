@@ -24,9 +24,10 @@ The main geometry primitives and algorithms required for later DRC rules are now
 #### `Point`
 
 - Coordinate storage
+- Explicit proximity comparison through `isNear()`
 - `vectorBetween()`
 - `orientationValue()`
-- `getOrientation()`
+- Scale-aware `getOrientation()`
 
 The reusable point-level geometry methods are implemented as `static` member functions.
 
@@ -39,11 +40,14 @@ The reusable point-level geometry methods are implemented as `static` member fun
 #### `BoundingBox`
 
 - Axis-aligned bounding box representation
-- Bounding-box overlap detection
+- Constructor-enforced coordinate ordering
+- Exact overlap detection by default
+- Optional tolerance for geometry broad-phase checks
 
 #### `Segment`
 
 - Endpoint storage
+- Constructor rejection of degenerate segments
 - Segment length
 - Bounding-box generation
 - Point containment
@@ -54,7 +58,11 @@ The reusable point-level geometry methods are implemented as `static` member fun
 
 #### `Polygon`
 
-- Constructor-enforced validity for minimum vertex count
+- Constructor-enforced validity:
+  - At least three vertices
+  - No zero-length edges
+  - Nonzero area
+  - No self-intersection
 - Vertex storage
 - Edge generation
 - Signed area using the shoelace formula
@@ -130,6 +138,7 @@ polygon.area();
 polygon.minWidth();
 
 boundingBox.overlaps(otherBoundingBox);
+boundingBox.overlaps(otherBoundingBox, EPSILON);
 ```
 
 Internal implementation details are kept private where appropriate.
@@ -140,17 +149,35 @@ Likewise, the current rectangle check used by `Polygon::minWidth()` is an implem
 
 ---
 
+## Floating-Point Tolerance Policy
+
+`EPSILON` represents an absolute coordinate-distance tolerance.
+
+- `Point::isNear()` compares coordinate differences explicitly instead of overloading mathematical equality.
+- Point orientation scales the tolerance by the longest distance among the three input points before comparing it with the cross product.
+- Polygon area validation scales the tolerance by polygon boundary length.
+- `BoundingBox::overlaps()` remains exact by default. Geometry broad-phase checks pass `EPSILON` explicitly so they cannot reject a near-boundary case before the tolerant narrow-phase check runs.
+
+This keeps tolerance handling dimensionally consistent while preserving exact bounding-box behavior for callers that do not request tolerance.
+
+---
+
 ## Polygon Validity Strategy
 
-The project currently follows the design:
+The project follows the design:
 
-> A `Polygon` object should not exist with fewer than three vertices.
+> A `Polygon` object should not exist in an invalid state.
 
-The constructor validates the minimum vertex count and throws if the input does not satisfy that invariant.
+The constructor enforces these invariants:
+
+- At least three vertices
+- No consecutive duplicate or near-duplicate vertices
+- Nonzero area under the scale-aware area tolerance
+- No self-intersection
+
+Construction throws `std::invalid_argument` when any invariant is violated.
 
 There is currently no public `isValid()` method.
-
-More advanced validity checks such as self-intersection or duplicate consecutive vertices may be added later if needed.
 
 ---
 
@@ -165,7 +192,7 @@ Each time the ray crosses a polygon edge, the inside state toggles.
 - Odd number of crossings: point is inside
 - Even number of crossings: point is outside
 
-Points lying directly on polygon edges or vertices are treated as inside.
+Points lying directly on polygon edges or vertices are treated as inside. Points within `EPSILON` of a boundary are handled consistently with segment containment.
 
 ---
 
@@ -271,10 +298,12 @@ Current test areas include:
 ### Point
 
 - Coordinate storage
+- Proximity comparison inside and outside `EPSILON`
 - Vector creation
 - Clockwise orientation
 - Counterclockwise orientation
 - Collinear points
+- Orientation behavior for small valid geometry
 
 ### Vector
 
@@ -287,8 +316,9 @@ Current test areas include:
 - Overlap
 - No overlap
 - Boundary touching
-- Width
-- Height
+- Explicit overlap tolerance
+- Invalid coordinate-range rejection
+- Negative-tolerance rejection
 
 ### Segment
 
@@ -299,7 +329,10 @@ Current test areas include:
 - Shared endpoint
 - Collinear overlap
 - Collinear separation
-- Degenerate segment behavior
+- Degenerate segment constructor rejection
+- Near-degenerate segment constructor rejection
+- Near-touching intersection symmetry
+- Separated intersection symmetry
 - Point-to-segment distance
 - Segment-to-segment distance
 - Distance symmetry
@@ -313,8 +346,12 @@ Current test areas include:
 - Bounding box
 - Point containment
 - Boundary-point containment
+- Near-boundary containment
 - Polygon intersection
+- Near-touching polygon intersection symmetry
 - Polygon containment intersection case
+- Small nondegenerate polygon acceptance
+- Nonzero-area self-intersection rejection
 - Polygon distance
 - Distance symmetry
 - Minimum rectangle width
@@ -328,13 +365,19 @@ Current test areas include:
 Requirements:
 
 - CMake 3.20+
-- C++17 compiler
+- C++20 compiler
 - Git, if GoogleTest is fetched through CMake
 
 Configure the project:
 
 ```bash
 cmake -S . -B build
+```
+
+To configure the library without downloading or building GoogleTest:
+
+```bash
+cmake -S . -B build -DDRCHECK_BUILD_TESTS=OFF
 ```
 
 Build:
@@ -358,13 +401,13 @@ GoogleTest filtering can also be used.
 Run all polygon tests:
 
 ```bash
-drcheck_geometry_tests --gtest_filter=PolygonTest.*
+drchecker_tests --gtest_filter=PolygonTest.*
 ```
 
 Run one specific test:
 
 ```bash
-drcheck_geometry_tests --gtest_filter=SegmentTest.DetectsProperIntersection
+drchecker_tests --gtest_filter=SegmentTest.DetectsProperIntersection
 ```
 
 ---
@@ -375,6 +418,7 @@ drcheck_geometry_tests --gtest_filter=SegmentTest.DetectsProperIntersection
 Point
 ├── getX()
 ├── getY()
+├── isNear()
 ├── static vectorBetween()
 ├── static orientationValue()
 └── static getOrientation()
@@ -385,7 +429,7 @@ Vector
 └── cross()
 
 BoundingBox
-└── overlaps()
+└── overlaps(other, tolerance = 0.0)
 
 Segment
 ├── length()
@@ -421,7 +465,13 @@ Before moving fully into the engine:
 - Review degenerate geometry cases
 - Strengthen constructor invariants where useful
 - Expand GoogleTest edge-case coverage
-- Later generalize minimum-width handling beyond rectangles
+
+### Minimum Width for Orthogonal Polygons
+
+- Generalize minimum-width handling beyond rectangles
+- Examine relevant pairs of opposite, parallel boundaries
+- Support concave rectilinear polygons
+- Keep arbitrary angled polygons outside the current scope
 
 ### Domain Layer
 

@@ -22,11 +22,17 @@ namespace drcheck::geometry {
 		for (std::size_t i = 0; i < this->vertices.size(); ++i)
 		{
 			const std::size_t next = (i + 1) % this->vertices.size();
-			if (this->vertices[i]==(this->vertices[next])) {
+			if (this->vertices[i].isNear(this->vertices[next])) {
 				throw std::invalid_argument ("Polygon contains a zero-length edge");
 			}
 		}
-		if (std::abs(signedArea()) < EPSILON) {
+		double boundaryLength = 0.0;
+		for (const Segment& edge : getEdges()) {
+			boundaryLength += edge.length();
+		}
+
+		const double areaTolerance = EPSILON * boundaryLength;
+		if (std::abs(signedArea()) <= areaTolerance) {
 			throw std::invalid_argument ("Polygon area must be greater than zero");
 		}
 		if (hasSelfIntersection()) {
@@ -96,7 +102,14 @@ namespace drcheck::geometry {
 	bool Polygon::contains(const Point& point) const
 	{
 		// Bounding box check (Broad-phase rejection).
-		if (!getBoundingBox().overlaps(BoundingBox(point.getX(), point.getY(), point.getX(), point.getY()))) {
+		if (!getBoundingBox().overlaps(
+				BoundingBox(
+					point.getX(),
+					point.getY(),
+					point.getX(),
+					point.getY()
+				),
+				EPSILON)) {
 			return false;
 		}
 		// If the point is within the bounding box, check if it's on the polygon edge.
@@ -133,7 +146,7 @@ namespace drcheck::geometry {
 	bool Polygon::intersects(const Polygon& other) const
 	{
 		// First check if the bounding boxes (Broad-phase rejection) of the two polygons overlap
-		if (!getBoundingBox().overlaps(other.getBoundingBox())) {
+		if (!getBoundingBox().overlaps(other.getBoundingBox(), EPSILON)) {
 			return false;
 		}
 		// Check for edge intersections between the two polygons

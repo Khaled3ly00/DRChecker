@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "drcheck/geometry/Constants.h"
 #include "drcheck/geometry/Point.h"
 
 using namespace drcheck::geometry;
@@ -64,5 +65,41 @@ TEST(PointTest, DetectsCollinearPoints)
     EXPECT_EQ(
         result,
         Orientation::Collinear
+    );
+}
+
+TEST(PointTest, DetectsPointsWithinGeometryTolerance)
+{
+    const Point point(2.0, 3.0);
+    const Point nearby(
+        2.0 + EPSILON * 0.5,
+        3.0 - EPSILON * 0.5
+    );
+
+    EXPECT_TRUE(point.isNear(nearby));
+    EXPECT_TRUE(nearby.isNear(point));
+}
+
+TEST(PointTest, RejectsPointsOutsideGeometryTolerance)
+{
+    const Point point(2.0, 3.0);
+    const Point separated(
+        2.0 + EPSILON * 2.0,
+        3.0
+    );
+
+    EXPECT_FALSE(point.isNear(separated));
+    EXPECT_FALSE(separated.isNear(point));
+}
+
+TEST(PointTest, ScalesOrientationToleranceForSmallGeometry)
+{
+    const Point a(0.0, 0.0);
+    const Point b(1e-5, 0.0);
+    const Point c(0.0, 1e-5);
+
+    EXPECT_EQ(
+        Point::getOrientation(a, b, c),
+        Orientation::CounterClockwise
     );
 }

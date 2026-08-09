@@ -1,8 +1,6 @@
-﻿cmake_minimum_required(VERSION 3.10)
+﻿cmake_minimum_required(VERSION 3.20)
 
-project(DRChecker)
-
-include(FetchContent)
+project(DRChecker LANGUAGES CXX)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -32,40 +30,42 @@ target_include_directories(drchecker
 target_compile_features(drchecker PUBLIC cxx_std_20)
 
 # --------------------------------------------------
-# GoogleTest
-# --------------------------------------------------
-
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG v1.17.0
-)
-
-# Recommended on Windows so GoogleTest uses the same CRT as the project.
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-FetchContent_MakeAvailable(googletest)
-
-# --------------------------------------------------
 # Tests
 # --------------------------------------------------
 
-enable_testing()
+option(DRCHECK_BUILD_TESTS "Build DRChecker tests" ON)
 
-add_executable(drchecker_tests
-    tests/geometry/PointTest.cpp
-    tests/geometry/VectorTest.cpp
-    tests/geometry/BoundingBoxTest.cpp
-    tests/geometry/SegmentTest.cpp
-    tests/geometry/PolygonTest.cpp
-)
+if(DRCHECK_BUILD_TESTS)
+    include(FetchContent)
 
-target_link_libraries(drchecker_tests
-    PRIVATE
-        drchecker
-        GTest::gtest_main
-)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG v1.17.0
+    )
 
-include(GoogleTest)
+    # Recommended on Windows so GoogleTest uses the same CRT as the project.
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-gtest_discover_tests(drchecker_tests)
+    FetchContent_MakeAvailable(googletest)
+
+    enable_testing()
+
+    add_executable(drchecker_tests
+        tests/geometry/PointTest.cpp
+        tests/geometry/VectorTest.cpp
+        tests/geometry/BoundingBoxTest.cpp
+        tests/geometry/SegmentTest.cpp
+        tests/geometry/PolygonTest.cpp
+    )
+
+    target_link_libraries(drchecker_tests
+        PRIVATE
+            drchecker
+            GTest::gtest_main
+    )
+
+    include(GoogleTest)
+
+    gtest_discover_tests(drchecker_tests)
+endif()
