@@ -148,4 +148,56 @@ namespace drcheck::geometry {
 		}
 		return minDistance;
 	}
+	// Calculate the minimum width (not minimum edge legnth) of the polygon (currently only supports axis-aligned rectangles)
+	double Polygon::minWidth() const
+	{
+		// Check if the polygon is an axis-aligned rectangle. If not, throw a logic error since minWidth currently only supports axis-aligned rectangles.
+		if (!isAxisAlignedRectangle()) {
+			throw std::logic_error(
+				"minWidth currently supports only "
+				"axis-aligned rectangles"
+			);
+		}
+		// Get the edges of the polygon and find the minimum length among them
+		const auto polygonEdges = getEdges();
+
+		return std::min(polygonEdges[0].length(), polygonEdges[1].length());
+	}
+
+	// Temporary restriction for the initial min-width implementation.
+	bool Polygon::isAxisAlignedRectangle() const
+	{
+		if (vertices.size() != 4) {
+			return false;
+		}
+		// Check if the edges are axis-aligned (horizontal or vertical)
+		bool previousHorizontal = false;
+		for (std::size_t i = 0; i < vertices.size(); ++i)
+		{
+			const std::size_t next = (i + 1) % vertices.size();
+
+			const Point& a = vertices[i];
+			const Point& b = vertices[next];
+
+			const bool horizontal = std::abs(a.getY() - b.getY()) < EPSILON;
+
+			const bool vertical = std::abs(a.getX() - b.getX()) < EPSILON;
+			// Is the edge neither horizontal nor vertical? If so, it's not an axis-aligned rectangle.
+			if (!horizontal && !vertical) {
+				return false;
+			}
+
+			// Zero-length edge:
+			if (horizontal && vertical) {
+				return false;
+			}
+			// Check if two consecutive edges are both horizontal or both vertical. If so, it's not an axis-aligned rectangle.
+			if (i > 0 && horizontal == previousHorizontal) {
+				return false;
+			}
+
+			previousHorizontal = horizontal;
+		}
+		return true;
+	}
 }

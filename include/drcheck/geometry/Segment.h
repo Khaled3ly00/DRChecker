@@ -11,6 +11,7 @@ namespace drcheck::geometry {
 
 		const Point& getStart() const;
 		const Point& getEnd() const;
+		double length() const { return Point::vectorBetween(start, end).length(); }
 
 		BoundingBox getBoundingBox() const;
 		

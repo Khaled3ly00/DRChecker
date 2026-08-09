@@ -439,3 +439,62 @@ TEST(PolygonTest, DistanceToConcavePolygon)
         });
 	EXPECT_NEAR(first.distanceTo(second), 1.0, EPSILON);
 }
+
+TEST(PolygonTest, CalculatesMinimumWidthOfRectangle)
+{
+    Polygon polygon({
+        Point(0.0, 0.0),
+        Point(12.0, 0.0),
+        Point(12.0, 4.0),
+        Point(0.0, 4.0)
+        });
+
+    EXPECT_NEAR(polygon.minWidth(), 4.0, EPSILON);
+}
+
+TEST(PolygonTest, CalculatesMinimumWidthOfTallRectangle)
+{
+    Polygon polygon({
+        Point(0.0, 0.0),
+        Point(3.0, 0.0),
+        Point(3.0, 15.0),
+        Point(0.0, 15.0)
+        });
+
+    EXPECT_NEAR(polygon.minWidth(), 3.0, EPSILON);
+}
+
+TEST(PolygonTest, CalculatesMinimumWidthOfSquare)
+{
+    Polygon polygon({
+        Point(0.0, 0.0),
+        Point(5.0, 0.0),
+        Point(5.0, 5.0),
+        Point(0.0, 5.0)
+        });
+
+    EXPECT_NEAR(polygon.minWidth(), 5.0, EPSILON);
+}
+
+TEST(PolygonTest, MinimumWidthDoesNotDependOnVertexOrientation)
+{
+    Polygon polygon({
+        Point(0.0, 0.0),
+        Point(0.0, 4.0),
+        Point(12.0, 4.0),
+        Point(12.0, 0.0)
+        });
+
+    EXPECT_NEAR(polygon.minWidth(), 4.0, EPSILON);
+}
+
+TEST(PolygonTest, MinimumWidthRejectsUnsupportedPolygon)
+{
+    Polygon polygon({
+        Point(0.0, 0.0),
+        Point(5.0, 0.0),
+        Point(2.5, 5.0)
+        });
+
+    EXPECT_THROW(polygon.minWidth(), std::logic_error);
+}

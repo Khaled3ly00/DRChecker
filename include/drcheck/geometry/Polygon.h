@@ -17,12 +17,18 @@ namespace drcheck::geometry {
 		std::vector<Segment> getEdges() const;
 		double signedArea() const;
 		double area() const { return std::abs(signedArea()); }
+
 		Orientation getOrientation() const;
 		BoundingBox getBoundingBox() const;
+
 		bool contains(const Point& point) const;
 		bool intersects(const Polygon& other) const;
+
 		double distanceTo(const Polygon& other) const;
+
+		double minWidth() const;
 	private:
 		std::vector<Point> vertices;
+		bool isAxisAlignedRectangle() const;
 	};
 }

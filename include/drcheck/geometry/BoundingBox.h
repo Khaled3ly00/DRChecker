@@ -12,6 +12,9 @@ namespace drcheck::geometry {
 		double getMinY() const;
 		double getMaxX() const;
 		double getMaxY() const;
+
+		double getWidth() const { return maxX - minX; }
+		double getHeight() const { return maxY - minY; }
 	private:
 		double minX;
 		double minY;
