@@ -15,11 +15,16 @@ endif()
 # --------------------------------------------------
 
 add_library(drchecker
+    # Geometry
     src/geometry/Point.cpp
     src/geometry/Vector.cpp
     src/geometry/BoundingBox.cpp
     src/geometry/Segment.cpp
     src/geometry/Polygon.cpp
+
+    # Domain
+    src/domain/Shape.cpp
+    src/domain/Violation.cpp
 )
 
 target_include_directories(drchecker
@@ -44,7 +49,8 @@ if(DRCHECK_BUILD_TESTS)
         GIT_TAG v1.17.0
     )
 
-    # Recommended on Windows so GoogleTest uses the same CRT as the project.
+    # Recommended on Windows so GoogleTest uses
+    # the same CRT as the project.
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
     FetchContent_MakeAvailable(googletest)
@@ -52,11 +58,16 @@ if(DRCHECK_BUILD_TESTS)
     enable_testing()
 
     add_executable(drchecker_tests
+        # Geometry tests
         tests/geometry/PointTest.cpp
         tests/geometry/VectorTest.cpp
         tests/geometry/BoundingBoxTest.cpp
         tests/geometry/SegmentTest.cpp
         tests/geometry/PolygonTest.cpp
+
+        # Domain tests
+        tests/domain/ShapeTest.cpp
+        tests/domain/ViolationTest.cpp
     )
 
     target_link_libraries(drchecker_tests
