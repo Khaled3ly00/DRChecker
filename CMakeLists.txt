@@ -28,6 +28,7 @@ add_library(drchecker
 
     #Rules
     src/rules/MinWidthRule.cpp
+    src/rules/MinSpacingRule.cpp
 )
 
 target_include_directories(drchecker
@@ -74,6 +75,7 @@ if(DRCHECK_BUILD_TESTS)
 
         # Rules tests
         tests/rules/MinWidthRuleTest.cpp
+        tests/rules/MinSpacingRuleTest.cpp
     )
 
     target_link_libraries(drchecker_tests
