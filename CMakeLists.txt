@@ -25,6 +25,9 @@ add_library(drchecker
     # Domain
     src/domain/Shape.cpp
     src/domain/Violation.cpp
+
+    #Rules
+    src/rules/MinWidthRule.cpp
 )
 
 target_include_directories(drchecker
@@ -68,6 +71,9 @@ if(DRCHECK_BUILD_TESTS)
         # Domain tests
         tests/domain/ShapeTest.cpp
         tests/domain/ViolationTest.cpp
+
+        # Rules tests
+        tests/rules/MinWidthRuleTest.cpp
     )
 
     target_link_libraries(drchecker_tests

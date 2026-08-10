@@ -25,6 +25,8 @@ public:
 
 private:
     ViolationType type;
+	// shapeIds is a vector of shape IDs that are involved in the violation
+	// Can be one or more shapes depending on the violation type
     std::vector<std::size_t> shapeIds;
     std::string message;
 };
