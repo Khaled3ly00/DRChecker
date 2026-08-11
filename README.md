@@ -15,9 +15,9 @@ The project is being developed as a portfolio project focused on:
 
 ## Current Status
 
-The project has completed the **geometry core / foundation phase** and has started the **domain model phase**.
+The project has completed the **geometry core**, **domain model**, and the first **DRC rule implementations**.
 
-The geometry core is now hardened, tested, and supports the main operations required by the upcoming DRC rule layer.
+The current rule layer includes minimum width, minimum spacing, and minimum enclosure checks, all backed by GoogleTest coverage.
 
 ### Implemented Geometry
 
@@ -69,7 +69,8 @@ The geometry core is now hardened, tested, and supports the main operations requ
 - Axis-aligned bounding box
 - Point containment using ray casting
 - Polygon-to-polygon intersection
-- Polygon-to-polygon distance
+- Polygon containment, including concave-boundary crossing checks
+- Polygon-to-polygon distance with configurable intersection handling
 - Minimum local width for orthogonal (Manhattan) polygons
 - Rejection of unsupported non-orthogonal minimum-width calculations
 
@@ -91,10 +92,16 @@ drcheck/
 │       │   ├── Segment.h
 │       │   └── Polygon.h
 │       │
-│       └── domain/
-│           ├── Layer.h
-│           ├── Shape.h
-│           └── Violation.h
+│       ├── domain/
+│       │   ├── Layer.h
+│       │   ├── Shape.h
+│       │   └── Violation.h
+│       │
+│       └── rules/
+│           ├── Rule.h
+│           ├── MinWidthRule.h
+│           ├── MinSpacingRule.h
+│           └── MinEnclosureRule.h
 │
 ├── src/
 │   ├── geometry/
@@ -104,9 +111,14 @@ drcheck/
 │   │   ├── Segment.cpp
 │   │   └── Polygon.cpp
 │   │
-│   └── domain/
-│       ├── Shape.cpp
-│       └── Violation.cpp
+│   ├── domain/
+│   │   ├── Shape.cpp
+│   │   └── Violation.cpp
+│   │
+│   └── rules/
+│       ├── MinWidthRule.cpp
+│       ├── MinSpacingRule.cpp
+│       └── MinEnclosureRule.cpp
 │
 ├── tests/
 │   ├── geometry/
@@ -116,9 +128,14 @@ drcheck/
 │   │   ├── SegmentTest.cpp
 │   │   └── PolygonTest.cpp
 │   │
-│   └── domain/
-│       ├── ShapeTest.cpp
-│       └── ViolationTest.cpp
+│   ├── domain/
+│   │   ├── ShapeTest.cpp
+│   │   └── ViolationTest.cpp
+│   │
+│   └── rules/
+│       ├── MinWidthRuleTest.cpp
+│       ├── MinSpacingRuleTest.cpp
+│       └── MinEnclosureRuleTest.cpp
 │
 └── README.md
 ```
@@ -143,8 +160,10 @@ segment.distanceTo(point);
 segment.distanceTo(otherSegment);
 
 polygon.contains(point);
+polygon.contains(otherPolygon);
 polygon.intersects(otherPolygon);
 polygon.distanceTo(otherPolygon);
+polygon.distanceTo(otherPolygon, false);
 polygon.minWidth();
 
 boundingBox.overlaps(otherBoundingBox);
@@ -154,6 +173,10 @@ boundingBox.overlaps(otherBoundingBox, EPSILON);
 Internal implementation details are kept private where appropriate.
 
 The public `Polygon::minWidth()` interface is intentionally kept general. The current implementation selects the orthogonal algorithm, while future non-Manhattan width support can be added internally without changing callers.
+
+`Segment::intersects()` preserves its original behavior by default, including touching and collinear overlap.
+
+`Polygon::distanceTo()` also preserves its original region-distance behavior by default. Passing `false` skips the polygon-level intersection shortcut and computes minimum edge-to-edge distance, which is used by minimum-enclosure checking.
 
 ---
 
@@ -220,6 +243,8 @@ This handles:
 - Shared vertices
 - One polygon fully contained in another
 
+`Polygon::contains(const Polygon&)` verifies that every vertex of the inner polygon lies inside the outer polygon and that no inner edge properly crosses the outer boundary. This is important for concave outer polygons, where vertex containment alone is not sufficient.
+
 ---
 
 ## Geometry Distance
@@ -250,11 +275,13 @@ Otherwise, the minimum is taken from endpoint-to-segment distances.
 
 ### Polygon-to-Polygon
 
-If polygons intersect, distance is zero.
+By default, if polygon regions intersect or one contains the other, distance is zero.
 
 Otherwise, the minimum is taken over all edge-pair segment distances.
 
-This will support the future **minimum spacing DRC rule**.
+The method can also skip the polygon-level intersection shortcut. In that mode, it returns the minimum edge-to-edge distance even when one polygon contains the other. This is used to measure minimum enclosure.
+
+This operation supports both the **minimum spacing** and **minimum enclosure** rules.
 
 ---
 
@@ -379,6 +406,47 @@ The geometry layer remains independent of domain concepts.
 
 ---
 
+## Rule Layer
+
+The rule layer is contained inside:
+
+```cpp
+namespace drcheck::rules
+```
+
+### `Rule`
+
+`Rule` is an abstract base class with a common polymorphic interface:
+
+```cpp
+virtual std::vector<domain::Violation>
+check(const std::vector<domain::Shape>& shapes) const = 0;
+```
+
+### `MinWidthRule`
+
+- Applies to a selected layer
+- Calls `Polygon::minWidth()`
+- Compares actual width against the required minimum
+- Produces a `MinWidth` violation for failing shapes
+
+### `MinSpacingRule`
+
+- Applies to unique pairs of shapes on the selected layer
+- Uses `Polygon::distanceTo()`
+- Produces violations containing both involved shape IDs
+- Currently uses brute-force pairwise checking as the correctness baseline
+
+### `MinEnclosureRule`
+
+- Applies between an inner layer and an outer layer
+- Uses `Polygon::contains(const Polygon&)` to verify containment
+- Uses `Polygon::distanceTo(other, false)` to measure edge-to-edge enclosure distance
+- Produces an enclosure violation when no valid outer polygon provides the required enclosure
+
+
+---
+
 ## Testing
 
 GoogleTest is used for unit testing.
@@ -450,6 +518,43 @@ Coverage includes:
 
 - `Shape` stores its ID, layer, and polygon correctly
 - `Violation` stores type, shape IDs, and message correctly
+
+### Rule Tests
+
+#### `MinWidthRule`
+
+- Width below, exactly at, and above the minimum
+- Layer filtering
+- Multiple shapes
+- Orthogonal concave shapes
+- Invalid rule parameters
+- Polymorphic use through `Rule`
+
+#### `MinSpacingRule`
+
+- Spacing below, exactly at, and above the minimum
+- Intersecting polygons
+- Layer filtering
+- Multiple shapes
+- Duplicate-pair prevention
+- Concave polygons
+- Invalid rule parameters
+- Polymorphic use through `Rule`
+
+#### `MinEnclosureRule`
+
+- Exact minimum enclosure
+- More than minimum enclosure
+- Less than minimum enclosure
+- Intersecting and internally touching polygons
+- Inner polygon completely outside
+- Concave outer polygon with valid enclosure
+- Concave outer polygon with crossing geometry
+- Wrong outer layer
+- Multiple outer candidates
+- Multiple inner shapes
+- Invalid rule parameters
+- Polymorphic use through `Rule`
 
 ---
 
@@ -528,7 +633,7 @@ Segment
 ├── length()
 ├── getBoundingBox()
 ├── contains()
-├── intersects()
+├── intersects(other)
 ├── distanceTo(Point)
 ├── distanceTo(Segment)
 ├── isHorizontal()
@@ -541,9 +646,10 @@ Polygon
 ├── signedArea()
 ├── getOrientation()
 ├── getBoundingBox()
-├── contains()
+├── contains(Point)
+├── contains(Polygon)
 ├── intersects()
-├── distanceTo(Polygon)
+├── distanceTo(other, treatIntersectionAsZero = true)
 └── minWidth()
 
 Domain
@@ -564,6 +670,27 @@ Violation
 ├── getType()
 ├── getShapeIds()
 └── getMessage()
+
+Rules
+
+Rule
+└── check(shapes)
+
+MinWidthRule
+├── check(shapes)
+├── getMinimumWidth()
+└── getLayer()
+
+MinSpacingRule
+├── check(shapes)
+├── getLayer()
+└── getMinimumSpacing()
+
+MinEnclosureRule
+├── check(shapes)
+├── getInnerLayer()
+├── getOuterLayer()
+└── getMinimumEnclosure()
 ```
 
 ---
@@ -587,26 +714,57 @@ Violation
 - `Shape`
 - `Violation`
 
+### Rule Layer
+
+- Abstract `Rule` interface
+- `MinWidthRule`
+- `MinSpacingRule`
+- `MinEnclosureRule`
+- Rule-focused GoogleTest coverage
+- Polymorphic execution through `Rule`
+
+---
+
+## Known Limitations
+
+The current implementation intentionally prioritizes correctness, testability, and clear architecture over complete production-DRC coverage.
+
+### Minimum Width
+
+- `Polygon::minWidth()` and therefore `MinWidthRule` currently support **orthogonal (Manhattan) polygons only**.
+- Non-orthogonal polygons, including 45° geometry, are not yet supported by the minimum-width algorithm.
+- Unsupported non-orthogonal width checks throw `std::logic_error` rather than silently returning an incorrect result.
+
+### Minimum Spacing
+
+- `MinSpacingRule` currently uses brute-force pairwise shape checking.
+- Spatial indexing and optimized candidate filtering are planned later.
+
+### Minimum Enclosure
+
+- `MinEnclosureRule` evaluates enclosure against **individual outer polygons**.
+- If two separate outer polygons both contain the same inner polygon, the current rule does **not** combine or jointly evaluate them as a single enclosing structure.
+- The rule accepts an inner shape once one individual outer polygon satisfies the required enclosure.
+- Richer violation metadata identifying the best or nearest failed outer candidate is not yet implemented.
+
+### Geometry Representation
+
+- Coordinates currently use floating-point values with the project `EPSILON` tolerance policy.
+- Integer database units may be adopted later for stronger IC-layout-style numerical robustness.
+
 ---
 
 ## Next Development
 
-### Rule Layer
+### Rule / Engine Integration
 
 Next planned work:
 
-- Define the abstract `Rule` interface
-- Implement `MinWidthRule`
-- Apply rules to domain `Shape` objects
-- Produce `Violation` objects
-- Add rule-focused GoogleTests
-
-### Later Rule Development
-
-- `MinSpacingRule`
-- `EnclosureRule`
 - Rule creation / configuration
-- `RuleFactory`
+- `RuleFactory` where appropriate
+- `DRCEngine`
+- Run multiple rules over a shared shape collection
+- Collect unified violations
 
 ### Layout Loading
 
@@ -615,7 +773,7 @@ Next planned work:
 - Hand-crafted example layouts
 - Known violation cases
 
-### Rule Engine
+### Engine and Reporting
 
 - `DRCEngine`
 - Rule orchestration
