@@ -700,3 +700,25 @@ TEST(PolygonTest, MinimumWidthOfHPolygon) {
         });
     EXPECT_NEAR(polygon.minWidth(), 1.0, EPSILON);
 }
+
+TEST(PolygonTest, InnerPolygonCompletelyInsideConcavePolygon) {
+    Polygon firstPolygon({
+        Point(2.0, 4.0),
+        Point(2.0, 6.0),
+        Point(4.0, 6.0),
+        Point(4.0, 4.0)
+        });
+
+    Polygon secondPolygon({
+        Point(0.0, 0.0),
+        Point(2.0, 0.0),
+        Point(2.0, 2.0),
+        Point(4.0, 2.0),
+        Point(4.0, 0.0),
+        Point(6.0, 0.0),
+        Point(6.0, 8.0),
+        Point(0.0, 8.0)
+        });
+    EXPECT_FALSE(firstPolygon.contains(secondPolygon));
+    EXPECT_TRUE(secondPolygon.contains(firstPolygon));
+}

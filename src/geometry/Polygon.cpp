@@ -137,6 +137,29 @@ namespace drcheck::geometry {
 		}
 		return inside;
 	}
+	// Checks whether this polygon completely contains the other polygon.
+	bool Polygon::contains(const Polygon& other) const
+	{	
+		//  Every vertex of the other polygon must lie inside this polygon.
+		for (const Point& vertex : other.getVertices()) {
+			if (!contains(vertex)) {
+				return false;
+			}
+		}
+		// Strict containment does not allow the two polygon boundaries to cross (touching not counted as intersection).
+		// Tailored to MinEnclosure as inner polygon touching is considered contained
+		const auto thisEdges = getEdges();
+		const auto otherEdges = other.getEdges();
+
+		for (const Segment& edge1 : thisEdges) {
+			for (const Segment& edge2 : otherEdges) {
+				if (edge1.intersects(edge2, false)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 	// Check if two polygons intersect by checking for edge intersections and containment
 	bool Polygon::intersects(const Polygon& other) const
 	{
@@ -162,10 +185,10 @@ namespace drcheck::geometry {
 		return false;
 	}
 	// Calculate the minimum distance between two polygons by checking distances between edges
-	double Polygon::distanceTo(const Polygon& other) const
-	{
-		// If the polygons intersect, the distance is zero
-		if (intersects(other)) {
+	double Polygon::distanceTo(const Polygon& other, bool treatIntersectionAsZero) const
+	{	
+		// For ordinary distance, overlapping or contained polygons have zero distance.
+		if (treatIntersectionAsZero && intersects(other)) {
 			return 0.0;
 		}
 		double minDistance = std::numeric_limits<double>::max();

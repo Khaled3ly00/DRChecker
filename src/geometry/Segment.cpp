@@ -63,7 +63,7 @@ namespace drcheck::geometry {
 		return otherCrossesThis && thisCrossesOther;
 	}
 	// Complete intersection check between two segments, including endpoint touching and collinear overlap.
-	bool Segment::intersects(const Segment& other) const
+	bool Segment::intersects(const Segment& other, bool includeBoundaryContact) const
 	{
 		// First check if bounding boxes overlap (Broad check)
 		if (!getBoundingBox().overlaps(other.getBoundingBox(), EPSILON)) {
@@ -74,9 +74,11 @@ namespace drcheck::geometry {
 		if (properIntersection(other)) {
 			return true;
 		}
-		// Handle endpoint touching and collinear overlap.
-		if (contains(other.start) || contains(other.end) || other.contains(start) || other.contains(end)) {
-			return true;
+		if (includeBoundaryContact) {
+			// Handle endpoint touching and collinear overlap.
+			if (contains(other.start) || contains(other.end) || other.contains(start) || other.contains(end)) {
+				return true;
+			}
 		}
 		return false;
 	}

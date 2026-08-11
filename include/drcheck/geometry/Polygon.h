@@ -26,9 +26,11 @@ namespace drcheck::geometry {
 		BoundingBox getBoundingBox() const;
 
 		bool contains(const Point& point) const;
+		bool contains(const Polygon& other) const;
+
 		bool intersects(const Polygon& other) const;
 
-		double distanceTo(const Polygon& other) const;
+		double distanceTo(const Polygon& other, bool treatIntersectionAsZero = true) const;
 
 		double minWidth() const;
 		double orthogonalMinWidth() const;

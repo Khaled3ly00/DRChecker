@@ -18,7 +18,7 @@ namespace drcheck::geometry {
 		bool isVertical() const { return start.getX() == end.getX(); }
 
 		bool contains(const Point& point) const;
-		bool intersects(const Segment& other) const;
+		bool intersects(const Segment& other, bool includeBoundaryContact = true) const;
 		double distanceTo(const Point& point) const;
 		double distanceTo(const Segment& other) const;
 	private:

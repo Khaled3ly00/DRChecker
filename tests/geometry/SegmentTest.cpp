@@ -80,6 +80,21 @@ TEST(SegmentTest, DetectsCollinearOverlap)
     EXPECT_TRUE(first.intersects(second));
 }
 
+TEST(SegmentTest, DoesntDetectCollinearOverlapWhenBoundaryContactDisabled)
+{
+    Segment first(
+        Point(0.0, 0.0),
+        Point(6.0, 0.0)
+    );
+
+    Segment second(
+        Point(3.0, 0.0),
+        Point(10.0, 0.0)
+    );
+
+    EXPECT_FALSE(first.intersects(second, false));
+}
+
 TEST(SegmentTest, SharedEndpointCountsAsIntersection)
 {
     Segment first(
