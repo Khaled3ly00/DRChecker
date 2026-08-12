@@ -2,13 +2,20 @@
 
 project(DRChecker LANGUAGES CXX)
 
-# Enable Hot Reload for MSVC compilers if supported.
-if (POLICY CMP0141)
-    cmake_policy(SET CMP0141 NEW)
-    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT
-        "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>"
-    )
-endif()
+# --------------------------------------------------
+# Dependencies
+# --------------------------------------------------
+
+include(FetchContent)
+
+# nlohmann/json
+FetchContent_Declare(
+    json
+    URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+
+FetchContent_MakeAvailable(json)
 
 # --------------------------------------------------
 # DRChecker library
@@ -26,13 +33,16 @@ add_library(drchecker
     src/domain/Shape.cpp
     src/domain/Violation.cpp
 
-    #Rules
+    # Rules
     src/rules/MinWidthRule.cpp
     src/rules/MinSpacingRule.cpp
     src/rules/MinEnclosureRule.cpp
 
-    #Engine
+    # Engine
     src/engine/DRCEngine.cpp
+
+    # Parser
+    src/io/JSONLayoutParser.cpp
 )
 
 target_include_directories(drchecker
@@ -42,6 +52,11 @@ target_include_directories(drchecker
 
 target_compile_features(drchecker PUBLIC cxx_std_20)
 
+target_link_libraries(drchecker
+    PUBLIC
+        nlohmann_json::nlohmann_json
+)
+
 # --------------------------------------------------
 # Tests
 # --------------------------------------------------
@@ -49,7 +64,6 @@ target_compile_features(drchecker PUBLIC cxx_std_20)
 option(DRCHECK_BUILD_TESTS "Build DRChecker tests" ON)
 
 if(DRCHECK_BUILD_TESTS)
-    include(FetchContent)
 
     FetchContent_Declare(
         googletest
@@ -84,12 +98,20 @@ if(DRCHECK_BUILD_TESTS)
 
         # Engine Tests
         tests/engine/DRCEngineTest.cpp
+
+        # JSONParser Test
+        tests/io/JSONLayoutParserTest.cpp
     )
 
     target_link_libraries(drchecker_tests
         PRIVATE
             drchecker
             GTest::gtest_main
+    )
+
+    target_compile_definitions(drchecker_tests
+    PRIVATE
+        DRCHECK_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
     )
 
     include(GoogleTest)
