@@ -45,6 +45,7 @@ add_library(drchecker
     # Parser
     src/io/JSONLayoutParser.cpp
     src/io/JSONRuleParser.cpp
+    src/io/JSONReportWriter.cpp
 )
 
 target_include_directories(drchecker
@@ -105,6 +106,7 @@ if(DRCHECK_BUILD_TESTS)
         # JSONParser Tests
         tests/io/JSONLayoutParserTest.cpp
         tests/io/JSONRuleParserTest.cpp
+        tests/io/JSONReportWriterTest.cpp
 
         # EndToEnd Tests
         tests/integration/EndtoEndTest.cpp

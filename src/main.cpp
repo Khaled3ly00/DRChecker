@@ -3,6 +3,7 @@
 #include "drcheck/engine/DRCEngine.h"
 #include "drcheck/io/JSONLayoutParser.h"
 #include "drcheck/io/JSONRuleParser.h"
+#include "drcheck/io/JSONReportWriter.h"
 
 int main(int argc, char* argv[])
 {
@@ -10,8 +11,9 @@ int main(int argc, char* argv[])
     // argv[0] → executable name 
     // argv[1] → layout path 
     // argv[2] → rules path
-    if (argc != 3) {
-        std::cerr<< "Usage: drchecker <layout.json> <rules.json>\n";
+    // argv[3] → output report path
+    if (argc != 4) {
+        std::cerr<< "Usage: drchecker <layout.json> <rules.json> <report.json>\n";
         return 1;
     }
 
@@ -20,6 +22,7 @@ int main(int argc, char* argv[])
         drcheck::io::JSONLayoutParser layoutParser;
         drcheck::io::JSONRuleParser ruleParser;
         drcheck::engine::DRCEngine engine;
+        drcheck::io::JSONReportWriter reportWriter;
 
         const auto shapes = layoutParser.load(argv[1]);
 
@@ -27,29 +30,13 @@ int main(int argc, char* argv[])
 
         const auto violations = engine.run(shapes, rules);
 
-        std::size_t index = 1;
+        reportWriter.write(violations, argv[3]);
 
-        for (const auto& violation : violations)
-        {
-            std::cout
-                << "[" << index++ << "] "
-                << violation.getTypeAsString()
-                << '\n';
-
-            std::cout
-                << "  Message: "
-                << violation.getMessage()
-                << '\n';
-
-            std::cout
-                << "  Shapes: ";
-
-            for (const std::size_t id :violation.getShapeIds())
-            {
-                std::cout << id << ' ';
-            }
-            std::cout << "\n\n";
-        }
+        std::cout
+            << "DRC completed.\n"
+            << "Violations: "
+            << violations.size()
+            << '\n';
 
         return 0;
     }
