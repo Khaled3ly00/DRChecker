@@ -1,0 +1,27 @@
+{
+    "violationCount": 3,
+    "violations": [
+        {
+            "message": "Minimum width violation: required 3.000000, actual 2.000000",
+            "shapeIds": [
+                0
+            ],
+            "type": "MinWidth"
+        },
+        {
+            "message": "Minimum spacing violation",
+            "shapeIds": [
+                0,
+                1
+            ],
+            "type": "MinSpacing"
+        },
+        {
+            "message": "Enclosure violation",
+            "shapeIds": [
+                2
+            ],
+            "type": "Enclosure"
+        }
+    ]
+}
