@@ -15,9 +15,9 @@ The project is being developed as a portfolio project focused on:
 
 ## Current Status
 
-The project has completed the **geometry core**, **domain model**, initial **DRC rule layer**, **DRC engine orchestration**, and the first **JSON input parsers**.
+The project has completed the **geometry core**, **domain model**, initial **DRC rule layer**, **DRC engine orchestration**, **JSON input parsing**, a runnable **command-line application**, and **JSON violation reporting**.
 
-The current implementation can load layout shapes and rule definitions from JSON, build the corresponding domain and rule objects, run width, spacing, and enclosure checks through `DRCEngine`, and return a unified collection of violations.
+The current implementation can load layout shapes and rule definitions from JSON, build the corresponding domain and rule objects, run width, spacing, and enclosure checks through `DRCEngine`, print a result summary, and write a machine-readable JSON violation report.
 
 ### Implemented Geometry
 
@@ -105,7 +105,8 @@ drcheck/
 │       │
 │       ├── io/
 │       │   ├── JSONLayoutParser.h
-│       │   └── JSONRuleParser.h
+│       │   ├── JSONRuleParser.h
+│       │   └── JSONReportWriter.h
 │       │
 │       └── engine/
 │           └── DRCEngine.h
@@ -130,10 +131,13 @@ drcheck/
 │   │
 │   ├── io/
 │   │   ├── JSONLayoutParser.cpp
-│   │   └── JSONRuleParser.cpp
+│   │   ├── JSONRuleParser.cpp
+│   │   └── JSONReportWriter.cpp
 │   │
-│   └── engine/
-│       └── DRCEngine.cpp
+│   ├── engine/
+│   │   └── DRCEngine.cpp
+│   │
+│   └── main.cpp
 │
 ├── tests/
 │   ├── geometry/
@@ -154,17 +158,25 @@ drcheck/
 │   │
 │   ├── io/
 │   │   ├── JSONLayoutParserTest.cpp
-│   │   └── JSONRuleParserTest.cpp
+│   │   ├── JSONRuleParserTest.cpp
+│   │   └── JSONReportWriterTest.cpp
 │   │
-│   └── engine/
-│       └── DRCEngineTest.cpp
+│   ├── engine/
+│   │   └── DRCEngineTest.cpp
+│   │
+│   └── integration/
+│       └── EndToEndTest.cpp
 │
 ├── examples/
 │   ├── basic_layout.json
+│   ├── cli_layout.json
+│   ├── cli_multiple_shapes_layout.json
+│   ├── cli_rules.json
 │   ├── empty_layout.json
 │   ├── invalid_polygon.json
 │   ├── invalid_rules.json
 │   ├── layer_parser.json
+│   ├── report.json
 │   └── rules.json
 │
 └── README.md
@@ -408,11 +420,13 @@ No setters are currently required.
 
 `Violation` represents a detected DRC error.
 
-The initial representation stores:
+The current representation stores:
 
 - `ViolationType`
 - Involved shape IDs
 - Human-readable message
+
+`Violation::getTypeAsString()` provides the string representation used by CLI and JSON reporting without requiring output code to duplicate enum-conversion logic.
 
 Current violation types:
 
@@ -576,7 +590,7 @@ Example:
 
 Rule constructors remain responsible for validating rule-specific invariants.
 
-The current in-memory flow is:
+The current file-based flow is:
 
 ```text
 layout.json ──→ JSONLayoutParser ──→ vector<Shape>
@@ -588,7 +602,67 @@ rules.json  ──→ JSONRuleParser ────→ vector<unique_ptr<Rule>>
                                          │
                                          ▼
                                  vector<Violation>
+                                         │
+                                         ▼
+                                 JSONReportWriter
+                                         │
+                                         ▼
+                                    report.json
 ```
+
+
+---
+
+## Command-Line Application
+
+The `drcheck` executable connects the parsers, rule engine, and report writer into a complete application pipeline.
+
+Typical usage:
+
+```bash
+drcheck <layout.json> <rules.json> <report.json>
+```
+
+The application loads the layout and rules, runs `DRCEngine`, writes the report, and prints a concise completion summary. Exceptions from parsing, invalid geometry, unsupported operations, or file I/O are caught at the `main()` application boundary.
+
+A DRC violation is treated as a verification result, not as a program execution failure.
+
+---
+
+## JSON Violation Reporting
+
+`JSONReportWriter` converts collected violations into a machine-readable JSON report.
+
+Example:
+
+```json
+{
+  "violationCount": 2,
+  "violations": [
+    {
+      "type": "MinWidth",
+      "shapeIds": [0],
+      "message": "Minimum width violation"
+    },
+    {
+      "type": "MinSpacing",
+      "shapeIds": [0, 1],
+      "message": "Minimum spacing violation"
+    }
+  ]
+}
+```
+
+Clean layouts are also represented explicitly:
+
+```json
+{
+  "violationCount": 0,
+  "violations": []
+}
+```
+
+The current report does not yet include measured values, required rule values, exact violation locations, or offending edge pairs.
 
 
 ---
@@ -664,6 +738,7 @@ Coverage includes:
 
 - `Shape` stores its ID, layer, and polygon correctly
 - `Violation` stores type, shape IDs, and message correctly
+- `Violation::getTypeAsString()` for all current violation types
 - Layer string conversion through `layerFromString()`
 
 ### Rule Tests
@@ -748,6 +823,23 @@ Coverage includes:
 - Malformed JSON handling
 - Polymorphic behavior of parsed rules
 
+### JSON Report Writer Tests
+
+Coverage includes:
+
+- Empty report generation
+- Single and multiple violation serialization
+- Multiple shape IDs
+- Violation type string output
+- Message serialization
+- Invalid output path handling
+- Re-parsing generated JSON to validate semantic contents
+
+### Integration Tests
+
+Coverage includes the complete flow from JSON layout and rule files through parsing, `DRCEngine`, and JSON report generation.
+
+
 ---
 
 ## Building
@@ -779,6 +871,23 @@ Build:
 ```bash
 cmake --build build
 ```
+
+
+---
+
+## Running DRCheck
+
+```bash
+drcheck <layout.json> <rules.json> <report.json>
+```
+
+Example:
+
+```bash
+drcheck ../../examples/basic_layout.json ../../examples/rules.json report.json
+```
+
+The executable prints a concise summary and writes detailed violations to the requested JSON report file.
 
 ---
 
@@ -865,6 +974,7 @@ Shape
 
 Violation
 ├── getType()
+├── getTypeAsString()
 ├── getShapeIds()
 └── getMessage()
 
@@ -897,10 +1007,18 @@ JSONLayoutParser
 JSONRuleParser
 └── load(filePath) → vector<unique_ptr<Rule>>
 
+JSONReportWriter
+└── write(violations, filePath)
+
 Engine
 
 DRCEngine
 └── run(shapes, rules) → vector<Violation>
+
+Application
+
+drcheck
+└── layout.json + rules.json → report.json
 ```
 
 ---
@@ -949,6 +1067,22 @@ DRCEngine
 - `JSONRuleParser`
 - Parser validation and tests
 
+### Executable Integration
+
+- `main.cpp`
+- `drcheck` executable
+- Command-line layout/rule/report paths
+- Application-boundary exception handling
+- Full parser-to-engine execution flow
+
+### JSON Reporting
+
+- `Violation::getTypeAsString()`
+- `JSONReportWriter`
+- Empty and non-empty reports
+- Machine-readable violation output
+- Reporting and end-to-end tests
+
 ---
 
 ## Known Limitations
@@ -991,44 +1125,40 @@ The current implementation intentionally prioritizes correctness, testability, a
 - Unknown rule types are rejected.
 - Tcl-style rule decks are planned as a later extension.
 
+### Violation Reporting
+
+- Reports currently contain violation type, involved shape IDs, and a human-readable message.
+- Reports do not yet include the actual measured value or the required rule value.
+- Exact violation coordinates, offending edges, and marker geometry are not yet stored.
+- Because shape IDs are generated from import order, report IDs are tied to the ordering of the imported layout.
+
 ---
 
 ## Next Development
 
-### Executable / End-to-End Integration
+### Richer Violation Metadata
 
-The next milestone is to connect the parsers and engine through a real executable.
-
-Planned flow:
-
-```text
-layout.json
-    ↓
-JSONLayoutParser
-
-rules.json
-    ↓
-JSONRuleParser
-
-        ↓
-    DRCEngine
-        ↓
-violations
-```
+The next milestone is to make each violation more informative.
 
 Planned work:
 
-- Add `main.cpp`
-- Accept layout and rule file paths
-- Run the full file-to-DRC pipeline
-- Print or serialize violations
-- Add end-to-end example inputs
+- Store the actual measured value that caused the violation
+- Store the required rule value
+- Update `MinWidthRule`, `MinSpacingRule`, and `MinEnclosureRule` to populate these values
+- Extend `JSONReportWriter` to serialize the additional information
+- Add regression tests for the richer violation data
 
-### Reporting
+Example target report entry:
 
-- JSON violation report writer
-- More structured violation metadata where useful
-- Optional SVG visualization
+```json
+{
+  "type": "MinWidth",
+  "shapeIds": [0],
+  "required": 3.0,
+  "actual": 2.0,
+  "message": "Minimum width violation"
+}
+```
 
 ### Performance
 
@@ -1048,8 +1178,16 @@ Planned work:
 
 - Direct or intermediate GDSII import
 - Optional Tcl rule decks
+- More stable source-geometry identifiers where available
 - Cross-platform build verification
 - CI
+
+### Future Reporting / Visualization
+
+- Exact violation locations
+- Offending edge-pair information
+- Marker geometry
+- Optional SVG visualization
 
 ---
 
