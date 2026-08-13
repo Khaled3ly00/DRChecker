@@ -1,0 +1,9 @@
+{
+  "rules": [
+    {
+      "type": "MinWidth",
+      "layer": "Metal12",
+      "value": -1
+    }
+  ]
+}

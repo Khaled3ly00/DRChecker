@@ -15,6 +15,7 @@ TEST(JSONLayoutParserTest, ValidJSONLayoutContainingOneShapeWithNoViolation) {
     const auto shapes = parser.load(path.string());
 
     ASSERT_EQ(shapes.size(), 1);
+    EXPECT_EQ(shapes[0].getId(), 0);
     EXPECT_EQ(shapes[0].getLayer(),Layer::Metal1);
     EXPECT_NEAR(shapes[0].getPolygon().area(), 50.0, EPSILON);
 }

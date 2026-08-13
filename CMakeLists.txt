@@ -32,6 +32,7 @@ add_library(drchecker
     # Domain
     src/domain/Shape.cpp
     src/domain/Violation.cpp
+    src/domain/Layer.cpp
 
     # Rules
     src/rules/MinWidthRule.cpp
@@ -43,6 +44,7 @@ add_library(drchecker
 
     # Parser
     src/io/JSONLayoutParser.cpp
+    src/io/JSONRuleParser.cpp
 )
 
 target_include_directories(drchecker
@@ -90,6 +92,7 @@ if(DRCHECK_BUILD_TESTS)
         # Domain tests
         tests/domain/ShapeTest.cpp
         tests/domain/ViolationTest.cpp
+        tests/domain/LayerTest.cpp
 
         # Rules tests
         tests/rules/MinWidthRuleTest.cpp
@@ -101,6 +104,7 @@ if(DRCHECK_BUILD_TESTS)
 
         # JSONParser Test
         tests/io/JSONLayoutParserTest.cpp
+        tests/io/JSONRuleParserTest.cpp
     )
 
     target_link_libraries(drchecker_tests

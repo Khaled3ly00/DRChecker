@@ -1,0 +1,30 @@
+{
+  "rules": [
+    {
+      "type": "MinWidth",
+      "layer": "Metal1",
+      "value": 3
+    },
+    {
+      "type": "MinWidth",
+      "layer": "Metal2",
+      "value": 4
+    },
+    {
+      "type": "MinWidth",
+      "layer": "Via12",
+      "value": 1
+    },
+    {
+      "type": "MinSpacing",
+      "layer": "Metal1",
+      "value": 2
+    },
+    {
+      "type": "MinEnclosure",
+      "innerLayer": "Via12",
+      "outerLayer": "Metal1",
+      "value": 2
+    }
+  ]
+}

@@ -32,8 +32,11 @@ std::vector<domain::Shape> JSONLayoutParser::load(const std::string& filePath) c
     // For loop to extract each shape from JSON File
     for (const auto& shapeJson : json["shapes"])
     {
+        if (!shapeJson.is_object()) {
+            throw std::invalid_argument("Each shape must be a JSON object");
+        }
         // Extracting Layer as string then calling parseLayer
-        const domain::Layer layer = parseLayer(shapeJson.at("layer").get<std::string>());
+        const domain::Layer layer = domain::layerFromString(shapeJson.at("layer").get<std::string>());
 
         // Extracting Vertices
         std::vector<geometry::Point> vertices;
@@ -66,34 +69,4 @@ std::vector<domain::Shape> JSONLayoutParser::load(const std::string& filePath) c
     }
     return shapes;
 }
-
-domain::Layer JSONLayoutParser::parseLayer(const std::string& layerName)
-{
-    using domain::Layer;
-
-    if (layerName == "Metal1") {
-        return Layer::Metal1;
-    }
-
-    if (layerName == "Metal2") {
-        return Layer::Metal2;
-    }
-
-    if (layerName == "Poly") {
-        return Layer::Poly;
-    }
-
-    if (layerName == "Diffusion") {
-        return Layer::Diffusion;
-    }
-
-    if (layerName == "Via12") {
-        return Layer::Via12;
-    }
-
-    throw std::invalid_argument(
-        "Unknown layer: " + layerName
-    );
-}
-
 }

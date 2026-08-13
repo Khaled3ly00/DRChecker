@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace drcheck::domain {
 
     enum class Layer
@@ -11,4 +13,5 @@ namespace drcheck::domain {
         Via12
     };
 
+    Layer layerFromString(const std::string& layerName);
 }
