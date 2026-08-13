@@ -15,9 +15,9 @@ The project is being developed as a portfolio project focused on:
 
 ## Current Status
 
-The project has completed the **geometry core**, **domain model**, and the first **DRC rule implementations**.
+The project has completed the **geometry core**, **domain model**, initial **DRC rule layer**, **DRC engine orchestration**, and the first **JSON input parsers**.
 
-The current rule layer includes minimum width, minimum spacing, and minimum enclosure checks, all backed by GoogleTest coverage.
+The current implementation can load layout shapes and rule definitions from JSON, build the corresponding domain and rule objects, run width, spacing, and enclosure checks through `DRCEngine`, and return a unified collection of violations.
 
 ### Implemented Geometry
 
@@ -97,11 +97,18 @@ drcheck/
 │       │   ├── Shape.h
 │       │   └── Violation.h
 │       │
-│       └── rules/
-│           ├── Rule.h
-│           ├── MinWidthRule.h
-│           ├── MinSpacingRule.h
-│           └── MinEnclosureRule.h
+│       ├── rules/
+│       │   ├── Rule.h
+│       │   ├── MinWidthRule.h
+│       │   ├── MinSpacingRule.h
+│       │   └── MinEnclosureRule.h
+│       │
+│       ├── io/
+│       │   ├── JSONLayoutParser.h
+│       │   └── JSONRuleParser.h
+│       │
+│       └── engine/
+│           └── DRCEngine.h
 │
 ├── src/
 │   ├── geometry/
@@ -112,13 +119,21 @@ drcheck/
 │   │   └── Polygon.cpp
 │   │
 │   ├── domain/
+│   │   ├── Layer.cpp
 │   │   ├── Shape.cpp
 │   │   └── Violation.cpp
 │   │
-│   └── rules/
-│       ├── MinWidthRule.cpp
-│       ├── MinSpacingRule.cpp
-│       └── MinEnclosureRule.cpp
+│   ├── rules/
+│   │   ├── MinWidthRule.cpp
+│   │   ├── MinSpacingRule.cpp
+│   │   └── MinEnclosureRule.cpp
+│   │
+│   ├── io/
+│   │   ├── JSONLayoutParser.cpp
+│   │   └── JSONRuleParser.cpp
+│   │
+│   └── engine/
+│       └── DRCEngine.cpp
 │
 ├── tests/
 │   ├── geometry/
@@ -132,10 +147,25 @@ drcheck/
 │   │   ├── ShapeTest.cpp
 │   │   └── ViolationTest.cpp
 │   │
-│   └── rules/
-│       ├── MinWidthRuleTest.cpp
-│       ├── MinSpacingRuleTest.cpp
-│       └── MinEnclosureRuleTest.cpp
+│   ├── rules/
+│   │   ├── MinWidthRuleTest.cpp
+│   │   ├── MinSpacingRuleTest.cpp
+│   │   └── MinEnclosureRuleTest.cpp
+│   │
+│   ├── io/
+│   │   ├── JSONLayoutParserTest.cpp
+│   │   └── JSONRuleParserTest.cpp
+│   │
+│   └── engine/
+│       └── DRCEngineTest.cpp
+│
+├── examples/
+│   ├── basic_layout.json
+│   ├── empty_layout.json
+│   ├── invalid_polygon.json
+│   ├── invalid_rules.json
+│   ├── layer_parser.json
+│   └── rules.json
 │
 └── README.md
 ```
@@ -349,6 +379,8 @@ Layer::Via12
 
 `Via12` explicitly represents the via layer connecting Metal1 and Metal2.
 
+Layer-name conversion is centralized in the domain layer through `layerFromString()`, avoiding duplicated string-to-layer conversion logic across parsers.
+
 ### `Shape`
 
 A `Shape` combines identity, layer information, and geometry:
@@ -447,6 +479,120 @@ check(const std::vector<domain::Shape>& shapes) const = 0;
 
 ---
 
+## DRC Engine
+
+`DRCEngine` orchestrates rule execution without implementing rule-specific geometry itself.
+
+```text
+vector<Shape>
+      +
+vector<unique_ptr<Rule>>
+      ↓
+   DRCEngine
+      ↓
+vector<Violation>
+```
+
+Each rule is executed polymorphically through the abstract `Rule` interface, and the engine appends all returned violations into one result vector.
+
+Unsupported geometry errors remain exceptions rather than being silently converted into DRC violations.
+
+---
+
+## JSON Input
+
+The project uses `nlohmann/json` for JSON parsing.
+
+### `JSONLayoutParser`
+
+`JSONLayoutParser` loads a flat list of polygon shapes and returns:
+
+```cpp
+std::vector<domain::Shape>
+```
+
+Example:
+
+```json
+{
+  "shapes": [
+    {
+      "layer": "Metal1",
+      "vertices": [
+        [0, 0],
+        [10, 0],
+        [10, 5],
+        [0, 5]
+      ]
+    }
+  ]
+}
+```
+
+The parser validates JSON structure while reusing existing geometry invariants from `Polygon`.
+
+Shape IDs are currently generated automatically in import order (`0, 1, 2, ...`) rather than being required from the input file. This keeps the simplified JSON format compatible with future raw-layout import flows where source polygon IDs may not exist.
+
+### `JSONRuleParser`
+
+`JSONRuleParser` loads rule definitions and returns:
+
+```cpp
+std::vector<std::unique_ptr<rules::Rule>>
+```
+
+Supported rule types:
+
+```text
+MinWidth
+MinSpacing
+MinEnclosure
+```
+
+Example:
+
+```json
+{
+  "rules": [
+    {
+      "type": "MinWidth",
+      "layer": "Metal1",
+      "value": 3.0
+    },
+    {
+      "type": "MinSpacing",
+      "layer": "Metal1",
+      "value": 2.0
+    },
+    {
+      "type": "MinEnclosure",
+      "innerLayer": "Via12",
+      "outerLayer": "Metal1",
+      "value": 1.0
+    }
+  ]
+}
+```
+
+Rule constructors remain responsible for validating rule-specific invariants.
+
+The current in-memory flow is:
+
+```text
+layout.json ──→ JSONLayoutParser ──→ vector<Shape>
+                                         │
+rules.json  ──→ JSONRuleParser ────→ vector<unique_ptr<Rule>>
+                                         │
+                                         ▼
+                                     DRCEngine
+                                         │
+                                         ▼
+                                 vector<Violation>
+```
+
+
+---
+
 ## Testing
 
 GoogleTest is used for unit testing.
@@ -518,6 +664,7 @@ Coverage includes:
 
 - `Shape` stores its ID, layer, and polygon correctly
 - `Violation` stores type, shape IDs, and message correctly
+- Layer string conversion through `layerFromString()`
 
 ### Rule Tests
 
@@ -556,6 +703,51 @@ Coverage includes:
 - Invalid rule parameters
 - Polymorphic use through `Rule`
 
+### Engine Tests
+
+Coverage includes:
+
+- One rule / one violation
+- Multiple rule types
+- Multiple violations from one rule
+- Empty rules
+- Empty shapes
+- Unified violation collection
+
+### JSON Layout Parser Tests
+
+Coverage includes:
+
+- Valid layouts
+- Multiple shapes
+- Generated sequential shape IDs
+- Supported layers
+- Empty layout
+- Missing or invalid `shapes`
+- Missing required fields
+- Malformed vertices
+- Unknown layer rejection
+- Invalid polygon geometry rejection
+- Missing file handling
+- Malformed JSON handling
+
+### JSON Rule Parser Tests
+
+Coverage includes:
+
+- Valid `MinWidthRule`
+- Valid `MinSpacingRule`
+- Valid `MinEnclosureRule`
+- Multiple rules
+- Empty rule deck
+- Unknown rule type rejection
+- Unknown layer rejection
+- Missing required fields
+- Invalid rule values
+- Missing file handling
+- Malformed JSON handling
+- Polymorphic behavior of parsed rules
+
 ---
 
 ## Building
@@ -564,7 +756,11 @@ Requirements:
 
 - CMake 3.20+
 - C++20 compiler
-- Git, if GoogleTest is fetched through CMake
+- Git / network access when dependencies are fetched through CMake
+- GoogleTest for unit testing
+- `nlohmann/json` for JSON parsing
+
+GoogleTest and `nlohmann/json` are integrated through CMake `FetchContent`.
 
 Configure:
 
@@ -659,7 +855,8 @@ Layer
 ├── Metal2
 ├── Poly
 ├── Diffusion
-└── Via12
+├── Via12
+└── layerFromString()
 
 Shape
 ├── getId()
@@ -691,6 +888,19 @@ MinEnclosureRule
 ├── getInnerLayer()
 ├── getOuterLayer()
 └── getMinimumEnclosure()
+
+I/O
+
+JSONLayoutParser
+└── load(filePath) → vector<Shape>
+
+JSONRuleParser
+└── load(filePath) → vector<unique_ptr<Rule>>
+
+Engine
+
+DRCEngine
+└── run(shapes, rules) → vector<Violation>
 ```
 
 ---
@@ -723,6 +933,22 @@ MinEnclosureRule
 - Rule-focused GoogleTest coverage
 - Polymorphic execution through `Rule`
 
+### Engine
+
+- `DRCEngine`
+- Multi-rule orchestration
+- Unified violation collection
+- Engine-focused GoogleTest coverage
+
+### JSON Input
+
+- `nlohmann/json` integration
+- `JSONLayoutParser`
+- Generated shape IDs
+- Shared `layerFromString()` conversion
+- `JSONRuleParser`
+- Parser validation and tests
+
 ---
 
 ## Known Limitations
@@ -752,52 +978,75 @@ The current implementation intentionally prioritizes correctness, testability, a
 - Coordinates currently use floating-point values with the project `EPSILON` tolerance policy.
 - Integer database units may be adopted later for stronger IC-layout-style numerical robustness.
 
+### Layout Input
+
+- The current JSON layout format is flat and polygon-based.
+- Hierarchical cells, paths, text, nets, and other GDSII concepts are not yet represented.
+- Shape IDs are generated from import order, so IDs change if shape ordering changes.
+- Direct GDSII parsing is not implemented yet.
+
+### Rule Input
+
+- JSON loading currently supports only `MinWidth`, `MinSpacing`, and `MinEnclosure`.
+- Unknown rule types are rejected.
+- Tcl-style rule decks are planned as a later extension.
+
 ---
 
 ## Next Development
 
-### Rule / Engine Integration
+### Executable / End-to-End Integration
 
-Next planned work:
+The next milestone is to connect the parsers and engine through a real executable.
 
-- Rule creation / configuration
-- `RuleFactory` where appropriate
-- `DRCEngine`
-- Run multiple rules over a shared shape collection
-- Collect unified violations
+Planned flow:
 
-### Layout Loading
+```text
+layout.json
+    ↓
+JSONLayoutParser
 
-- JSON layout format
-- `LayoutParser`
-- Hand-crafted example layouts
-- Known violation cases
+rules.json
+    ↓
+JSONRuleParser
 
-### Engine and Reporting
+        ↓
+    DRCEngine
+        ↓
+violations
+```
 
-- `DRCEngine`
-- Rule orchestration
-- Violation collection
-- JSON reporting
+Planned work:
+
+- Add `main.cpp`
+- Accept layout and rule file paths
+- Run the full file-to-DRC pipeline
+- Print or serialize violations
+- Add end-to-end example inputs
+
+### Reporting
+
+- JSON violation report writer
+- More structured violation metadata where useful
+- Optional SVG visualization
 
 ### Performance
 
 - Quadtree spatial index
 - Nearby / range queries
-- Replace brute-force pairwise checks
+- Replace brute-force pairwise spacing checks
 - Sweep-line optimization
 - Benchmarks against brute force
 
 ### Future Geometry Extension
 
 - Minimum-width support for non-Manhattan polygons
-- 45° and arbitrary-angle edge support where required
-- Keep the public `Polygon::minWidth()` API stable
+- 45° and arbitrary-angle support where required
+- Preserve the public `Polygon::minWidth()` API
 
-### I/O and Integration
+### Future Input / Integration
 
-- JSON violation reports
-- Optional SVG visualization
+- Direct or intermediate GDSII import
 - Optional Tcl rule decks
 - Cross-platform build verification
 - CI
