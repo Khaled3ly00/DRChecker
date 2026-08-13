@@ -82,7 +82,7 @@ if(DRCHECK_BUILD_TESTS)
     enable_testing()
 
     add_executable(drchecker_tests
-        # Geometry tests
+        # Geometry Tests
         tests/geometry/PointTest.cpp
         tests/geometry/VectorTest.cpp
         tests/geometry/BoundingBoxTest.cpp
@@ -94,7 +94,7 @@ if(DRCHECK_BUILD_TESTS)
         tests/domain/ViolationTest.cpp
         tests/domain/LayerTest.cpp
 
-        # Rules tests
+        # Rules Tests
         tests/rules/MinWidthRuleTest.cpp
         tests/rules/MinSpacingRuleTest.cpp
         tests/rules/MinEnclosureRuleTest.cpp
@@ -102,9 +102,12 @@ if(DRCHECK_BUILD_TESTS)
         # Engine Tests
         tests/engine/DRCEngineTest.cpp
 
-        # JSONParser Test
+        # JSONParser Tests
         tests/io/JSONLayoutParserTest.cpp
         tests/io/JSONRuleParserTest.cpp
+
+        # EndToEnd Tests
+        tests/integration/EndtoEndTest.cpp
     )
 
     target_link_libraries(drchecker_tests
@@ -122,3 +125,12 @@ if(DRCHECK_BUILD_TESTS)
 
     gtest_discover_tests(drchecker_tests)
 endif()
+
+add_executable(drcheck
+    src/main.cpp
+)
+
+target_link_libraries(drcheck
+    PRIVATE
+        drchecker
+)

@@ -18,6 +18,7 @@ public:
     Violation(ViolationType type, std::vector<std::size_t> shapeIds, std::string message);
 
     ViolationType getType() const;
+    std::string getTypeAsString() const;
 
     const std::vector<std::size_t>& getShapeIds() const;
 
