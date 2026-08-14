@@ -9,9 +9,7 @@ MinEnclosureRule::MinEnclosureRule(domain::Layer innerLayer, domain::Layer outer
     : innerLayer(innerLayer), outerLayer(outerLayer), minimumEnclosure(minimumEnclosure)
 {
     if (minimumEnclosure <= 0.0) {
-        throw std::invalid_argument(
-            "Minimum enclosure must be positive"
-        );
+        throw std::invalid_argument("Minimum enclosure must be positive");
     }
     if (innerLayer == outerLayer) {
         throw std::invalid_argument(
@@ -21,40 +19,49 @@ MinEnclosureRule::MinEnclosureRule(domain::Layer innerLayer, domain::Layer outer
     }
 }
 
-std::vector<domain::Violation> MinEnclosureRule::check(const std::vector<domain::Shape>& shapes) const
+std::vector<domain::Violation>MinEnclosureRule::check(const std::vector<domain::Shape>& shapes) const
 {
     std::vector<domain::Violation> violations;
-    // Check every shape if it has a layer that matches inner layer
+
     for (const domain::Shape& inner : shapes)
     {
         if (inner.getLayer() != innerLayer) {
             continue;
         }
-        // If shape has inner layer matching check it against outerlayer enclosure
-        bool properlyEnclosed = false;
+
+        bool foundContainingOuter = false;
+
         for (const domain::Shape& outer : shapes)
         {
             if (outer.getLayer() != outerLayer) {
                 continue;
             }
-            // Check for strict containment (no intersection between edges) note: touching not considered intersection
+
             if (!outer.getPolygon().contains(inner.getPolygon()))
             {
                 continue;
             }
-            // Calculate distance between shapes (if touching distance = 0)
-            const double actualEnclosure = outer.getPolygon().distanceTo(inner.getPolygon(), false);
 
-            if (actualEnclosure + geometry::EPSILON >= minimumEnclosure)
+            foundContainingOuter = true;
+
+            const double actualEnclosure =
+                outer.getPolygon().distanceTo(inner.getPolygon(), false);
+
+            if (actualEnclosure + geometry::EPSILON <
+                minimumEnclosure)
             {
-                properlyEnclosed = true;
-                break;
+                violations.emplace_back(
+                    domain::ViolationType::Enclosure, std::vector<std::size_t>{inner.getId(), outer.getId()}, "Enclosure violation", actualEnclosure, minimumEnclosure);
             }
+
+            // Current assumption:
+            // only one outer shape will contain this inner shape.
+            break;
         }
 
-        if (!properlyEnclosed)
+        if (!foundContainingOuter)
         {
-            violations.emplace_back(domain::ViolationType::Enclosure, std::vector<std::size_t>{inner.getId()}, "Enclosure violation" );
+            violations.emplace_back(domain::ViolationType::Enclosure, std::vector<std::size_t>{ inner.getId()}, "Inner shape is not enclosed by any outer shape", 0.0, minimumEnclosure);
         }
     }
 

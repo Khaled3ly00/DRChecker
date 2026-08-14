@@ -15,7 +15,7 @@ enum class ViolationType
 class Violation
 {
 public:
-    Violation(ViolationType type, std::vector<std::size_t> shapeIds, std::string message);
+    Violation(ViolationType type, std::vector<std::size_t> shapeIds, std::string message, double actualValue, double requiredValue);
 
     ViolationType getType() const;
     std::string getTypeAsString() const;
@@ -23,6 +23,8 @@ public:
     const std::vector<std::size_t>& getShapeIds() const;
 
     const std::string& getMessage() const;
+    double getActualValue() const;
+    double getRequiredValue() const;
 
 private:
     ViolationType type;
@@ -30,6 +32,8 @@ private:
 	// Can be one or more shapes depending on the violation type
     std::vector<std::size_t> shapeIds;
     std::string message;
+    double actualValue;
+    double requiredValue;
 };
 
 }

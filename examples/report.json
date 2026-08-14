@@ -2,26 +2,33 @@
     "violationCount": 3,
     "violations": [
         {
-            "message": "Minimum width violation: required 3.000000, actual 2.000000",
+            "type": "MinWidth",
             "shapeIds": [
                 0
             ],
-            "type": "MinWidth"
+            "message": "Minimum width violation: required ",
+            "actual": 2.0,
+            "required": 3.0
         },
         {
-            "message": "Minimum spacing violation",
+            "type": "MinSpacing",
             "shapeIds": [
                 0,
                 1
             ],
-            "type": "MinSpacing"
+            "message": "Minimum spacing violation",
+            "actual": 2.0,
+            "required": 3.0
         },
         {
-            "message": "Enclosure violation",
+            "type": "Enclosure",
             "shapeIds": [
-                2
+                2,
+                1
             ],
-            "type": "Enclosure"
+            "message": "Enclosure violation",
+            "actual": 1.0,
+            "required": 2.0
         }
     ]
 }

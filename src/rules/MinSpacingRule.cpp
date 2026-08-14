@@ -37,7 +37,7 @@ std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::S
                 continue;
             }
 
-            violations.emplace_back(domain::ViolationType::MinSpacing, std::vector<std::size_t>{first.getId(), second.getId()}, "Minimum spacing violation");
+            violations.emplace_back(domain::ViolationType::MinSpacing, std::vector<std::size_t>{first.getId(), second.getId()}, "Minimum spacing violation", actualSpacing, minimumSpacing);
         }
     }
     return violations;

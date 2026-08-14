@@ -5,8 +5,8 @@
 
 namespace drcheck::domain {
 
-Violation::Violation(ViolationType type,std::vector<std::size_t> shapeIds,std::string message)
-        : type(type), shapeIds(std::move(shapeIds)), message(std::move(message))
+Violation::Violation(ViolationType type, std::vector<std::size_t> shapeIds, std::string message, double actualValue, double requiredValue)
+        : type(type), shapeIds(std::move(shapeIds)), message(std::move(message)), actualValue(actualValue), requiredValue(requiredValue)
 {
 }
 
@@ -39,5 +39,13 @@ const std::string& Violation::getMessage() const
 {
     return message;
 }
+double Violation::getActualValue() const
+{
+    return actualValue;
+}
 
+double Violation::getRequiredValue() const
+{
+    return requiredValue;
+}
 }

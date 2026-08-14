@@ -15,7 +15,7 @@ using drcheck::io::JSONReportWriter;
 TEST(JSONReportWriterTest, CreatingSingleViolationReport) {
     std::vector<Violation> violations;
 
-    violations.emplace_back(ViolationType::MinWidth, std::vector<std::size_t>{7}, "Minimum width violation");
+    violations.emplace_back(ViolationType::MinWidth, std::vector<std::size_t>{7}, "Minimum width violation", 2.0, 3.0);
 
     const std::string outputPath = "json_report_writer_test.json";
 
@@ -37,6 +37,8 @@ TEST(JSONReportWriterTest, CreatingSingleViolationReport) {
     ASSERT_EQ(json["violations"][0]["shapeIds"].size(), 1);
     EXPECT_EQ(json["violations"][0]["shapeIds"][0].get<std::size_t>(), 7);
     EXPECT_EQ(json["violations"][0]["message"].get<std::string>(), "Minimum width violation");
+    EXPECT_DOUBLE_EQ(json["violations"][0]["actual"], 2.0);
+    EXPECT_DOUBLE_EQ(json["violations"][0]["required"], 3.0);
 
     input.close();
     std::remove(outputPath.c_str());
@@ -68,8 +70,8 @@ TEST(JSONReportWriterTest, CreatingEmptyViolationReport) {
 TEST(JSONReportWriterTest, CreatingMultipleViolationReport) {
     std::vector<Violation> violations;
 
-    violations.emplace_back(ViolationType::MinWidth, std::vector<std::size_t>{7}, "Minimum width violation");
-    violations.emplace_back(ViolationType::Enclosure, std::vector<std::size_t>{7, 10}, "Minimum enclosure violation");
+    violations.emplace_back(ViolationType::MinWidth, std::vector<std::size_t>{7}, "Minimum width violation", 2.0, 3.0);
+    violations.emplace_back(ViolationType::Enclosure, std::vector<std::size_t>{7, 10}, "Minimum enclosure violation", 2.0, 3.0);
 
     const std::string outputPath = "json_report_writer_test.json";
 

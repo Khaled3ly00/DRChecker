@@ -1,9 +1,11 @@
 #include <gtest/gtest.h>
 
 #include "drcheck/rules/MinEnclosureRule.h"
+#include "drcheck/geometry/Constants.h"
 
 #include <memory>
 
+using drcheck::geometry::EPSILON;
 using drcheck::rules::Rule;
 using drcheck::rules::MinEnclosureRule;
 using drcheck::geometry::Polygon;
@@ -82,6 +84,8 @@ TEST(MinEnclosureRuleTest, RejectsLessThanMinEnclosure)
     const auto violations = rule.check(shapes);
 
     EXPECT_EQ(violations.size(), 1);
+    EXPECT_NEAR(violations[0].getActualValue(), 2.0, EPSILON);
+    EXPECT_NEAR(violations[0].getRequiredValue(), 3.0, EPSILON);
 }
 
 TEST(MinEnclosureRuleTest, IntersectingPolygonsMinEnclosure) // Intersecting polygon should return violation as enclosure distance is zero

@@ -1,9 +1,11 @@
 #include <gtest/gtest.h>
 
 #include "drcheck/rules/MinSpacingRule.h"
+#include "drcheck/geometry/Constants.h"
 
 #include <memory>
 
+using drcheck::geometry::EPSILON;
 using drcheck::rules::MinSpacingRule;
 using drcheck::geometry::Polygon;
 using drcheck::geometry::Point;
@@ -35,6 +37,8 @@ TEST(MinSpacingRuleTest, DetectsSpacingViolation)
     ASSERT_EQ(violations[0].getShapeIds().size(), 2);
     EXPECT_EQ(violations[0].getShapeIds()[0], 1);
     EXPECT_EQ(violations[0].getShapeIds()[1], 2);
+	EXPECT_NEAR(violations[0].getActualValue(), 2.0, EPSILON);
+	EXPECT_NEAR(violations[0].getRequiredValue(), 3.0, EPSILON);
 }
 
 TEST(MinSpacingRuleTest, AcceptsShapesMeetingMinimumSpacing)

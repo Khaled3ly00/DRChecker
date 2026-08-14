@@ -27,9 +27,9 @@ std::vector<domain::Violation> MinWidthRule::check(const std::vector<domain::Sha
 		}
 		const double actualWidth = shape.getPolygon().minWidth();
 		if (actualWidth + geometry::EPSILON < minimumWidth) {
-			std::string message = "Minimum width violation: required " + std::to_string(minimumWidth) + ", actual " + std::to_string(actualWidth);
+			std::string message = "Minimum width violation: required ";
 			// If the shape's width is less than the minimum width, create a violation (object) and add it to the violations vector
-			violations.emplace_back(domain::ViolationType::MinWidth, std::vector<std::size_t>{shape.getId()}, std::move(message));
+			violations.emplace_back(domain::ViolationType::MinWidth, std::vector<std::size_t>{shape.getId()}, std::move(message), actualWidth, minimumWidth);
 		}
 	}
 	return violations;

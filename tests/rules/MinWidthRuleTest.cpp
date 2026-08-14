@@ -1,9 +1,11 @@
 #include <gtest/gtest.h>
 
 #include "drcheck/rules/MinWidthRule.h"
+#include "drcheck/geometry/Constants.h"
 
 #include <memory>
 
+using drcheck::geometry::EPSILON;
 using drcheck::rules::MinWidthRule;
 using drcheck::geometry::Polygon;
 using drcheck::geometry::Point;
@@ -24,6 +26,8 @@ TEST(MinWidthRuleTest, DetectsMinWidthViolation)
     ASSERT_EQ(violations.size(), 1);
     EXPECT_EQ(violations[0].getType(), ViolationType::MinWidth);
     EXPECT_EQ(violations[0].getShapeIds()[0], 1);
+    EXPECT_NEAR(violations[0].getActualValue(), 3.0, EPSILON);
+    EXPECT_NEAR(violations[0].getRequiredValue(), 4.0, EPSILON);
 }
 
 TEST(MinWidthRuleTest, AcceptsShapeMeetingMinWidth)
