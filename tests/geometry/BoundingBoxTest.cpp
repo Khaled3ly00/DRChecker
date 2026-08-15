@@ -92,3 +92,27 @@ TEST(BoundingBoxTest, RejectsNegativeOverlapTolerance)
         std::invalid_argument
     );
 }
+
+TEST(BoundingBoxTest, ContainsInnerBoundingBox)
+{
+    BoundingBox outer(0, 0, 100, 100);
+    BoundingBox inner(20, 20, 40, 40);
+
+    EXPECT_TRUE(outer.contains(inner));
+}
+
+TEST(BoundingBoxTest, ContainsBoundingBoxTouchingBoundary)
+{
+    BoundingBox outer(0, 0, 100, 100);
+    BoundingBox inner(0, 20, 40, 40);
+
+    EXPECT_TRUE(outer.contains(inner));
+}
+
+TEST(BoundingBoxTest, DoesNotContainPartiallyOutsideBoundingBox)
+{
+    BoundingBox outer(0, 0, 100, 100);
+    BoundingBox other(90, 20, 110, 40);
+
+    EXPECT_FALSE(outer.contains(other));
+}

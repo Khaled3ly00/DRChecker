@@ -46,6 +46,9 @@ add_library(drchecker
     src/io/JSONLayoutParser.cpp
     src/io/JSONRuleParser.cpp
     src/io/JSONReportWriter.cpp
+
+    # Spatial
+    src/spatial/QuadTree.cpp
 )
 
 target_include_directories(drchecker
@@ -110,6 +113,9 @@ if(DRCHECK_BUILD_TESTS)
 
         # EndToEnd Tests
         tests/integration/EndtoEndTest.cpp
+
+        # Spatial
+        tests/spatial/QuadTreeTest.cpp
     )
 
     target_link_libraries(drchecker_tests

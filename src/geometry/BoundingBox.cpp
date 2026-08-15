@@ -32,7 +32,7 @@ namespace drcheck::geometry {
 	{
 		return maxY;
 	}
-
+	// Overlaps is a symmetric function that checks if any of two bounding boxes have common area
 	bool BoundingBox::overlaps(const BoundingBox& other, double tolerance) const
 	{
 		if (tolerance < 0.0) {
@@ -46,5 +46,14 @@ namespace drcheck::geometry {
 			minX - tolerance <= other.maxX &&
 			maxY + tolerance >= other.minY &&
 			minY - tolerance <= other.maxY;
+	}
+	// Contains is NOT a symmetric function it checks if a bounding box contains other
+	bool BoundingBox::contains(const BoundingBox& other) const
+	{
+		return
+			other.minX >= minX &&
+			other.maxX <= maxX &&
+			other.minY >= minY &&
+			other.maxY <= maxY;
 	}
 }
