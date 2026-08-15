@@ -56,4 +56,28 @@ namespace drcheck::geometry {
 			other.minY >= minY &&
 			other.maxY <= maxY;
 	}
+	// Returns the smallest bounding box that contains both bounding boxes.
+	BoundingBox BoundingBox::mergedWith(const BoundingBox& other) const
+	{
+		return BoundingBox(
+			std::min(minX, other.minX),
+			std::min(minY, other.minY),
+			std::max(maxX, other.maxX),
+			std::max(maxY, other.maxY)
+		);
+	}
+	// Return an expanded bounding box for quadtree queries
+	BoundingBox BoundingBox::expanded(double amount) const
+	{
+		if (amount < 0.0)
+		{
+			throw std::invalid_argument("Bounding box expansion cannot be negative");
+		}
+		return BoundingBox(
+			minX - amount,
+			minY - amount,
+			maxX + amount,
+			maxY + amount
+		);
+	}
 }

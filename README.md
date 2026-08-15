@@ -15,9 +15,9 @@ The project is being developed as a portfolio project focused on:
 
 ## Current Status
 
-The project has completed the **geometry core**, **domain model**, initial **DRC rule layer**, **DRC engine orchestration**, **JSON input parsing**, a runnable **command-line application**, and **JSON violation reporting**.
+The project has completed the **geometry core**, **domain model**, initial **DRC rule layer**, **DRC engine orchestration**, **JSON input/output flow**, richer **violation metadata**, and the first **spatial-indexing optimization** using a QuadTree.
 
-The current implementation can load layout shapes and rule definitions from JSON, build the corresponding domain and rule objects, run width, spacing, and enclosure checks through `DRCEngine`, print a result summary, and write a machine-readable JSON violation report.
+The current implementation can load layout shapes and rule definitions from JSON, run width, spacing, and enclosure checks through `DRCEngine`, record actual and required rule values in violations, write machine-readable JSON reports, and use a QuadTree to reduce candidate comparisons for minimum-spacing checks.
 
 ### Implemented Geometry
 
@@ -41,6 +41,9 @@ The current implementation can load layout shapes and rule definitions from JSON
 - Constructor-enforced coordinate ordering
 - Exact overlap detection by default
 - Optional tolerance for geometry broad-phase checks
+- Bounding-box containment
+- Bounding-box merging
+- Uniform bounding-box expansion
 
 #### `Segment`
 
@@ -108,8 +111,11 @@ drcheck/
 │       │   ├── JSONRuleParser.h
 │       │   └── JSONReportWriter.h
 │       │
-│       └── engine/
-│           └── DRCEngine.h
+│       ├── engine/
+│       │   └── DRCEngine.h
+│       │
+│       └── spatial/
+│           └── QuadTree.h
 │
 ├── src/
 │   ├── geometry/
@@ -137,6 +143,9 @@ drcheck/
 │   ├── engine/
 │   │   └── DRCEngine.cpp
 │   │
+│   ├── spatial/
+│   │   └── QuadTree.cpp
+│   │
 │   └── main.cpp
 │
 ├── tests/
@@ -163,6 +172,9 @@ drcheck/
 │   │
 │   ├── engine/
 │   │   └── DRCEngineTest.cpp
+│   │
+│   ├── spatial/
+│   │   └── QuadTreeTest.cpp
 │   │
 │   └── integration/
 │       └── EndToEndTest.cpp
@@ -210,6 +222,9 @@ polygon.minWidth();
 
 boundingBox.overlaps(otherBoundingBox);
 boundingBox.overlaps(otherBoundingBox, EPSILON);
+boundingBox.contains(otherBoundingBox);
+boundingBox.mergedWith(otherBoundingBox);
+boundingBox.expanded(amount);
 ```
 
 Internal implementation details are kept private where appropriate.
@@ -425,6 +440,8 @@ The current representation stores:
 - `ViolationType`
 - Involved shape IDs
 - Human-readable message
+- Actual measured value
+- Required rule value
 
 `Violation::getTypeAsString()` provides the string representation used by CLI and JSON reporting without requiring output code to duplicate enum-conversion logic.
 
@@ -478,18 +495,72 @@ check(const std::vector<domain::Shape>& shapes) const = 0;
 
 ### `MinSpacingRule`
 
-- Applies to unique pairs of shapes on the selected layer
-- Uses `Polygon::distanceTo()`
-- Produces violations containing both involved shape IDs
-- Currently uses brute-force pairwise checking as the correctness baseline
+- Applies to shapes on the selected layer
+- Builds a target-layer QuadTree from polygon bounding boxes
+- Expands each shape's bounding box by the minimum-spacing requirement
+- Queries the QuadTree for nearby candidate shapes
+- Uses `Polygon::distanceTo()` for the exact spacing calculation
+- Avoids self-pairs and duplicate A-B / B-A checks
+- Produces violations containing both involved shape IDs, actual spacing, and required spacing
+
+The QuadTree is used only as a broad-phase accelerator. Exact DRC correctness still comes from the polygon-distance calculation.
 
 ### `MinEnclosureRule`
 
 - Applies between an inner layer and an outer layer
 - Uses `Polygon::contains(const Polygon&)` to verify containment
 - Uses `Polygon::distanceTo(other, false)` to measure edge-to-edge enclosure distance
-- Produces an enclosure violation when no valid outer polygon provides the required enclosure
+- Stores actual and required enclosure values in violations
+- Reports both inner and outer shape IDs when a containing outer shape exists but enclosure is insufficient
+- Reports only the inner shape ID with actual enclosure `0.0` when no containing outer shape exists
 
+The current implementation intentionally assumes that each inner shape is associated with at most one containing outer polygon.
+
+
+---
+
+## Spatial Indexing
+
+### QuadTree
+
+The project now includes a QuadTree under:
+
+```cpp
+namespace drcheck::spatial
+```
+
+The QuadTree partitions a 2D layout region into four recursive child regions and stores pointers to existing `Shape` objects instead of copying polygon geometry.
+
+A shape is moved into a child only when its complete bounding box fits inside that child. Shapes that cross child boundaries remain in the parent node, ensuring each shape is stored exactly once.
+
+Implemented behavior includes:
+
+- Shape insertion
+- Capacity-based subdivision
+- Maximum-depth control
+- Redistribution of stored shapes after subdivision
+- Bounding-box range queries
+- Rejection of shapes outside the root boundary
+
+The root boundary is calculated dynamically from the actual target-layer geometry, so no fixed layout dimensions are required.
+
+### QuadTree-Accelerated Spacing
+
+```text
+shape bounding box
+      ↓
+expand by minimum spacing
+      ↓
+QuadTree range query
+      ↓
+nearby candidates
+      ↓
+Polygon::distanceTo()
+      ↓
+exact spacing result
+```
+
+The QuadTree may return false-positive candidates, but the exact polygon-distance calculation still makes the final DRC decision. This reduces unnecessary comparisons for spatially distributed layouts, while worst-case layouts can still approach brute-force behavior.
 
 ---
 
@@ -642,11 +713,15 @@ Example:
     {
       "type": "MinWidth",
       "shapeIds": [0],
+      "actual": 2.0,
+      "required": 3.0,
       "message": "Minimum width violation"
     },
     {
       "type": "MinSpacing",
       "shapeIds": [0, 1],
+      "actual": 1.0,
+      "required": 2.0,
       "message": "Minimum spacing violation"
     }
   ]
@@ -662,7 +737,7 @@ Clean layouts are also represented explicitly:
 }
 ```
 
-The current report does not yet include measured values, required rule values, exact violation locations, or offending edge pairs.
+The report now includes actual measured values and required rule values. Exact violation locations, offending edge pairs, and marker geometry are not yet stored.
 
 
 ---
@@ -697,6 +772,12 @@ Coverage includes:
 - Explicit tolerance
 - Invalid coordinate ranges
 - Negative-tolerance rejection
+- Bounding-box containment
+- Boundary-touching containment
+- Partial-containment rejection
+- Bounding-box merging
+- Bounding-box expansion
+- Negative-expansion rejection
 
 #### Segment
 
@@ -737,7 +818,7 @@ Coverage includes:
 Coverage includes:
 
 - `Shape` stores its ID, layer, and polygon correctly
-- `Violation` stores type, shape IDs, and message correctly
+- `Violation` stores type, shape IDs, message, actual value, and required value correctly
 - `Violation::getTypeAsString()` for all current violation types
 - Layer string conversion through `layerFromString()`
 
@@ -760,6 +841,10 @@ Coverage includes:
 - Multiple shapes
 - Duplicate-pair prevention
 - Concave polygons
+- Cross-quadrant candidate detection
+- Parent-node crossing-shape detection
+- Far-shape rejection
+- Actual and required spacing metadata
 - Invalid rule parameters
 - Polymorphic use through `Rule`
 
@@ -773,10 +858,25 @@ Coverage includes:
 - Concave outer polygon with valid enclosure
 - Concave outer polygon with crossing geometry
 - Wrong outer layer
-- Multiple outer candidates
 - Multiple inner shapes
+- Missing containing outer polygon
+- Actual and required enclosure metadata
 - Invalid rule parameters
 - Polymorphic use through `Rule`
+
+### QuadTree Tests
+
+Coverage includes:
+
+- Zero-capacity rejection
+- Single-shape insertion and query
+- Non-overlapping query regions
+- Node subdivision
+- Shape redistribution after subdivision
+- Queries across different quadrants
+- Boundary-crossing shapes retained at parent nodes
+- Outside-root insertion rejection
+- Maximum-depth behavior
 
 ### Engine Tests
 
@@ -831,6 +931,8 @@ Coverage includes:
 - Single and multiple violation serialization
 - Multiple shape IDs
 - Violation type string output
+- Actual measured values
+- Required rule values
 - Message serialization
 - Invalid output path handling
 - Re-parsing generated JSON to validate semantic contents
@@ -932,7 +1034,14 @@ Vector
 └── cross()
 
 BoundingBox
-└── overlaps(other, tolerance = 0.0)
+├── getMinX()
+├── getMinY()
+├── getMaxX()
+├── getMaxY()
+├── overlaps(other, tolerance = 0.0)
+├── contains(other)
+├── mergedWith(other)
+└── expanded(amount)
 
 Segment
 ├── length()
@@ -976,7 +1085,9 @@ Violation
 ├── getType()
 ├── getTypeAsString()
 ├── getShapeIds()
-└── getMessage()
+├── getMessage()
+├── getActualValue()
+└── getRequiredValue()
 
 Rules
 
@@ -1014,6 +1125,12 @@ Engine
 
 DRCEngine
 └── run(shapes, rules) → vector<Violation>
+
+Spatial
+
+QuadTree
+├── insert(shape)
+└── query(region) → vector<const Shape*>
 
 Application
 
@@ -1078,10 +1195,23 @@ drcheck
 ### JSON Reporting
 
 - `Violation::getTypeAsString()`
+- Actual and required rule values
 - `JSONReportWriter`
 - Empty and non-empty reports
 - Machine-readable violation output
 - Reporting and end-to-end tests
+
+### Spatial Indexing
+
+- `BoundingBox::contains()`
+- `BoundingBox::mergedWith()`
+- `BoundingBox::expanded()`
+- QuadTree insertion and subdivision
+- Parent-node handling for boundary-crossing shapes
+- Bounding-box range queries
+- Dynamic root-boundary calculation
+- QuadTree-backed `MinSpacingRule`
+- Spatial-index regression tests
 
 ---
 
@@ -1097,15 +1227,17 @@ The current implementation intentionally prioritizes correctness, testability, a
 
 ### Minimum Spacing
 
-- `MinSpacingRule` currently uses brute-force pairwise shape checking.
-- Spatial indexing and optimized candidate filtering are planned later.
+- `MinSpacingRule` now uses a QuadTree to reduce candidate comparisons before exact polygon-distance checking.
+- QuadTree performance depends on spatial distribution; worst-case layouts can still approach brute-force behavior.
+- The current implementation builds a QuadTree inside each `MinSpacingRule::check()` call rather than reusing a shared spatial index across rules.
+- Current QuadTree parameters are initial fixed values rather than benchmark-tuned settings.
 
 ### Minimum Enclosure
 
-- `MinEnclosureRule` evaluates enclosure against **individual outer polygons**.
-- If two separate outer polygons both contain the same inner polygon, the current rule does **not** combine or jointly evaluate them as a single enclosing structure.
-- The rule accepts an inner shape once one individual outer polygon satisfies the required enclosure.
-- Richer violation metadata identifying the best or nearest failed outer candidate is not yet implemented.
+- `MinEnclosureRule` currently assumes that an inner shape is associated with at most one containing outer polygon.
+- Multiple containing outer candidates are not compared to select a best enclosure result.
+- Two or more outer polygons are not combined or evaluated as a union for enclosure.
+- If no containing outer polygon exists, the reported actual enclosure is currently `0.0`.
 
 ### Geometry Representation
 
@@ -1127,8 +1259,7 @@ The current implementation intentionally prioritizes correctness, testability, a
 
 ### Violation Reporting
 
-- Reports currently contain violation type, involved shape IDs, and a human-readable message.
-- Reports do not yet include the actual measured value or the required rule value.
+- Reports contain violation type, involved shape IDs, actual measured value, required value, and a human-readable message.
 - Exact violation coordinates, offending edges, and marker geometry are not yet stored.
 - Because shape IDs are generated from import order, report IDs are tied to the ordering of the imported layout.
 
@@ -1136,37 +1267,24 @@ The current implementation intentionally prioritizes correctness, testability, a
 
 ## Next Development
 
-### Richer Violation Metadata
+### Spatial Performance Validation
 
-The next milestone is to make each violation more informative.
+The next performance milestone is to measure the value of the QuadTree rather than relying only on functional correctness.
 
 Planned work:
 
-- Store the actual measured value that caused the violation
-- Store the required rule value
-- Update `MinWidthRule`, `MinSpacingRule`, and `MinEnclosureRule` to populate these values
-- Extend `JSONReportWriter` to serialize the additional information
-- Add regression tests for the richer violation data
+- Create synthetic layouts with increasing shape counts
+- Compare QuadTree-backed spacing checks against a brute-force baseline
+- Measure candidate-count reduction and runtime
+- Experiment with QuadTree capacity and maximum depth
+- Document cases where spatial indexing helps and cases where it degrades toward worst-case behavior
 
-Example target report entry:
+### Future Performance Work
 
-```json
-{
-  "type": "MinWidth",
-  "shapeIds": [0],
-  "required": 3.0,
-  "actual": 2.0,
-  "message": "Minimum width violation"
-}
-```
-
-### Performance
-
-- Quadtree spatial index
-- Nearby / range queries
-- Replace brute-force pairwise spacing checks
-- Sweep-line optimization
-- Benchmarks against brute force
+- Reusable/shared spatial indices across rules
+- Sweep-line optimization where appropriate
+- Additional spatial-query strategies
+- Larger-layout benchmarks
 
 ### Future Geometry Extension
 

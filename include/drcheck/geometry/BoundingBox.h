@@ -8,6 +8,8 @@ namespace drcheck::geometry {
 
 		bool overlaps(const BoundingBox& other, double tolerance = 0.0) const;
 		bool contains(const BoundingBox& other) const;
+		BoundingBox mergedWith(const BoundingBox& other) const;
+		BoundingBox expanded(double amount) const;
 
 		double getMinX() const;
 		double getMinY() const;

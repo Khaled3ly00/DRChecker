@@ -143,7 +143,7 @@ TEST(MinSpacingRuleTest, MultipleShapesAgainstMinSpacing)
 	EXPECT_EQ(violations[0].getShapeIds()[1], 2);
 }
 
-TEST(MinSpacingRule, IntersectingShapesAgainstMinSpacing) {
+TEST(MinSpacingRuleTest, IntersectingShapesAgainstMinSpacing) {
 	Polygon polygon1({
 		Point(0,0),
 		Point(5,0),
@@ -165,7 +165,7 @@ TEST(MinSpacingRule, IntersectingShapesAgainstMinSpacing) {
 	EXPECT_EQ(violations[0].getShapeIds()[1], 2);
 }
 
-TEST(MinSpacingRule, LShapesAgainstMinSpacing) {
+TEST(MinSpacingRuleTest, LShapesAgainstMinSpacing) {
 	Polygon polygon1({
 		Point(0.0, 0.0),
 		Point(4.0, 0.0),
@@ -211,4 +211,132 @@ TEST(MinSpacingRuleTest, WorksThroughRuleInterface)
 	ASSERT_EQ(violations.size(), 1);
 	EXPECT_EQ(violations[0].getShapeIds()[0], 1);
 	EXPECT_EQ(violations[0].getShapeIds()[1], 2);
+}
+
+TEST(MinSpacingRuleTest, DetectsViolationAcrossQuadTreeQuadrants)
+{
+	Polygon polygonA({
+		Point(45, 40),
+		Point(48, 40),
+		Point(48, 45),
+		Point(45, 45)
+		});
+	Shape shapeA(1, Layer::Metal1, std::move(polygonA));
+
+	Polygon polygonB({
+		Point(50, 40),
+		Point(53, 40),
+		Point(53, 45),
+		Point(50, 45)
+		});
+	Shape shapeB(2, Layer::Metal1, std::move(polygonB));
+
+	// Extra far-away shapes force the QuadTree to subdivide,
+	// but should not create additional spacing violations.
+	Polygon polygonC({
+		Point(0, 0),
+		Point(5, 0),
+		Point(5, 5),
+		Point(0, 5)
+		});
+	Shape shapeC(3, Layer::Metal1, std::move(polygonC));
+
+	Polygon polygonD({
+		Point(95, 0),
+		Point(100, 0),
+		Point(100, 5),
+		Point(95, 5)
+		});
+	Shape shapeD(4, Layer::Metal1, std::move(polygonD));
+
+	Polygon polygonE({
+		Point(0, 95),
+		Point(5, 95),
+		Point(5, 100),
+		Point(0, 100)
+		});
+	Shape shapeE(5, Layer::Metal1, std::move(polygonE));
+
+	std::vector<Shape> shapes;
+	shapes.push_back(std::move(shapeA));
+	shapes.push_back(std::move(shapeB));
+	shapes.push_back(std::move(shapeC));
+	shapes.push_back(std::move(shapeD));
+	shapes.push_back(std::move(shapeE));
+
+	MinSpacingRule rule(Layer::Metal1, 3.0);
+
+	const auto violations = rule.check(shapes);
+
+	ASSERT_EQ(violations.size(), 1);
+
+	EXPECT_EQ(violations[0].getType(), ViolationType::MinSpacing);
+
+	EXPECT_NEAR(violations[0].getActualValue(), 2.0, EPSILON);
+
+	EXPECT_NEAR(violations[0].getRequiredValue(), 3.0, EPSILON);
+}
+
+TEST(MinSpacingRuleTest, ShapeCrossingQuadTreeQuadrants)
+{
+	Polygon polygonA({
+		Point(45, 40),
+		Point(48, 40),
+		Point(48, 45),
+		Point(45, 45)
+		});
+	Shape shapeA(1, Layer::Metal1, std::move(polygonA));
+
+	Polygon polygonB({
+		Point(45, 40),
+		Point(53, 40),
+		Point(53, 45),
+		Point(45, 45)
+		});
+	Shape shapeB(2, Layer::Metal1, std::move(polygonB));
+
+	// Extra far-away shapes force the QuadTree to subdivide,
+	// but should not create additional spacing violations.
+	Polygon polygonC({
+		Point(0, 0),
+		Point(5, 0),
+		Point(5, 5),
+		Point(0, 5)
+		});
+	Shape shapeC(3, Layer::Metal1, std::move(polygonC));
+
+	Polygon polygonD({
+		Point(95, 0),
+		Point(100, 0),
+		Point(100, 5),
+		Point(95, 5)
+		});
+	Shape shapeD(4, Layer::Metal1, std::move(polygonD));
+
+	Polygon polygonE({
+		Point(0, 95),
+		Point(5, 95),
+		Point(5, 100),
+		Point(0, 100)
+		});
+	Shape shapeE(5, Layer::Metal1, std::move(polygonE));
+
+	std::vector<Shape> shapes;
+	shapes.push_back(std::move(shapeA));
+	shapes.push_back(std::move(shapeB));
+	shapes.push_back(std::move(shapeC));
+	shapes.push_back(std::move(shapeD));
+	shapes.push_back(std::move(shapeE));
+
+	MinSpacingRule rule(Layer::Metal1, 3.0);
+
+	const auto violations = rule.check(shapes);
+
+	ASSERT_EQ(violations.size(), 1);
+
+	EXPECT_EQ(violations[0].getType(), ViolationType::MinSpacing);
+
+	EXPECT_NEAR(violations[0].getActualValue(), 0.0, EPSILON);
+
+	EXPECT_NEAR(violations[0].getRequiredValue(), 3.0, EPSILON);
 }

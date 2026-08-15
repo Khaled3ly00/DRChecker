@@ -247,3 +247,28 @@ TEST(QuadTreeTest, SupportsRecursiveSubdivisionBeyondRoot)
 
     ASSERT_EQ(results.size(), 3);
 }
+
+TEST(QuadTreeTest, InsertOneShapeTouchingBoundary)
+{
+    BoundingBox boundary(0, 0, 100, 100);
+
+    Polygon polygon({
+        Point(0, 0),
+        Point(100, 0),
+        Point(100, 100),
+        Point(0, 100)
+        });
+    Shape shape(1, Layer::Metal1, std::move(polygon));
+
+    QuadTree quadtree(boundary, 2, 5);
+
+    BoundingBox region(0, 0, 100, 100);
+
+    quadtree.insert(shape);
+
+    std::vector<const Shape*> results;
+    results = quadtree.query(region);
+
+    ASSERT_EQ(results.size(), 1);
+    EXPECT_EQ(results[0]->getId(), 1);
+}

@@ -1,4 +1,5 @@
 #include "drcheck/rules/MinSpacingRule.h"
+#include "drcheck/spatial/Quadtree.h"
 #include "drcheck/geometry/Constants.h"
 
 #include <stdexcept>
@@ -16,28 +17,64 @@ MinSpacingRule::MinSpacingRule(domain::Layer layer, double minimumSpacing)
 std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::Shape>& shapes) const
 {
     std::vector<domain::Violation> violations;
-    // Loop through all pairs of shapes to check for minimum spacing violations
-    for (std::size_t i = 0; i < shapes.size(); ++i)
-    {
-        for (std::size_t j = i + 1; j < shapes.size(); ++j)
+    const domain::Shape* firstTargetShape = nullptr;
+
+    // Check if there's any shape with the same layer
+    for (const domain::Shape& shape : shapes) {
+        if (shape.getLayer() == layer) {
+            firstTargetShape = &shape;
+            break;
+        }
+    }
+    if (!firstTargetShape) {
+        return violations;
+    }
+    // Merge all bounding boxes for shapes with same layer to get root boundary
+    geometry::BoundingBox boundary = firstTargetShape->getPolygon().getBoundingBox();
+    for (const domain::Shape& shape : shapes) {
+        if (shape.getLayer() != layer) {
+            continue;
+        }
+        boundary = boundary.mergedWith(shape.getPolygon().getBoundingBox());
+    }
+    // Build QuadTree
+    spatial::QuadTree tree(boundary, 4, 8);
+    for (const domain::Shape& shape : shapes) {
+        if (shape.getLayer() != layer) {
+            continue;
+        }
+        tree.insert(shape);
+    }
+    // Create query for each shape to get candidates
+    // Then calculate distance between each pair
+    for (const domain::Shape& shape : shapes) {
+        if (shape.getLayer() != layer) {
+            continue;
+        }
+        const geometry::BoundingBox searchRegion =shape.getPolygon().getBoundingBox().expanded(minimumSpacing);
+        const auto candidates = tree.query(searchRegion);
+        
+        for (const domain::Shape* candidate :candidates)
         {
-            const domain::Shape& first = shapes[i];
+            // Avoid checking the shape against itself.
+            if (candidate == &shape) {
+                continue;
+            }
 
-            const domain::Shape& second = shapes[j];
-            // Make sure both shapes are on the same layer as the rule
-            if (first.getLayer() != layer || second.getLayer() != layer)
+            // Prevent duplicate A-B / B-A checks.
+            // Shapes have unique IDs arranged ascendingly 
+            if (candidate->getId() <= shape.getId())
             {
                 continue;
             }
 
-            const double actualSpacing = first.getPolygon().distanceTo(second.getPolygon());
+            const double actualSpacing = shape.getPolygon().distanceTo(candidate->getPolygon());
 
-            if (actualSpacing + geometry::EPSILON >= minimumSpacing)
+            if (actualSpacing + geometry::EPSILON <minimumSpacing)
             {
-                continue;
+                violations.emplace_back(domain::ViolationType::MinSpacing, std::vector<std::size_t>{shape.getId(), candidate->getId()},
+                    "Minimum spacing violation", actualSpacing, minimumSpacing);
             }
-
-            violations.emplace_back(domain::ViolationType::MinSpacing, std::vector<std::size_t>{first.getId(), second.getId()}, "Minimum spacing violation", actualSpacing, minimumSpacing);
         }
     }
     return violations;

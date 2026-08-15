@@ -116,3 +116,34 @@ TEST(BoundingBoxTest, DoesNotContainPartiallyOutsideBoundingBox)
 
     EXPECT_FALSE(outer.contains(other));
 }
+
+TEST(BoundingBoxTest, MergesBoundingBoxes)
+{
+    BoundingBox first(0, 0, 10, 10);
+    BoundingBox second(-5, 5, 30, 20);
+
+    const BoundingBox result = first.mergedWith(second);
+
+    EXPECT_DOUBLE_EQ(result.getMinX(), -5);
+    EXPECT_DOUBLE_EQ(result.getMinY(), 0);
+    EXPECT_DOUBLE_EQ(result.getMaxX(), 30);
+    EXPECT_DOUBLE_EQ(result.getMaxY(), 20);
+}
+
+TEST(BoundingBoxTest, ExpandsBoundingBox)
+{
+    BoundingBox box(10, 20, 30, 40);
+    const BoundingBox expanded = box.expanded(5);
+
+    EXPECT_DOUBLE_EQ(expanded.getMinX(), 5);
+    EXPECT_DOUBLE_EQ(expanded.getMinY(), 15);
+    EXPECT_DOUBLE_EQ(expanded.getMaxX(), 35);
+    EXPECT_DOUBLE_EQ(expanded.getMaxY(), 45);
+}
+
+TEST(BoundingBoxTest, RejectsNegativeExpansion)
+{
+    BoundingBox box(0, 0, 10, 10);
+
+    EXPECT_THROW(box.expanded(-1), std::invalid_argument);
+}
