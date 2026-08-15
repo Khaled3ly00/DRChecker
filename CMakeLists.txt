@@ -118,14 +118,16 @@ if(DRCHECK_BUILD_TESTS)
         tests/spatial/QuadTreeTest.cpp
     )
 
-    target_link_libraries(drchecker_tests
+    target_link_libraries(
+        drchecker_tests
         PRIVATE
             drchecker
             GTest::gtest_main
     )
 
-    target_compile_definitions(drchecker_tests
-    PRIVATE
+    target_compile_definitions(
+        drchecker_tests
+        PRIVATE
         DRCHECK_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
     )
 
@@ -134,11 +136,36 @@ if(DRCHECK_BUILD_TESTS)
     gtest_discover_tests(drchecker_tests)
 endif()
 
-add_executable(drcheck
+add_executable(
+    drcheck
     src/main.cpp
 )
 
-target_link_libraries(drcheck
+target_link_libraries(
+    drcheck
     PRIVATE
         drchecker
+)
+
+target_compile_definitions(
+    drcheck
+    PRIVATE
+        DRCHECK_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
+)
+
+add_executable(
+    drcheck_benchmark
+    benchmarks/MinSpacingBenchmark.cpp
+)
+
+target_link_libraries(
+    drcheck_benchmark
+    PRIVATE
+        drchecker
+)
+
+target_compile_definitions(
+    drcheck_benchmark
+    PRIVATE
+        DRCHECK_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
 )

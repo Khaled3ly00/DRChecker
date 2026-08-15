@@ -15,9 +15,9 @@ The project is being developed as a portfolio project focused on:
 
 ## Current Status
 
-The project has completed the **geometry core**, **domain model**, initial **DRC rule layer**, **DRC engine orchestration**, **JSON input/output flow**, richer **violation metadata**, and the first **spatial-indexing optimization** using a QuadTree.
+The project has completed the **geometry core**, **domain model**, initial **DRC rule layer**, **DRC engine orchestration**, **JSON input/output flow**, richer **violation metadata**, the first **spatial-indexing optimization** using a QuadTree, and **performance validation and parameter tuning** of the QuadTree-backed spacing check against a brute-force baseline.
 
-The current implementation can load layout shapes and rule definitions from JSON, run width, spacing, and enclosure checks through `DRCEngine`, record actual and required rule values in violations, write machine-readable JSON reports, and use a QuadTree to reduce candidate comparisons for minimum-spacing checks.
+The current implementation can load layout shapes and rule definitions from JSON, run width, spacing, and enclosure checks through `DRCEngine`, record actual and required rule values in violations, write machine-readable JSON reports, and use a QuadTree to reduce candidate comparisons for minimum-spacing checks. Release-mode dense and sparse benchmarks have been completed, followed by a 16-configuration QuadTree parameter sweep. The selected balanced defaults are `capacity = 16` and `maxDepth = 8`.
 
 ### Implemented Geometry
 
@@ -178,6 +178,13 @@ drcheck/
 │   │
 │   └── integration/
 │       └── EndToEndTest.cpp
+│
+├── benchmarks/
+│   ├── MinSpacingBenchmark.cpp
+│   └── results/
+│       ├── min_spacing_dense_benchmark.txt
+│       ├── min_spacing_sparse_benchmark.txt
+│       └── quadtree_parameter_tuning.txt
 │
 ├── examples/
 │   ├── basic_layout.json
@@ -544,6 +551,15 @@ Implemented behavior includes:
 
 The root boundary is calculated dynamically from the actual target-layer geometry, so no fixed layout dimensions are required.
 
+After benchmark-based parameter tuning, the current default configuration used by `MinSpacingRule` is:
+
+```text
+QuadTree Capacity: 16
+QuadTree Max Depth: 8
+```
+
+These values are implementation/performance parameters, not design-rule parameters.
+
 ### QuadTree-Accelerated Spacing
 
 ```text
@@ -561,6 +577,175 @@ exact spacing result
 ```
 
 The QuadTree may return false-positive candidates, but the exact polygon-distance calculation still makes the final DRC decision. This reduces unnecessary comparisons for spatially distributed layouts, while worst-case layouts can still approach brute-force behavior.
+
+---
+
+## Performance Benchmarking
+
+A dedicated benchmark executable compares the original brute-force minimum-spacing candidate enumeration with the current QuadTree-backed implementation.
+
+The exact geometry operation remains unchanged in both paths:
+
+```text
+Brute force:
+all unique shape pairs
+        ↓
+Polygon::distanceTo()
+
+QuadTree:
+expanded bounding-box query
+        ↓
+nearby candidate pairs
+        ↓
+Polygon::distanceTo()
+```
+
+This keeps the comparison focused on candidate selection rather than changing DRC semantics.
+
+### Measurements
+
+Each benchmark run records:
+
+- Number of shapes
+- Exact polygon-pair checks
+- Number of detected violations
+- Total runtime
+- Pair-check reduction
+- Speedup relative to brute force
+
+The QuadTree timing includes root-boundary calculation, tree construction, shape insertion, range queries, and exact polygon-distance checks.
+
+Correctness is checked by requiring the brute-force and QuadTree implementations to report the same violation count.
+
+### Scenario 1 — Dense Grid
+
+Configuration:
+
+```text
+Build Type: Release
+Shape Size: 10 × 10
+Gap: 2
+Minimum Spacing: 3
+QuadTree Capacity: 4
+QuadTree Max Depth: 8
+```
+
+Measured results:
+
+| Shapes | Brute Pair Checks | QuadTree Pair Checks | Pair Reduction | Brute Time (ms) | QuadTree Time (ms) | Speedup |
+|---:|---:|---:|---:|---:|---:|---:|
+| 100 | 4,950 | 342 | 93.09% | 51.37 | 4.10 | 12.52× |
+| 500 | 124,750 | 1,868 | 98.50% | 1,452.57 | 23.63 | 61.47× |
+| 1,000 | 499,500 | 3,811 | 99.24% | 4,704.80 | 43.76 | 107.52× |
+| 2,000 | 1,999,000 | 7,733 | 99.61% | 18,048.81 | 121.71 | 148.30× |
+
+For every tested size, the brute-force and QuadTree implementations reported the same violation count, confirming that the spatial filtering preserved the benchmarked spacing-check results.
+
+For this dense regular grid, the QuadTree greatly reduces exact `Polygon::distanceTo()` calls as layout size increases. The measured speedup also grows with shape count because brute-force candidate enumeration grows quadratically while the spatial query limits exact checks to nearby candidates.
+
+### Scenario 2 — Sparse Grid
+
+The sparse scenario uses the same benchmark framework, QuadTree settings, and minimum spacing, but spaces shapes far enough apart that no spacing violations occur.
+
+Measured results:
+
+| Shapes | Brute Pair Checks | QuadTree Pair Checks | Pair Reduction | Brute Time (ms) | QuadTree Time (ms) | Speedup |
+|---:|---:|---:|---:|---:|---:|---:|
+| 100 | 4,950 | 0 | 100.00% | 51.62 | 0.44 | 116.87× |
+| 500 | 124,750 | 0 | 100.00% | 1,233.44 | 4.03 | 305.99× |
+| 1,000 | 499,500 | 0 | 100.00% | 5,218.15 | 3.95 | 1,321.29× |
+| 2,000 | 1,999,000 | 0 | 100.00% | 18,352.65 | 39.05 | 470.00× |
+
+The brute-force path still evaluates every unique pair even though no shapes are close enough to violate the rule. The QuadTree rejects all non-nearby pairs during the bounding-box query stage, so no exact `Polygon::distanceTo()` calls are required in this scenario.
+
+Across both completed scenarios, the brute-force and QuadTree implementations produced matching violation counts for every tested shape count. This confirms that the spatial optimization preserved the benchmarked spacing-check results while substantially reducing exact geometry work.
+
+The two benchmark scenarios are sufficient for the current layout-density comparison: the dense grid demonstrates performance when nearby shapes produce real spacing violations, while the sparse grid demonstrates the benefit when shapes are spatially separated. No additional layout scenarios are required for the current project plan.
+
+### QuadTree Parameter Tuning
+
+After validating the dense and sparse scenarios, the QuadTree configuration was tuned using:
+
+```text
+Shape Count: 2000
+Minimum Spacing: 3
+Repetitions Per Configuration: 5
+
+Capacity values: 2, 4, 8, 16
+Max-depth values: 4, 6, 8, 10
+Total configurations: 16
+```
+
+The existing `capacity = 4`, `maxDepth = 8` configuration was used as the correctness reference. Every tested configuration preserved:
+
+```text
+Dense Pair Checks: 7733
+Dense Violations: 7733
+
+Sparse Pair Checks: 0
+Sparse Violations: 0
+```
+
+Therefore, the parameter sweep changed performance only and did not change the benchmarked DRC results.
+
+Measured average QuadTree runtimes:
+
+| Capacity | Max Depth | Dense Avg. Time (ms) | Sparse Avg. Time (ms) |
+|---:|---:|---:|---:|
+| 2 | 4 | 144.90 | 39.57 |
+| 2 | 6 | 224.86 | 40.99 |
+| 2 | 8 | 126.17 | 40.90 |
+| 2 | 10 | 129.53 | 40.62 |
+| 4 | 4 | 124.47 | **37.89** |
+| 4 | 6 | 122.89 | 40.52 |
+| 4 | 8 | 124.14 | 38.72 |
+| 4 | 10 | 127.00 | 38.61 |
+| 8 | 4 | 125.65 | 38.63 |
+| 8 | 6 | **121.16** | 39.34 |
+| 8 | 8 | 123.75 | 40.49 |
+| 8 | 10 | 123.99 | 38.74 |
+| 16 | 4 | 125.86 | 42.10 |
+| 16 | 6 | 121.52 | 38.86 |
+| **16** | **8** | **122.02** | **38.43** |
+| 16 | 10 | 122.42 | 38.90 |
+
+The absolute fastest dense result was `capacity = 8`, `maxDepth = 6`, while the absolute fastest sparse result was `capacity = 4`, `maxDepth = 4`.
+
+The selected default is:
+
+```text
+capacity = 16
+maxDepth = 8
+```
+
+This configuration was selected as a balanced choice across both workloads: it was within about 0.71% of the fastest dense result and about 1.42% of the fastest sparse result, while improving both measured workloads relative to the original `4 / 8` baseline.
+
+The tuning also demonstrates that more aggressive subdivision is not automatically faster. For example, `capacity = 2`, `maxDepth = 6` was substantially slower on the dense layout than the better-balanced configurations.
+
+### Benchmark Driver Workflow
+
+`benchmarks/MinSpacingBenchmark.cpp` is a dedicated experimental benchmark driver, not a fixed production entry point.
+
+Its helper functions such as grid generation and QuadTree/brute-force measurement are reused, while its `main()` function is intentionally changed according to the benchmarking task being performed.
+
+Examples:
+
+```text
+Dense / sparse scenario benchmarking
+→ main() generates layouts of several sizes
+→ compares brute force against QuadTree
+→ records pair reduction and speedup
+
+QuadTree parameter tuning
+→ main() generates the selected benchmark layouts
+→ runs capacity / maxDepth combinations
+→ averages repeated QuadTree timings
+→ validates unchanged pair checks and violations
+```
+
+This keeps performance experiments isolated from the production `drcheck` application while allowing the benchmark executable to evolve with the current measurement task.
+
+These measurements are specific to the benchmark geometries, machine, Release build, and current implementation. They are not a universal QuadTree speedup guarantee.
 
 ---
 
@@ -1015,6 +1200,35 @@ drchecker_tests --gtest_filter=SegmentTest.DetectsProperIntersection
 
 ---
 
+## Running Benchmarks
+
+Build the benchmark in Release mode:
+
+```bash
+cmake --build build --config Release
+```
+
+Run:
+
+```bash
+drcheck_benchmark
+```
+
+Recorded benchmark results are stored under:
+
+```text
+benchmarks/results/
+├── min_spacing_dense_benchmark.txt
+├── min_spacing_sparse_benchmark.txt
+└── quadtree_parameter_tuning.txt
+```
+
+`MinSpacingBenchmark.cpp` is intentionally task-oriented: its `main()` is modified depending on whether the executable is being used for scenario benchmarking or QuadTree parameter tuning. The reusable benchmark helpers remain the same while `main()` defines the current experiment.
+
+Release builds should be used for performance comparisons because Debug-mode timings are not representative.
+
+---
+
 ## Current API Overview
 
 ```text
@@ -1136,6 +1350,13 @@ Application
 
 drcheck
 └── layout.json + rules.json → report.json
+
+Benchmark
+
+drcheck_benchmark
+├── dense / sparse brute-force vs QuadTree comparison
+├── QuadTree parameter tuning
+└── task-specific MinSpacingBenchmark.cpp main()
 ```
 
 ---
@@ -1213,6 +1434,25 @@ drcheck
 - QuadTree-backed `MinSpacingRule`
 - Spatial-index regression tests
 
+### Performance Benchmarking
+
+- Dedicated `drcheck_benchmark` executable
+- Synthetic grid-layout generation
+- Brute-force spacing baseline
+- QuadTree spacing benchmark
+- Exact pair-check counting
+- Runtime measurement with `std::chrono::steady_clock`
+- Correctness comparison through matching violation counts
+- File-based benchmark result output
+- Dense and sparse Release-mode benchmark scenarios completed
+- Dense scenario: up to 99.61% reduction in exact pair checks and 148.30× measured speedup at 2,000 shapes
+- Sparse scenario: 100% reduction in exact pair checks for all tested sizes and up to 1,321.29× measured speedup
+- Matching violation counts between brute-force and QuadTree implementations in every recorded benchmark
+- 16-configuration QuadTree parameter sweep completed
+- Five timing repetitions per tuning configuration
+- Selected balanced defaults: `capacity = 16`, `maxDepth = 8`
+- Task-specific benchmark `main()` used for scenario comparison and parameter tuning
+
 ---
 
 ## Known Limitations
@@ -1227,10 +1467,12 @@ The current implementation intentionally prioritizes correctness, testability, a
 
 ### Minimum Spacing
 
-- `MinSpacingRule` now uses a QuadTree to reduce candidate comparisons before exact polygon-distance checking.
-- QuadTree performance depends on spatial distribution; worst-case layouts can still approach brute-force behavior.
+- `MinSpacingRule` uses a QuadTree to reduce candidate comparisons before exact polygon-distance checking.
+- Dense and sparse synthetic-grid benchmarks both show substantial improvement over the brute-force baseline while preserving violation counts.
+- Benchmark results remain workload-specific; different geometry distributions may produce different speedups.
+- QuadTree performance depends on spatial distribution, and pathological layouts can still degrade toward brute-force behavior.
 - The current implementation builds a QuadTree inside each `MinSpacingRule::check()` call rather than reusing a shared spatial index across rules.
-- Current QuadTree parameters are initial fixed values rather than benchmark-tuned settings.
+- The current QuadTree defaults (`capacity = 16`, `maxDepth = 8`) were selected from the completed dense/sparse parameter sweep; they are benchmark-informed defaults rather than universal optima.
 
 ### Minimum Enclosure
 
@@ -1267,24 +1509,11 @@ The current implementation intentionally prioritizes correctness, testability, a
 
 ## Next Development
 
-### Spatial Performance Validation
-
-The next performance milestone is to measure the value of the QuadTree rather than relying only on functional correctness.
-
-Planned work:
-
-- Create synthetic layouts with increasing shape counts
-- Compare QuadTree-backed spacing checks against a brute-force baseline
-- Measure candidate-count reduction and runtime
-- Experiment with QuadTree capacity and maximum depth
-- Document cases where spatial indexing helps and cases where it degrades toward worst-case behavior
-
 ### Future Performance Work
 
 - Reusable/shared spatial indices across rules
 - Sweep-line optimization where appropriate
-- Additional spatial-query strategies
-- Larger-layout benchmarks
+- Additional spatial-query strategies if future project requirements justify them
 
 ### Future Geometry Extension
 

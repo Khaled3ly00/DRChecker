@@ -1,0 +1,74 @@
+DRCheck MinSpacing Benchmark
+============================
+Configuration
+Build Type: Release
+QuadTree Capacity: 4
+QuadTree Max Depth: 8
+Minimum Spacing: 3.000000
+============================
+
+Shape Count: 100
+
+Brute Force
+  Pair checks: 4950
+  Violations: 0
+  Time: 51.619300 ms
+Quadtree
+  Pair checks: 0
+  Violations: 0
+  Time: 0.441700 ms
+
+  Pair-check reduction:  100.000000 %
+  Speedup: 116.865067 x
+
+-----------------------------
+
+Shape Count: 500
+
+Brute Force
+  Pair checks: 124750
+  Violations: 0
+  Time: 1233.437800 ms
+Quadtree
+  Pair checks: 0
+  Violations: 0
+  Time: 4.031000 ms
+
+  Pair-check reduction:  100.000000 %
+  Speedup: 305.988043 x
+
+-----------------------------
+
+Shape Count: 1000
+
+Brute Force
+  Pair checks: 499500
+  Violations: 0
+  Time: 5218.154000 ms
+Quadtree
+  Pair checks: 0
+  Violations: 0
+  Time: 3.949300 ms
+
+  Pair-check reduction:  100.000000 %
+  Speedup: 1321.285797 x
+
+-----------------------------
+
+Shape Count: 2000
+
+Brute Force
+  Pair checks: 1999000
+  Violations: 0
+  Time: 18352.652800 ms
+Quadtree
+  Pair checks: 0
+  Violations: 0
+  Time: 39.048200 ms
+
+  Pair-check reduction:  100.000000 %
+  Speedup: 469.999969 x
+
+-----------------------------
+
+Benchmark completed successfully.

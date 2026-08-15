@@ -1,0 +1,256 @@
+DRCheck QuadTree Parameter Tuning
+=================================
+Shape Count: 2000
+Minimum Spacing: 3.000000
+Repetitions Per Configuration: 5
+
+Reference Results
+-----------------
+Dense Pair Checks: 7733
+Dense Violations: 7733
+Sparse Pair Checks: 0
+Sparse Violations: 0
+
+=================================
+
+Capacity: 2
+Max Depth: 4
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 144.904740 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 39.571920 ms
+
+-----------------------------
+
+Capacity: 2
+Max Depth: 6
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 224.855460 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 40.989100 ms
+
+-----------------------------
+
+Capacity: 2
+Max Depth: 8
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 126.166980 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 40.901360 ms
+
+-----------------------------
+
+Capacity: 2
+Max Depth: 10
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 129.532500 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 40.623960 ms
+
+-----------------------------
+
+Capacity: 4
+Max Depth: 4
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 124.468900 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 37.893120 ms
+
+-----------------------------
+
+Capacity: 4
+Max Depth: 6
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 122.885340 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 40.515640 ms
+
+-----------------------------
+
+Capacity: 4
+Max Depth: 8
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 124.138340 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 38.722680 ms
+
+-----------------------------
+
+Capacity: 4
+Max Depth: 10
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 127.001320 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 38.606560 ms
+
+-----------------------------
+
+Capacity: 8
+Max Depth: 4
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 125.645100 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 38.631500 ms
+
+-----------------------------
+
+Capacity: 8
+Max Depth: 6
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 121.160320 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 39.335440 ms
+
+-----------------------------
+
+Capacity: 8
+Max Depth: 8
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 123.754980 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 40.490280 ms
+
+-----------------------------
+
+Capacity: 8
+Max Depth: 10
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 123.988160 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 38.737600 ms
+
+-----------------------------
+
+Capacity: 16
+Max Depth: 4
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 125.864360 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 42.097560 ms
+
+-----------------------------
+
+Capacity: 16
+Max Depth: 6
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 121.517380 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 38.862880 ms
+
+-----------------------------
+
+Capacity: 16
+Max Depth: 8
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 122.019400 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 38.430120 ms
+
+-----------------------------
+
+Capacity: 16
+Max Depth: 10
+
+Dense
+  Pair checks: 7733
+  Violations: 7733
+  Average time: 122.424560 ms
+
+Sparse
+  Pair checks: 0
+  Violations: 0
+  Average time: 38.903620 ms
+
+-----------------------------
+
+Parameter tuning completed successfully.

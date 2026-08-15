@@ -4,6 +4,13 @@
 
 #include <stdexcept>
 
+namespace {
+    // Values obtained from tuning
+    constexpr std::size_t QUADTREE_CAPACITY = 16;
+    constexpr std::size_t QUADTREE_MAX_DEPTH = 8;
+
+}
+
 namespace drcheck::rules {
 MinSpacingRule::MinSpacingRule(domain::Layer layer, double minimumSpacing)
     : layer(layer), minimumSpacing(minimumSpacing)
@@ -38,7 +45,8 @@ std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::S
         boundary = boundary.mergedWith(shape.getPolygon().getBoundingBox());
     }
     // Build QuadTree
-    spatial::QuadTree tree(boundary, 4, 8);
+    // Capacity and maxDepth parameter are tuned using MinSpacingBenchmark.cpp
+    spatial::QuadTree tree(boundary, QUADTREE_CAPACITY, QUADTREE_MAX_DEPTH);
     for (const domain::Shape& shape : shapes) {
         if (shape.getLayer() != layer) {
             continue;
