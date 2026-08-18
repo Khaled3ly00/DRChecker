@@ -86,6 +86,22 @@ TEST(MinEnclosureRuleTest, RejectsLessThanMinEnclosure)
     EXPECT_EQ(violations.size(), 1);
     EXPECT_NEAR(violations[0].getActualValue(), 2.0, EPSILON);
     EXPECT_NEAR(violations[0].getRequiredValue(), 3.0, EPSILON);
+    EXPECT_EQ(violations[0].getShapeIds()[0], 2);
+    EXPECT_EQ(violations[0].getShapeIds()[1], 1);
+    // Marker tests
+    ASSERT_TRUE(violations[0].getMarker().has_value());
+    const auto& marker = violations[0].getMarker().value();
+    // First nearst edge (point)
+    EXPECT_EQ(marker.firstEdgeIndex, 0);
+    EXPECT_EQ(marker.secondEdgeIndex, 0);
+    EXPECT_NEAR(Point::vectorBetween(marker.firstPoint, marker.secondPoint).length(), 2.0, EPSILON);
+    const auto innerEdges = second.getPolygon().getEdges();
+    const auto outerEdges = first.getPolygon().getEdges();
+    ASSERT_TRUE(marker.firstEdgeIndex.has_value());
+    ASSERT_TRUE(marker.secondEdgeIndex.has_value());
+    EXPECT_TRUE(innerEdges[marker.firstEdgeIndex.value()].contains(marker.firstPoint));
+    EXPECT_TRUE(outerEdges[marker.secondEdgeIndex.value()].contains(marker.secondPoint));
+
 }
 
 TEST(MinEnclosureRuleTest, IntersectingPolygonsMinEnclosure) // Intersecting polygon should return violation as enclosure distance is zero
@@ -110,7 +126,10 @@ TEST(MinEnclosureRuleTest, IntersectingPolygonsMinEnclosure) // Intersecting pol
     const std::vector<Shape> shapes{first, second};
     const auto violations = rule.check(shapes);
 
-    EXPECT_EQ(violations.size(), 1);
+    EXPECT_EQ(violations.size(), 1);    
+    // Marker tests
+    // Currently intersecting polygons return no foundContainingOuter
+    ASSERT_FALSE(violations[0].getMarker().has_value());
 }
 
 TEST(MinEnclosureRuleTest, TouchingInternallyPolygonsMinEnclosure) // Touching Internally polygon should return violation as enclosure distance is zero
@@ -243,6 +262,7 @@ TEST(MinEnclosureRuleTest,NoMatchingOuterLayerMinEnclosure)
     const auto violations = rule.check(shapes);
 
     EXPECT_EQ(violations.size(), 1);
+    EXPECT_FALSE(violations[0].getMarker().has_value());
 }
 // Multiple outer candidates, one valid. Have two Metal1 shapes:
 // one does not contain the Via12, while another provides sufficient enclosure.

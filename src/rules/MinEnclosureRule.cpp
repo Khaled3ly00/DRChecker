@@ -44,14 +44,19 @@ std::vector<domain::Violation>MinEnclosureRule::check(const std::vector<domain::
 
             foundContainingOuter = true;
 
-            const double actualEnclosure =
-                outer.getPolygon().distanceTo(inner.getPolygon(), false);
+            const geometry::PolygonEdgePairResult actualEnclosure = inner.getPolygon().distanceTo(outer.getPolygon(), false);
 
-            if (actualEnclosure + geometry::EPSILON <
-                minimumEnclosure)
+            if (actualEnclosure.distance + geometry::EPSILON < minimumEnclosure)
             {
+                domain::ViolationMarker marker{
+                    actualEnclosure.firstPoint,
+                    actualEnclosure.secondPoint,
+                    actualEnclosure.firstEdgeIndex,
+                    actualEnclosure.secondEdgeIndex
+                };
+
                 violations.emplace_back(
-                    domain::ViolationType::Enclosure, std::vector<std::size_t>{inner.getId(), outer.getId()}, "Enclosure violation", actualEnclosure, minimumEnclosure);
+                    domain::ViolationType::Enclosure, std::vector<std::size_t>{inner.getId(), outer.getId()}, "Enclosure violation", actualEnclosure.distance, minimumEnclosure, marker);
             }
 
             // Current assumption:

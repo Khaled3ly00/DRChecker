@@ -15,9 +15,9 @@ The project is being developed as a portfolio project focused on:
 
 ## Current Status
 
-The project has completed the **geometry core**, **domain model**, initial **DRC rule layer**, **DRC engine orchestration**, **JSON input/output flow**, richer **violation metadata**, the first **spatial-indexing optimization** using a QuadTree, and **performance validation and parameter tuning** of the QuadTree-backed spacing check against a brute-force baseline.
+The project has completed the **geometry core**, **domain model**, initial **DRC rule layer**, **DRC engine orchestration**, **JSON input/output flow**, richer **violation metadata**, the first **spatial-indexing optimization** using a QuadTree, **performance validation and parameter tuning**, **independent Via12 enclosure verification against both Metal1 and Metal2**, and **detailed geometric violation-marker reporting**.
 
-The current implementation can load layout shapes and rule definitions from JSON, run width, spacing, and enclosure checks through `DRCEngine`, record actual and required rule values in violations, write machine-readable JSON reports, and use a QuadTree to reduce candidate comparisons for minimum-spacing checks. Release-mode dense and sparse benchmarks have been completed, followed by a 16-configuration QuadTree parameter sweep. The selected balanced defaults are `capacity = 16` and `maxDepth = 8`.
+The current implementation can load layout shapes and rule definitions from JSON, run width, spacing, and enclosure checks through `DRCEngine`, preserve closest-point and offending-edge information from geometry calculations, attach marker geometry to violations, serialize markers into JSON reports, and use a QuadTree to reduce candidate comparisons for minimum-spacing checks. Release-mode dense and sparse benchmarks have been completed, followed by a 16-configuration QuadTree parameter sweep. The selected balanced defaults are `capacity = 16` and `maxDepth = 8`.
 
 ### Implemented Geometry
 
@@ -53,8 +53,8 @@ The current implementation can load layout shapes and rule definitions from JSON
 - Bounding-box generation
 - Point containment
 - Segment intersection
-- Point-to-segment distance
-- Segment-to-segment distance
+- Point-to-segment distance with closest-point witnesses
+- Segment-to-segment distance with closest-point witnesses
 - Horizontal / vertical classification
 - Private helper for proper segment intersection
 
@@ -74,7 +74,8 @@ The current implementation can load layout shapes and rule definitions from JSON
 - Polygon-to-polygon intersection
 - Polygon containment, including concave-boundary crossing checks
 - Polygon-to-polygon distance with configurable intersection handling
-- Minimum local width for orthogonal (Manhattan) polygons
+- Closest boundary-point and offending-edge information through `PolygonEdgePairResult`
+- Minimum local width for orthogonal (Manhattan) polygons with opposing-edge witness information
 - Rejection of unsupported non-orthogonal minimum-width calculations
 
 ---
@@ -240,7 +241,9 @@ The public `Polygon::minWidth()` interface is intentionally kept general. The cu
 
 `Segment::intersects()` preserves its original behavior by default, including touching and collinear overlap.
 
-`Polygon::distanceTo()` also preserves its original region-distance behavior by default. Passing `false` skips the polygon-level intersection shortcut and computes minimum edge-to-edge distance, which is used by minimum-enclosure checking.
+`Segment::distanceTo()` returns a lightweight `DistanceResult` containing the distance and the two witness points.
+
+`Polygon::distanceTo()` returns a `PolygonEdgePairResult` containing the reported polygon distance together with the retained boundary witness points and corresponding edge indices. By default, intersecting or contained polygon regions report distance `0.0` while retaining nearest-boundary marker information. Passing `false` returns the boundary-to-boundary distance directly, which is used by minimum-enclosure checking.
 
 ---
 
@@ -323,29 +326,52 @@ Segment → Segment
 Polygon → Polygon
 ```
 
+Detailed results preserve the geometry that produced the measurement instead of returning only a scalar.
+
+### `DistanceResult`
+
+Segment distance operations return:
+
+```text
+DistanceResult
+├── distance
+├── firstPoint
+└── secondPoint
+```
+
+The returned points identify the closest/witness locations on the two geometries.
+
 ### Point-to-Segment
 
-Projection determines whether the closest point lies:
-
-- Before the segment start
-- On the segment interior
-- After the segment end
+Projection determines whether the closest point lies before the segment start, on the segment interior, or after the segment end. The returned result preserves the closest point on the segment and the supplied point.
 
 ### Segment-to-Segment
 
-If the segments intersect, distance is zero.
+Intersecting segments report zero distance and retain an intersection/overlap witness. Otherwise, endpoint-to-segment candidates are compared while preserving the closest point on each segment.
 
-Otherwise, the minimum is taken from endpoint-to-segment distances.
+### `PolygonEdgePairResult`
 
-### Polygon-to-Polygon
+Polygon distance operations return:
 
-By default, if polygon regions intersect or one contains the other, distance is zero.
+```text
+PolygonEdgePairResult
+├── distance
+├── firstPoint
+├── secondPoint
+├── firstEdgeIndex
+└── secondEdgeIndex
+```
 
-Otherwise, the minimum is taken over all edge-pair segment distances.
+The edge indices identify the polygon boundaries associated with the retained witness pair.
 
-The method can also skip the polygon-level intersection shortcut. In that mode, it returns the minimum edge-to-edge distance even when one polygon contains the other. This is used to measure minimum enclosure.
+By default, intersecting or contained polygon regions report distance `0.0`. The nearest boundary pair remains available for marker/reporting purposes. When `treatIntersectionAsZero` is `false`, the returned distance is the boundary-to-boundary distance even when one polygon contains the other.
 
-This operation supports both the **minimum spacing** and **minimum enclosure** rules.
+This supports:
+
+- **Minimum spacing**, where region overlap must report zero spacing while still retaining marker geometry.
+- **Minimum enclosure**, where the actual boundary separation is required.
+
+When several edge pairs have the same minimum distance, the current implementation may retain any deterministic valid minimum pair based on iteration order. A deliberate geometric tie-breaking policy is planned before visualization work.
 
 ---
 
@@ -361,7 +387,8 @@ The current algorithm:
 4. Samples the region between the boundaries.
 5. Uses `Polygon::contains()` to ensure the candidate represents material inside the polygon.
 6. Computes the separation between valid opposing boundaries.
-7. Returns the smallest valid candidate width.
+7. Retains the two opposing witness points and edge indices for each valid candidate.
+8. Returns the smallest valid candidate through `PolygonEdgePairResult`.
 
 This generalizes the earlier rectangle-only implementation.
 
@@ -389,7 +416,7 @@ polygon.minWidth();
 
 currently throws `std::logic_error` rather than silently returning an incorrect value.
 
-Future work can add a general minimum-width algorithm using edge directions, normals, projections, and appropriate local-width reasoning while preserving the public `minWidth()` API.
+Future work can add a general minimum-width algorithm using edge directions, normals, projections, and appropriate local-width reasoning while preserving the public `minWidth()` API and detailed edge-pair result.
 
 ---
 
@@ -449,6 +476,7 @@ The current representation stores:
 - Human-readable message
 - Actual measured value
 - Required rule value
+- Optional `ViolationMarker` geometry
 
 `Violation::getTypeAsString()` provides the string representation used by CLI and JSON reporting without requiring output code to duplicate enum-conversion logic.
 
@@ -460,7 +488,9 @@ ViolationType::MinSpacing
 ViolationType::Enclosure
 ```
 
-Shape IDs are stored instead of references or pointers, avoiding lifetime problems and simplifying future serialization.
+Shape IDs are stored instead of references or pointers, avoiding lifetime problems and simplifying serialization.
+
+`ViolationMarker` stores two witness points and optional offending-edge indices. For two-shape violations, the first marker fields correspond to `shapeIds[0]` and the second marker fields correspond to `shapeIds[1]`. For one-shape minimum-width violations, both marker sides belong to `shapeIds[0]`.
 
 ### Dependency Direction
 
@@ -498,7 +528,8 @@ check(const std::vector<domain::Shape>& shapes) const = 0;
 - Applies to a selected layer
 - Calls `Polygon::minWidth()`
 - Compares actual width against the required minimum
-- Produces a `MinWidth` violation for failing shapes
+- Preserves opposing boundary points and edge indices
+- Produces a `MinWidth` violation with marker geometry for failing shapes
 
 ### `MinSpacingRule`
 
@@ -508,7 +539,7 @@ check(const std::vector<domain::Shape>& shapes) const = 0;
 - Queries the QuadTree for nearby candidate shapes
 - Uses `Polygon::distanceTo()` for the exact spacing calculation
 - Avoids self-pairs and duplicate A-B / B-A checks
-- Produces violations containing both involved shape IDs, actual spacing, and required spacing
+- Produces violations containing both involved shape IDs, actual spacing, required spacing, and marker geometry
 
 The QuadTree is used only as a broad-phase accelerator. Exact DRC correctness still comes from the polygon-distance calculation.
 
@@ -518,8 +549,11 @@ The QuadTree is used only as a broad-phase accelerator. Exact DRC correctness st
 - Uses `Polygon::contains(const Polygon&)` to verify containment
 - Uses `Polygon::distanceTo(other, false)` to measure edge-to-edge enclosure distance
 - Stores actual and required enclosure values in violations
+- Preserves inner/outer boundary witness points and edge indices when a valid containing outer exists but enclosure is insufficient
 - Reports both inner and outer shape IDs when a containing outer shape exists but enclosure is insufficient
-- Reports only the inner shape ID with actual enclosure `0.0` when no containing outer shape exists
+- Reports only the inner shape ID with actual enclosure `0.0` and no marker when no containing outer shape exists
+
+The same generic rule can be configured independently for Via12 → Metal1 and Via12 → Metal2 enclosure requirements, including different minimum values.
 
 The current implementation intentionally assumes that each inner shape is associated with at most one containing outer polygon.
 
@@ -839,6 +873,12 @@ Example:
       "innerLayer": "Via12",
       "outerLayer": "Metal1",
       "value": 1.0
+    },
+    {
+      "type": "MinEnclosure",
+      "innerLayer": "Via12",
+      "outerLayer": "Metal2",
+      "value": 1.5
     }
   ]
 }
@@ -889,31 +929,38 @@ A DRC violation is treated as a verification result, not as a program execution 
 
 `JSONReportWriter` converts collected violations into a machine-readable JSON report.
 
-Example:
+Violations with available witness geometry include a `marker` object:
 
 ```json
 {
-  "violationCount": 2,
+  "violationCount": 1,
   "violations": [
-    {
-      "type": "MinWidth",
-      "shapeIds": [0],
-      "actual": 2.0,
-      "required": 3.0,
-      "message": "Minimum width violation"
-    },
     {
       "type": "MinSpacing",
       "shapeIds": [0, 1],
       "actual": 1.0,
       "required": 2.0,
-      "message": "Minimum spacing violation"
+      "message": "Minimum spacing violation",
+      "marker": {
+        "firstPoint": {
+          "x": 10.0,
+          "y": 5.0
+        },
+        "secondPoint": {
+          "x": 11.0,
+          "y": 5.0
+        },
+        "firstEdgeIndex": 1,
+        "secondEdgeIndex": 3
+      }
     }
   ]
 }
 ```
 
-Clean layouts are also represented explicitly:
+When marker geometry is unavailable, such as an enclosure violation with no valid containing outer polygon, the `marker` field is omitted rather than filled with artificial geometry.
+
+Clean layouts are represented explicitly:
 
 ```json
 {
@@ -922,8 +969,7 @@ Clean layouts are also represented explicitly:
 }
 ```
 
-The report now includes actual measured values and required rule values. Exact violation locations, offending edge pairs, and marker geometry are not yet stored.
-
+Reports therefore contain rule-level values plus, where available, exact witness points and offending edge indices suitable for later marker rendering and visualization.
 
 ---
 
@@ -972,8 +1018,8 @@ Coverage includes:
 - Collinear overlap / separation
 - Degenerate and near-degenerate constructor rejection
 - Intersection symmetry
-- Point-to-segment distance
-- Segment-to-segment distance
+- Point-to-segment distance with closest-point witnesses
+- Segment-to-segment distance with closest-point witnesses
 - Distance symmetry
 - Horizontal / vertical classification
 
@@ -990,6 +1036,9 @@ Coverage includes:
 - Small valid polygons
 - Self-intersection rejection
 - Polygon distance
+- Polygon closest-boundary witness points
+- Offending polygon edge indices
+- Containment region-distance vs boundary-distance behavior
 - Distance symmetry
 - Rectangle minimum-width regression
 - L-shape minimum width
@@ -997,13 +1046,14 @@ Coverage includes:
 - Notch / concavity cases
 - Clockwise orthogonal shapes
 - Non-orthogonal `minWidth()` rejection
+- Minimum-width opposing-edge witness points and indices
 
 ### Domain Tests
 
 Coverage includes:
 
 - `Shape` stores its ID, layer, and polygon correctly
-- `Violation` stores type, shape IDs, message, actual value, and required value correctly
+- `Violation` stores type, shape IDs, message, actual value, required value, and optional marker geometry correctly
 - `Violation::getTypeAsString()` for all current violation types
 - Layer string conversion through `layerFromString()`
 
@@ -1030,6 +1080,8 @@ Coverage includes:
 - Parent-node crossing-shape detection
 - Far-shape rejection
 - Actual and required spacing metadata
+- Closest-boundary marker points and offending edge indices
+- Marker behavior for intersecting and contained polygons
 - Invalid rule parameters
 - Polymorphic use through `Rule`
 
@@ -1046,6 +1098,9 @@ Coverage includes:
 - Multiple inner shapes
 - Missing containing outer polygon
 - Actual and required enclosure metadata
+- Boundary marker points and offending edge indices for insufficient enclosure
+- No-marker behavior when no valid containing outer exists
+- Independent Via12 enclosure checks against Metal1 and Metal2
 - Invalid rule parameters
 - Polymorphic use through `Rule`
 
@@ -1073,6 +1128,7 @@ Coverage includes:
 - Empty rules
 - Empty shapes
 - Unified violation collection
+- Independent Via12 enclosure checks against Metal1 and Metal2
 
 ### JSON Layout Parser Tests
 
@@ -1107,6 +1163,7 @@ Coverage includes:
 - Missing file handling
 - Malformed JSON handling
 - Polymorphic behavior of parsed rules
+- Independent Via12 → Metal1 and Via12 → Metal2 enclosure-rule parsing
 
 ### JSON Report Writer Tests
 
@@ -1119,12 +1176,15 @@ Coverage includes:
 - Actual measured values
 - Required rule values
 - Message serialization
+- Marker point serialization
+- Offending edge-index serialization
+- Omission of marker data when unavailable
 - Invalid output path handling
 - Re-parsing generated JSON to validate semantic contents
 
 ### Integration Tests
 
-Coverage includes the complete flow from JSON layout and rule files through parsing, `DRCEngine`, and JSON report generation.
+Coverage includes the complete flow from JSON layout and rule files through parsing, `DRCEngine`, and JSON report generation, including dual-metal Via12 enclosure configuration and geometric violation-marker reporting.
 
 
 ---
@@ -1257,15 +1317,27 @@ BoundingBox
 ├── mergedWith(other)
 └── expanded(amount)
 
+DistanceResult
+├── distance
+├── firstPoint
+└── secondPoint
+
 Segment
 ├── length()
 ├── getBoundingBox()
 ├── contains()
 ├── intersects(other)
-├── distanceTo(Point)
-├── distanceTo(Segment)
+├── distanceTo(Point) → DistanceResult
+├── distanceTo(Segment) → DistanceResult
 ├── isHorizontal()
 └── isVertical()
+
+PolygonEdgePairResult
+├── distance
+├── firstPoint
+├── secondPoint
+├── firstEdgeIndex
+└── secondEdgeIndex
 
 Polygon
 ├── getVertices()
@@ -1277,8 +1349,8 @@ Polygon
 ├── contains(Point)
 ├── contains(Polygon)
 ├── intersects()
-├── distanceTo(other, treatIntersectionAsZero = true)
-└── minWidth()
+├── distanceTo(other, treatIntersectionAsZero = true) → PolygonEdgePairResult
+└── minWidth() → PolygonEdgePairResult
 
 Domain
 
@@ -1295,13 +1367,20 @@ Shape
 ├── getLayer()
 └── getPolygon()
 
+ViolationMarker
+├── firstPoint
+├── secondPoint
+├── firstEdgeIndex
+└── secondEdgeIndex
+
 Violation
 ├── getType()
 ├── getTypeAsString()
 ├── getShapeIds()
 ├── getMessage()
 ├── getActualValue()
-└── getRequiredValue()
+├── getRequiredValue()
+└── getMarker()
 
 Rules
 
@@ -1372,6 +1451,9 @@ drcheck_benchmark
 - Constructor invariants
 - Scale-aware tolerance handling
 - Orthogonal polygon minimum width
+- `DistanceResult` closest-point witnesses
+- `PolygonEdgePairResult` closest-boundary and edge-index reporting
+- Minimum-width opposing-edge witness reporting
 - GoogleTest regression coverage
 
 ### Domain Model
@@ -1388,6 +1470,7 @@ drcheck_benchmark
 - `MinEnclosureRule`
 - Rule-focused GoogleTest coverage
 - Polymorphic execution through `Rule`
+- Rule-generated violation markers for width, spacing, and insufficient enclosure
 
 ### Engine
 
@@ -1417,6 +1500,10 @@ drcheck_benchmark
 
 - `Violation::getTypeAsString()`
 - Actual and required rule values
+- Optional `ViolationMarker`
+- Exact witness-point serialization
+- Offending edge-index serialization
+- Marker omission when geometry is unavailable
 - `JSONReportWriter`
 - Empty and non-empty reports
 - Machine-readable violation output
@@ -1476,22 +1563,16 @@ The current implementation intentionally prioritizes correctness, testability, a
 
 ### Minimum Enclosure
 
+- Via12 can be checked independently against both Metal1 and Metal2 by configuring two `MinEnclosureRule` instances, including different minimum requirements.
 - `MinEnclosureRule` currently assumes that an inner shape is associated with at most one containing outer polygon.
 - Multiple containing outer candidates are not compared to select a best enclosure result.
 - Two or more outer polygons are not combined or evaluated as a union for enclosure.
 - If no containing outer polygon exists, the reported actual enclosure is currently `0.0`.
 
-### Geometry Representation
-
-- Coordinates currently use floating-point values with the project `EPSILON` tolerance policy.
-- Integer database units may be adopted later for stronger IC-layout-style numerical robustness.
-
 ### Layout Input
 
 - The current JSON layout format is flat and polygon-based.
-- Hierarchical cells, paths, text, nets, and other GDSII concepts are not yet represented.
 - Shape IDs are generated from import order, so IDs change if shape ordering changes.
-- Direct GDSII parsing is not implemented yet.
 
 ### Rule Input
 
@@ -1501,40 +1582,62 @@ The current implementation intentionally prioritizes correctness, testability, a
 
 ### Violation Reporting
 
-- Reports contain violation type, involved shape IDs, actual measured value, required value, and a human-readable message.
-- Exact violation coordinates, offending edges, and marker geometry are not yet stored.
+- Reports contain violation type, involved shape IDs, actual measured value, required value, a human-readable message, and marker geometry when available.
+- Marker geometry currently consists of witness points and offending edge indices; rendered marker shapes are not yet generated.
+- If several edge pairs have the same minimum distance, the retained pair may depend on deterministic edge iteration order.
+- A deliberate geometric tie-breaking policy is required before visualization so markers prefer meaningful facing boundaries.
 - Because shape IDs are generated from import order, report IDs are tied to the ordering of the imported layout.
-
----
 
 ## Next Development
 
-### Future Performance Work
+### Next Milestone — Reusable Spatial Indices
 
-- Reusable/shared spatial indices across rules
-- Sweep-line optimization where appropriate
-- Additional spatial-query strategies if future project requirements justify them
+The current `MinSpacingRule` builds its own QuadTree during each `check()` call. The next architectural milestone is to build reusable per-layer spatial indices that can be shared across multiple rules.
 
-### Future Geometry Extension
+```text
+Layout / DRC Context
+        ↓
+per-layer spatial indices
+        ↓
+┌───────────────┬─────────────────┬─────────────────┐
+│ MinSpacing    │ MinEnclosure    │ future rules    │
+└───────────────┴─────────────────┴─────────────────┘
+```
+
+This will reduce repeated spatial-index construction and prepare other rules to use the same broad-phase infrastructure.
+
+### Planned Rule / Architecture Work
+
+- Reusable/shared QuadTrees across multiple rules
+- Rule Factory to separate rule construction from JSON parsing
+- Density-rule support
+- Polygon/window clipping needed for density calculations
+
+### Planned Geometry Work
 
 - Minimum-width support for non-Manhattan polygons
-- 45° and arbitrary-angle support where required
-- Preserve the public `Polygon::minWidth()` API
+- Start with convex arbitrary-angle geometry before tackling more difficult concave cases
+- Preserve detailed witness/edge-pair reporting in the public `Polygon::minWidth()` result
 
-### Future Input / Integration
+### Planned Reporting / Visualization Work
 
-- Direct or intermediate GDSII import
-- Optional Tcl rule decks
-- More stable source-geometry identifiers where available
+- Deliberate tie-breaking for equal-distance edge-pair candidates before visualization
+- Geometrically meaningful facing-boundary selection
+- Marker-geometry generation beyond raw witness points
+- Optional SVG visualization
+
+### Future Performance Work
+
+- Sweep-line optimization where it solves a measurable candidate-generation or intersection problem
+- Benchmark alternative spatial strategies against the existing brute-force and QuadTree baselines
+- Additional spatial-query strategies only when justified by measured workloads
+
+### Other Engineering Work
+
+- Optional Tcl-style rule decks
+- More stable source-geometry identifiers where useful
 - Cross-platform build verification
 - CI
-
-### Future Reporting / Visualization
-
-- Exact violation locations
-- Offending edge-pair information
-- Marker geometry
-- Optional SVG visualization
 
 ---
 
@@ -1546,7 +1649,8 @@ The final tool will:
 2. Build an in-memory layout representation.
 3. Apply configurable design rules.
 4. Detect geometric violations.
-5. Generate violation reports.
-6. Compare brute-force checking against spatially optimized implementations.
+5. Generate machine-readable reports with geometric violation markers.
+6. Support optional visual violation rendering.
+7. Compare brute-force checking against spatially optimized implementations.
 
 The project is intended to demonstrate both **EDA-domain understanding** and **strong C++ software design**, including OOP, testing, algorithms, data structures, and performance analysis.

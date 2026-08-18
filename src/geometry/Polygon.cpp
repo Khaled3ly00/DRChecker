@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include <algorithm>
 #include <utility>
-#include <limits>
 
 namespace drcheck::geometry {
 	Polygon::Polygon(std::vector<Point> vertices)
@@ -185,22 +184,28 @@ namespace drcheck::geometry {
 		return false;
 	}
 	// Calculate the minimum distance between two polygons by checking distances between edges
-	double Polygon::distanceTo(const Polygon& other, bool treatIntersectionAsZero) const
+	PolygonEdgePairResult Polygon::distanceTo(const Polygon& other, bool treatIntersectionAsZero) const
 	{	
-		// For ordinary distance, overlapping or contained polygons have zero distance.
-		if (treatIntersectionAsZero && intersects(other)) {
-			return 0.0;
-		}
-		double minDistance = std::numeric_limits<double>::max();
 		const auto thisEdges = getEdges();
 		const auto otherEdges = other.getEdges();
+		const DistanceResult initialDistance = thisEdges[0].distanceTo(otherEdges[0]);
 
-		for (const Segment& edge1 : thisEdges) {
-			for (const Segment& edge2 : otherEdges) {
-				minDistance = std::min(minDistance, edge1.distanceTo(edge2));
+		PolygonEdgePairResult best{initialDistance.distance, initialDistance.firstPoint, initialDistance.secondPoint, 0, 0};
+
+		for (std::size_t i = 0; i < thisEdges.size(); ++i) {
+			for (std::size_t j = 0; j < otherEdges.size(); ++j) {
+				const DistanceResult result = thisEdges[i].distanceTo(otherEdges[j]);
+				if (result.distance < best.distance) {
+					best = {result.distance, result.firstPoint, result.secondPoint, i, j};
+				}
 			}
 		}
-		return minDistance;
+		// For ordinary distance, overlapping or contained polygons have zero distance.
+		if (treatIntersectionAsZero && intersects(other))
+		{
+			best.distance = 0.0;
+		}
+		return best;
 	}
 	// Check if the polygon has self-intersections by checking for intersections between non-adjacent edges
 	bool Polygon::hasSelfIntersection() const
@@ -222,7 +227,7 @@ namespace drcheck::geometry {
 	// Calculate the minimum local width of the polygon.
 	// Temporary restriction: This implementation is only valid for orthogonal polygons (polygons with edges aligned to the axes).
 	// Will be extended to handle non-orthogonal polygons (45 degrees) in the future.
-	double Polygon::minWidth() const
+	PolygonEdgePairResult Polygon::minWidth() const
 	{
 		if (isOrthogonal()) {
 			return orthogonalMinWidth();
@@ -233,11 +238,11 @@ namespace drcheck::geometry {
 			"polygons is not implemented yet"
 		);
 	}
-	double Polygon::orthogonalMinWidth() const
+	PolygonEdgePairResult Polygon::orthogonalMinWidth() const
 	{
 		const auto polygonEdges = getEdges();
 
-		double minimumWidth = std::numeric_limits<double>::max();
+		std::optional<PolygonEdgePairResult> bestResult;
 
 		for (std::size_t i = 0; i < polygonEdges.size(); ++i)
 		{
@@ -278,8 +283,14 @@ namespace drcheck::geometry {
 					if (!contains(samplePoint)) {
 						continue;
 					}
+					// Points lying on violating edges
+					const Point firstPoint(sampleX, firstY);
+					const Point secondPoint(sampleX, secondY);
 
-					minimumWidth = std::min(minimumWidth, width);
+					if (!bestResult.has_value() || width < bestResult->distance)
+					{
+						bestResult = PolygonEdgePairResult{width, firstPoint, secondPoint, i, j};
+					}
 				}
 
 				// Vertical edge pair
@@ -310,19 +321,25 @@ namespace drcheck::geometry {
 					if (!contains(samplePoint)) {
 						continue;
 					}
-					minimumWidth = std::min(minimumWidth, width);
+					const Point firstPoint(firstX, sampleY);
+					const Point secondPoint(secondX, sampleY);
+
+					if (!bestResult.has_value() || width < bestResult->distance)
+					{
+						bestResult = PolygonEdgePairResult{width, firstPoint, secondPoint, i, j};
+					}
 				}
 			}
 		}
 
-		if (minimumWidth == std::numeric_limits<double>::max())
+		if (!bestResult.has_value())
 		{
 			throw std::logic_error(
 				"Unable to determine polygon minimum width"
 			);
 		}
 
-		return minimumWidth;
+		return bestResult.value();
 	}
 
 	// Check if the polygon is orthogonal (all edges are either horizontal or vertical)

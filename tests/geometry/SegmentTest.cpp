@@ -134,7 +134,13 @@ TEST(SegmentTest, CalculatesPointDistanceWithProjectionInside)
 
     Point point(4.0, 3.0);
 
-    EXPECT_NEAR(segment.distanceTo(point), 3.0, EPSILON);
+    const auto result = segment.distanceTo(point);
+
+    EXPECT_NEAR(result.distance, 3.0,EPSILON);
+    EXPECT_NEAR(result.firstPoint.getX(), 4.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 0.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 4.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 3.0, EPSILON);
 }
 
 TEST(SegmentTest, CalculatesPointDistanceBeforeStart)
@@ -146,7 +152,13 @@ TEST(SegmentTest, CalculatesPointDistanceBeforeStart)
 
     Point point(-3.0, 4.0);
 
-    EXPECT_NEAR(segment.distanceTo(point), 5.0, EPSILON);
+    const auto result = segment.distanceTo(point);
+
+    EXPECT_NEAR(result.distance, 5.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getX(), 0.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 0.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), -3.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 4.0, EPSILON);
 }
 
 TEST(SegmentTest, CalculatesPointDistanceAfterEnd)
@@ -158,7 +170,13 @@ TEST(SegmentTest, CalculatesPointDistanceAfterEnd)
 
     Point point(13.0, 4.0);
 
-    EXPECT_NEAR(segment.distanceTo(point), 5.0, EPSILON);
+    const auto result = segment.distanceTo(point);
+
+    EXPECT_NEAR(result.distance, 5.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getX(), 10.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 0.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 13.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 4.0, EPSILON);
 }
 
 TEST(SegmentTest, PointOnSegmentHasZeroDistance)
@@ -170,7 +188,31 @@ TEST(SegmentTest, PointOnSegmentHasZeroDistance)
 
     Point point(5.0, 0.0);
 
-    EXPECT_NEAR(segment.distanceTo(point), 0.0, EPSILON);
+    const auto result = segment.distanceTo(point);
+
+    EXPECT_NEAR(result.distance, 0.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getX(), 5.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 0.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 5.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 0.0, EPSILON);
+}
+
+TEST(SegmentTest, CalculatesPointDistanceFromInclinedSegment)
+{
+    Segment segment(
+        Point(0.0, 0.0),
+        Point(10.0, 10.0)
+    );
+
+    Point point(10.0, 0.0);
+
+    const auto result = segment.distanceTo(point);
+
+    EXPECT_NEAR(result.distance, std::sqrt(50.0), EPSILON);
+    EXPECT_NEAR(result.firstPoint.getX(), 5.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 5.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 10.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 0.0, EPSILON);
 }
 
 TEST(SegmentTest, DegeneratedSegmentsThrowsException) {
@@ -198,16 +240,14 @@ TEST(SegmentTest, PointDistanceToVerticalSegment) {
 		Point(3.0, 5.0) // Vertical segment
 	);
 	Point point(6.0, 3.0);
-	EXPECT_NEAR(segment.distanceTo(point), 3.0, EPSILON);
-}
+	
+    const auto result = segment.distanceTo(point);
 
-TEST(SegmentTest, PointDistanceToInclinedSegment) {
-	Segment segment(
-		Point(1.0, 1.0),
-		Point(4.0, 4.0) // Inclined segment
-	);
-	Point point(2.0, 3.0);
-	EXPECT_NEAR(segment.distanceTo(point), std::sqrt(2.0)/2, EPSILON);
+    EXPECT_NEAR(result.distance, 3.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getX(), 3.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 3.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 6.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 3.0, EPSILON);
 }
 
 TEST(SegmentTest, CollinearPointDistanceToSegment) {
@@ -218,8 +258,15 @@ TEST(SegmentTest, CollinearPointDistanceToSegment) {
 
     Point point(13.0, 0.0);
 
-    EXPECT_NEAR(segment.distanceTo(point), 3.0, EPSILON);
+    const auto result = segment.distanceTo(point);
+
+    EXPECT_NEAR(result.distance, 3.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getX(), 10.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 0.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 13.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 0.0, EPSILON);
 }
+
 
 TEST(SegmentTest, CalculatesDistanceBetweenParallelSegments)
 {
@@ -233,8 +280,15 @@ TEST(SegmentTest, CalculatesDistanceBetweenParallelSegments)
         Point(10.0, 3.0)
     );
 
-    EXPECT_NEAR(first.distanceTo(second), 3.0, EPSILON);
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, 3.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getX(), 0.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 0.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 0.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 3.0, EPSILON);
 }
+
 
 TEST(SegmentTest, CalculatesDistanceBetweenNonIntersectingSegments)
 {
@@ -246,7 +300,14 @@ TEST(SegmentTest, CalculatesDistanceBetweenNonIntersectingSegments)
 		Point(8.0, 4.0),
 		Point(10.0, 4.0)
 	);
-	EXPECT_NEAR(first.distanceTo(second), 5.0, EPSILON);
+
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, 5.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getX(), 5.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 0.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 8.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 4.0, EPSILON);
 }
 
 TEST(SegmentTest, IntersectingSegmentsHaveZeroDistance)
@@ -261,7 +322,13 @@ TEST(SegmentTest, IntersectingSegmentsHaveZeroDistance)
         Point(10.0, 0.0)
     );
 
-    EXPECT_NEAR(first.distanceTo(second), 0.0, EPSILON);
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, 0.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getX(), 5.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 5.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 5.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 5.0, EPSILON);
 }
 
 TEST(SegmentTest, NearTouchingSegmentsIntersectSymmetrically)
@@ -308,17 +375,49 @@ TEST(SegmentTest, SegmentDistanceIsSymmetric)
         Point(10.0, 4.0)
     );
 
-    EXPECT_NEAR(first.distanceTo(second), second.distanceTo(first), EPSILON);
+    EXPECT_NEAR(first.distanceTo(second).distance, second.distanceTo(first).distance, EPSILON);
 }
 
-TEST(SegmentTest, SegmentIntersectionIsSymmetric) {
-	Segment first(
-		Point(0.0, 0.0),
-		Point(5.0, 5.0)
-	);
-	Segment second(
-		Point(0.0, 5.0),
-		Point(5.0, 0.0)
-	);
-	EXPECT_EQ(first.intersects(second), second.intersects(first));
+TEST(SegmentTest, DistanceResultPreservesPointOrderingWhenSegmentsAreReversed)
+{
+    Segment first(
+        Point(0, 0),
+        Point(10, 0)
+    );
+
+    Segment second(
+        Point(4, 3),
+        Point(4, 6)
+    );
+
+    const auto firstToSecond = first.distanceTo(second);
+    const auto secondToFirst = second.distanceTo(first);
+
+    EXPECT_DOUBLE_EQ(firstToSecond.distance, secondToFirst.distance);
+
+    EXPECT_NEAR(firstToSecond.firstPoint.getX(), secondToFirst.secondPoint.getX(), EPSILON);
+    EXPECT_NEAR(firstToSecond.firstPoint.getY(), secondToFirst.secondPoint.getY(), EPSILON);
+    EXPECT_NEAR(firstToSecond.secondPoint.getX(), secondToFirst.firstPoint.getX(), EPSILON);
+    EXPECT_NEAR(firstToSecond.secondPoint.getY(), secondToFirst.firstPoint.getY(), EPSILON);
+}
+
+TEST(SegmentTest, DistanceToTouchingSegmentsReturnsTouchPoint)
+{
+    Segment first(
+        Point(0, 0),
+        Point(5, 0)
+    );
+
+    Segment second(
+        Point(5, 0),
+        Point(5, 5)
+    );
+
+    const auto result = first.distanceTo(second);
+
+    EXPECT_DOUBLE_EQ(result.distance, 0.0);
+    EXPECT_NEAR(result.firstPoint.getX(), 5.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 0.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 5.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 0.0, EPSILON);
 }

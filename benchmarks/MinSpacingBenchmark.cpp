@@ -83,7 +83,7 @@ BenchmarkResult runBruteForce(const std::vector<drcheck::domain::Shape>& shapes,
   
             ++result.pairChecks;
 
-            const double spacing = shapes[i].getPolygon().distanceTo(shapes[j].getPolygon());
+            const double spacing = shapes[i].getPolygon().distanceTo(shapes[j].getPolygon()).distance;
 
             if (spacing + geometry::EPSILON < minimumSpacing)
             {
@@ -168,7 +168,7 @@ BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, d
 
             ++result.pairChecks;
 
-            const double spacing = shape.getPolygon().distanceTo(candidate->getPolygon());
+            const double spacing = shape.getPolygon().distanceTo(candidate->getPolygon()).distance;
 
             if (spacing + geometry::EPSILON < minimumSpacing)
             {

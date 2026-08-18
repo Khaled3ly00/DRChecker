@@ -174,3 +174,141 @@ TEST(DRCEngineTest, IgnoresNullRules) {
 
     EXPECT_TRUE(violations.empty());
 }
+
+
+TEST(DRCEngineTest, Via12PassesEnclosureByBothMetalLayers) {
+    Polygon metal1Polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+    Polygon metal2Polygon({
+        Point(-1, -1),
+        Point(11, -1),
+        Point(11, 11),
+        Point(-1, 11)
+        });
+    Polygon viaPolygon({
+        Point(3, 3),
+        Point(7, 3),
+        Point(7, 7),
+        Point(3, 7)
+        });
+    Shape metal1Pol(1, Layer::Metal1, std::move(metal1Polygon));
+    Shape metal2Pol(2, Layer::Metal2, std::move(metal2Polygon));
+    Shape viaPol(3, Layer::Via12, std::move(viaPolygon));
+    std::vector<Shape> shapes{ metal1Pol, metal2Pol, viaPol };
+
+    std::vector<std::unique_ptr<Rule>> rules;
+    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::Via12, Layer::Metal1, 2.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::Via12, Layer::Metal2, 3.0));
+
+    DRCEngine engine;
+    const auto violations = engine.run(shapes, rules);
+
+    EXPECT_TRUE(violations.empty());
+}
+
+
+TEST(DRCEngineTest, Via12FailsOnlyMetal1Enclosure) {
+    Polygon metal1Polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+    Polygon metal2Polygon({
+        Point(-1, -1),
+        Point(11, -1),
+        Point(11, 11),
+        Point(-1, 11)
+        });
+    Polygon viaPolygon({
+        Point(2, 2),
+        Point(8, 2),
+        Point(8, 8),
+        Point(2, 8)
+        });
+    Shape metal1Pol(1, Layer::Metal1, std::move(metal1Polygon));
+    Shape metal2Pol(2, Layer::Metal2, std::move(metal2Polygon));
+    Shape viaPol(3, Layer::Via12, std::move(viaPolygon));
+    std::vector<Shape> shapes{ metal1Pol, metal2Pol, viaPol };
+
+    std::vector<std::unique_ptr<Rule>> rules;
+    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::Via12, Layer::Metal1, 3.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::Via12, Layer::Metal2, 3.0));
+
+    DRCEngine engine;
+    const auto violations = engine.run(shapes, rules);
+
+    ASSERT_EQ(violations.size(), 1);
+}
+
+TEST(DRCEngineTest, Via12FailsOnlyMetal2Enclosure) {
+    Polygon metal1Polygon({
+        Point(-1, -1),
+        Point(11, -1),
+        Point(11, 11),
+        Point(-1, 11)
+        });
+    Polygon metal2Polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+    Polygon viaPolygon({
+        Point(2, 2),
+        Point(8, 2),
+        Point(8, 8),
+        Point(2, 8)
+        });
+    Shape metal1Pol(1, Layer::Metal1, std::move(metal1Polygon));
+    Shape metal2Pol(2, Layer::Metal2, std::move(metal2Polygon));
+    Shape viaPol(3, Layer::Via12, std::move(viaPolygon));
+    std::vector<Shape> shapes{ metal1Pol, metal2Pol, viaPol };
+
+    std::vector<std::unique_ptr<Rule>> rules;
+    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::Via12, Layer::Metal1, 3.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::Via12, Layer::Metal2, 3.0));
+
+    DRCEngine engine;
+    const auto violations = engine.run(shapes, rules);
+
+    ASSERT_EQ(violations.size(), 1);
+}
+
+TEST(DRCEngineTest, Via12FailsEnclosureByBothMetalLayers) {
+    Polygon metal1Polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+    Polygon metal2Polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+    Polygon viaPolygon({
+        Point(2, 2),
+        Point(8, 2),
+        Point(8, 8),
+        Point(2, 8)
+        });
+    Shape metal1Pol(1, Layer::Metal1, std::move(metal1Polygon));
+    Shape metal2Pol(2, Layer::Metal2, std::move(metal2Polygon));
+    Shape viaPol(3, Layer::Via12, std::move(viaPolygon));
+    std::vector<Shape> shapes{ metal1Pol, metal2Pol, viaPol };
+
+    std::vector<std::unique_ptr<Rule>> rules;
+    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::Via12, Layer::Metal1, 3.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::Via12, Layer::Metal2, 3.0));
+
+    DRCEngine engine;
+    const auto violations = engine.run(shapes, rules);
+
+    ASSERT_EQ(violations.size(), 2);
+}

@@ -1,6 +1,7 @@
 #include "drcheck/rules/MinSpacingRule.h"
 #include "drcheck/spatial/Quadtree.h"
 #include "drcheck/geometry/Constants.h"
+#include "drcheck/geometry/Polygon.h"
 
 #include <stdexcept>
 
@@ -76,12 +77,19 @@ std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::S
                 continue;
             }
 
-            const double actualSpacing = shape.getPolygon().distanceTo(candidate->getPolygon());
+            const geometry::PolygonEdgePairResult actualSpacing = shape.getPolygon().distanceTo(candidate->getPolygon());
 
-            if (actualSpacing + geometry::EPSILON <minimumSpacing)
+            if (actualSpacing.distance + geometry::EPSILON < minimumSpacing)
             {
+                domain::ViolationMarker marker{
+                    actualSpacing.firstPoint,
+                    actualSpacing.secondPoint,
+                    actualSpacing.firstEdgeIndex,
+                    actualSpacing.secondEdgeIndex
+                };
+
                 violations.emplace_back(domain::ViolationType::MinSpacing, std::vector<std::size_t>{shape.getId(), candidate->getId()},
-                    "Minimum spacing violation", actualSpacing, minimumSpacing);
+                    "Minimum spacing violation", actualSpacing.distance, minimumSpacing, marker);
             }
         }
     }

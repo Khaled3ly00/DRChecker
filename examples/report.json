@@ -8,7 +8,19 @@
             ],
             "message": "Minimum width violation: required ",
             "actual": 2.0,
-            "required": 3.0
+            "required": 3.0,
+            "marker": {
+                "firstPoint": {
+                    "x": 2.0,
+                    "y": 5.0
+                },
+                "secondPoint": {
+                    "x": 0.0,
+                    "y": 5.0
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 3
+            }
         },
         {
             "type": "MinSpacing",
@@ -18,7 +30,19 @@
             ],
             "message": "Minimum spacing violation",
             "actual": 2.0,
-            "required": 3.0
+            "required": 3.0,
+            "marker": {
+                "firstPoint": {
+                    "x": 2.0,
+                    "y": 0.0
+                },
+                "secondPoint": {
+                    "x": 4.0,
+                    "y": 0.0
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 0
+            }
         },
         {
             "type": "Enclosure",
@@ -28,7 +52,19 @@
             ],
             "message": "Enclosure violation",
             "actual": 1.0,
-            "required": 2.0
+            "required": 2.0,
+            "marker": {
+                "firstPoint": {
+                    "x": 5.0,
+                    "y": 2.0
+                },
+                "secondPoint": {
+                    "x": 4.0,
+                    "y": 2.0
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 3
+            }
         }
     ]
 }

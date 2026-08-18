@@ -10,12 +10,19 @@
 
 using drcheck::domain::Violation;
 using drcheck::domain::ViolationType;
+using drcheck::domain::ViolationMarker;
+using drcheck::geometry::Point;
 using drcheck::io::JSONReportWriter;
 
 TEST(JSONReportWriterTest, CreatingSingleViolationReport) {
     std::vector<Violation> violations;
-
-    violations.emplace_back(ViolationType::MinWidth, std::vector<std::size_t>{7}, "Minimum width violation", 2.0, 3.0);
+    ViolationMarker marker{
+        Point(4.0, 2.0),
+        Point(4.0, 5.0),
+        2,
+        0
+    };
+    violations.emplace_back(ViolationType::MinWidth, std::vector<std::size_t>{7}, "Minimum width violation", 2.0, 3.0, marker);
 
     const std::string outputPath = "json_report_writer_test.json";
 
@@ -39,6 +46,10 @@ TEST(JSONReportWriterTest, CreatingSingleViolationReport) {
     EXPECT_EQ(json["violations"][0]["message"].get<std::string>(), "Minimum width violation");
     EXPECT_DOUBLE_EQ(json["violations"][0]["actual"], 2.0);
     EXPECT_DOUBLE_EQ(json["violations"][0]["required"], 3.0);
+    EXPECT_DOUBLE_EQ(json["violations"][0]["marker"]["firstPoint"]["x"], 4.0);
+    EXPECT_DOUBLE_EQ(json["violations"][0]["marker"]["firstPoint"]["y"], 2.0);
+    EXPECT_DOUBLE_EQ(json["violations"][0]["marker"]["secondPoint"]["x"], 4.0);
+    EXPECT_DOUBLE_EQ(json["violations"][0]["marker"]["secondPoint"]["y"], 5.0);
 
     input.close();
     std::remove(outputPath.c_str());
@@ -99,7 +110,8 @@ TEST(JSONReportWriterTest, CreatingMultipleViolationReport) {
     EXPECT_EQ(json["violations"][1]["shapeIds"][0].get<std::size_t>(), 7);
     EXPECT_EQ(json["violations"][1]["shapeIds"][1].get<std::size_t>(), 10);
     EXPECT_EQ(json["violations"][1]["message"].get<std::string>(), "Minimum enclosure violation");
-
+    EXPECT_FALSE(json["violations"][0].contains("marker"));
+    EXPECT_FALSE(json["violations"][1].contains("marker"));
     input.close();
     std::remove(outputPath.c_str());
 }

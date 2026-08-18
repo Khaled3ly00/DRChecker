@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "drcheck/rules/MinWidthRule.h"
+#include "drcheck/geometry/Segment.h"
 #include "drcheck/geometry/Constants.h"
 
 #include <memory>
@@ -9,6 +10,7 @@ using drcheck::geometry::EPSILON;
 using drcheck::rules::MinWidthRule;
 using drcheck::geometry::Polygon;
 using drcheck::geometry::Point;
+using drcheck::geometry::Segment;
 using namespace drcheck::domain;
 using drcheck::rules::Rule;
 
@@ -28,6 +30,16 @@ TEST(MinWidthRuleTest, DetectsMinWidthViolation)
     EXPECT_EQ(violations[0].getShapeIds()[0], 1);
     EXPECT_NEAR(violations[0].getActualValue(), 3.0, EPSILON);
     EXPECT_NEAR(violations[0].getRequiredValue(), 4.0, EPSILON);
+    // Marker tests
+    ASSERT_TRUE(violations[0].getMarker().has_value());
+    const auto marker = violations[0].getMarker().value();
+    ASSERT_TRUE(marker.firstEdgeIndex.has_value());
+    ASSERT_TRUE(marker.secondEdgeIndex.has_value());
+    const auto edges = shape.getPolygon().getEdges();
+    EXPECT_TRUE(edges[marker.firstEdgeIndex.value()].contains(marker.firstPoint));
+    EXPECT_TRUE(edges[marker.secondEdgeIndex.value()].contains(marker.secondPoint));
+    // Distance can be retrieved as we calculate distance between 2 points
+    EXPECT_NEAR(Point::vectorBetween(marker.firstPoint, marker.secondPoint).length(), 3.0, EPSILON);
 }
 
 TEST(MinWidthRuleTest, AcceptsShapeMeetingMinWidth)

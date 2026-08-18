@@ -3,8 +3,25 @@
 #include <cstddef>
 #include <string>
 #include <vector>
+#include <optional>
+
+#include "drcheck/geometry/Point.h"
 
 namespace drcheck::domain {
+struct ViolationMarker
+{
+    // For two-shape violations:
+    // first fields correspond to shapeIds[0],
+    // second fields correspond to shapeIds[1].
+    //
+    // For one-shape violations: (MinWidth)
+    // both fields correspond to shapeIds[0].
+    geometry::Point firstPoint;
+    geometry::Point secondPoint;
+
+    std::optional<std::size_t> firstEdgeIndex;
+    std::optional<std::size_t> secondEdgeIndex;
+};
 enum class ViolationType
 {
     MinWidth,
@@ -15,7 +32,7 @@ enum class ViolationType
 class Violation
 {
 public:
-    Violation(ViolationType type, std::vector<std::size_t> shapeIds, std::string message, double actualValue, double requiredValue);
+    Violation(ViolationType type, std::vector<std::size_t> shapeIds, std::string message, double actualValue, double requiredValue, std::optional<ViolationMarker> marker = std::nullopt);
 
     ViolationType getType() const;
     std::string getTypeAsString() const;
@@ -25,7 +42,7 @@ public:
     const std::string& getMessage() const;
     double getActualValue() const;
     double getRequiredValue() const;
-
+    const std::optional<ViolationMarker>& getMarker() const;
 private:
     ViolationType type;
 	// shapeIds is a vector of shape IDs that are involved in the violation
@@ -34,6 +51,7 @@ private:
     std::string message;
     double actualValue;
     double requiredValue;
+    std::optional<ViolationMarker> marker;
 };
 
 }

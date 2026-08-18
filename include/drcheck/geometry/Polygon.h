@@ -5,12 +5,24 @@
 #include <vector>
 #include <optional>
 #include <utility>
+#include <optional>
+#include <cstddef>
 
 #include "drcheck/geometry/Segment.h"
 #include "drcheck/geometry/Point.h"
 #include "drcheck/geometry/BoundingBox.h"
 
 namespace drcheck::geometry {
+	struct PolygonEdgePairResult
+	{
+		double distance;
+
+		Point firstPoint;
+		Point secondPoint;
+
+		std::size_t firstEdgeIndex;
+		std::size_t secondEdgeIndex;
+	};
 	class Polygon
 	{
 	public:
@@ -30,10 +42,10 @@ namespace drcheck::geometry {
 
 		bool intersects(const Polygon& other) const;
 
-		double distanceTo(const Polygon& other, bool treatIntersectionAsZero = true) const;
+		PolygonEdgePairResult distanceTo(const Polygon& other, bool treatIntersectionAsZero = true) const;
 
-		double minWidth() const;
-		double orthogonalMinWidth() const;
+		PolygonEdgePairResult minWidth() const;
+		PolygonEdgePairResult orthogonalMinWidth() const;
 	private:
 		std::vector<Point> vertices;
 		bool hasSelfIntersection() const;

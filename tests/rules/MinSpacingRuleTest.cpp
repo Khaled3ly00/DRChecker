@@ -39,6 +39,12 @@ TEST(MinSpacingRuleTest, DetectsSpacingViolation)
     EXPECT_EQ(violations[0].getShapeIds()[1], 2);
 	EXPECT_NEAR(violations[0].getActualValue(), 2.0, EPSILON);
 	EXPECT_NEAR(violations[0].getRequiredValue(), 3.0, EPSILON);
+	ASSERT_TRUE(violations[0].getMarker().has_value());
+	const auto& marker = violations[0].getMarker().value();
+	// First nearst edge (point)
+	EXPECT_EQ(marker.firstEdgeIndex, 0);
+	EXPECT_EQ(marker.secondEdgeIndex, 0);
+	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint,marker.secondPoint).length(), 2.0, EPSILON);
 }
 
 TEST(MinSpacingRuleTest, AcceptsShapesMeetingMinimumSpacing)
@@ -163,6 +169,11 @@ TEST(MinSpacingRuleTest, IntersectingShapesAgainstMinSpacing) {
 	ASSERT_EQ(violations.size(), 1);
 	EXPECT_EQ(violations[0].getShapeIds()[0], 1);
 	EXPECT_EQ(violations[0].getShapeIds()[1], 2);
+	ASSERT_TRUE(violations[0].getMarker().has_value());
+	const auto& marker = violations[0].getMarker().value();
+	EXPECT_EQ(marker.firstEdgeIndex, 0);
+	EXPECT_EQ(marker.secondEdgeIndex, 0);
+	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint, marker.secondPoint).length(), 0.0, EPSILON);
 }
 
 TEST(MinSpacingRuleTest, LShapesAgainstMinSpacing) {
@@ -339,4 +350,40 @@ TEST(MinSpacingRuleTest, ShapeCrossingQuadTreeQuadrants)
 	EXPECT_NEAR(violations[0].getActualValue(), 0.0, EPSILON);
 
 	EXPECT_NEAR(violations[0].getRequiredValue(), 3.0, EPSILON);
+}
+
+TEST(MinSpacingRuleTest, DetectsContainedPolygon)
+{
+	Polygon outer({
+		Point(0.0, 0.0),
+		Point(10.0, 0.0),
+		Point(10.0, 10.0),
+		Point(0.0, 10.0)
+		});
+	Polygon inner({
+		Point(4.0, 4.0),
+		Point(8.0, 4.0),
+		Point(8.0, 7.0),
+		Point(4.0, 7.0)
+		});
+
+	Shape first(1, Layer::Metal1, std::move(outer));
+	Shape second(2, Layer::Metal1, std::move(inner));
+	MinSpacingRule rule(Layer::Metal1, 3.0);
+	const std::vector<Shape> shapes{ first, second };
+	const auto violations = rule.check(shapes);
+
+	ASSERT_EQ(violations.size(), 1);
+	ASSERT_EQ(violations[0].getShapeIds().size(), 2);
+	EXPECT_EQ(violations[0].getShapeIds()[0], 1);
+	EXPECT_EQ(violations[0].getShapeIds()[1], 2);
+	EXPECT_NEAR(violations[0].getActualValue(), 0.0, EPSILON);
+	EXPECT_NEAR(violations[0].getRequiredValue(), 3.0, EPSILON);
+	ASSERT_TRUE(violations[0].getMarker().has_value());
+	const auto& marker = violations[0].getMarker().value();
+	// First nearst edge (point)
+	EXPECT_EQ(marker.firstEdgeIndex, 1);
+	EXPECT_EQ(marker.secondEdgeIndex, 0);
+	// Distance can be retrieved as we calculate distance between 2 points
+	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint, marker.secondPoint).length(), 2.0, EPSILON);
 }

@@ -26,6 +26,35 @@ void JSONReportWriter::write(const std::vector<domain::Violation>& violations, c
         violationJson["actual"] = violation.getActualValue();
         violationJson["required"] = violation.getRequiredValue();
 
+        if (violation.getMarker().has_value())
+        {
+            const auto& marker = violation.getMarker().value();
+            violationJson["marker"] = {
+                {
+                    "firstPoint",
+                    {
+                        { "x", marker.firstPoint.getX() },
+                        { "y", marker.firstPoint.getY() }
+                    }
+                },
+                {
+                    "secondPoint",
+                    {
+                        { "x", marker.secondPoint.getX() },
+                        { "y", marker.secondPoint.getY() }
+                    }
+                }
+            };
+            if (marker.firstEdgeIndex.has_value())
+            {
+                violationJson["marker"]["firstEdgeIndex"] = marker.firstEdgeIndex.value();
+            }
+
+            if (marker.secondEdgeIndex.has_value())
+            {
+                violationJson["marker"]["secondEdgeIndex"] = marker.secondEdgeIndex.value();
+            }
+        }
         // Push violationJson to violations
         report["violations"].push_back(std::move(violationJson));
     }

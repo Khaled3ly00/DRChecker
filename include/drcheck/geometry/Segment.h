@@ -4,6 +4,14 @@
 #include "BoundingBox.h"
 
 namespace drcheck::geometry {
+	// First Point is point on "this" segment
+	// Second Point is point on "other" segment
+	struct DistanceResult
+	{
+		double distance;
+		Point firstPoint;
+		Point secondPoint;
+	};
 	class Segment
 	{
 	public:
@@ -19,8 +27,8 @@ namespace drcheck::geometry {
 
 		bool contains(const Point& point) const;
 		bool intersects(const Segment& other, bool includeBoundaryContact = true) const;
-		double distanceTo(const Point& point) const;
-		double distanceTo(const Segment& other) const;
+		DistanceResult distanceTo(const Point& point) const;
+		DistanceResult distanceTo(const Segment& other) const;
 	private:
 		Point start;
 		Point end;

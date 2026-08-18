@@ -401,8 +401,8 @@ TEST(PolygonTest, NearTouchingPolygonsIntersectSymmetrically)
 
 	EXPECT_TRUE(first.intersects(second));
 	EXPECT_TRUE(second.intersects(first));
-	EXPECT_NEAR(first.distanceTo(second), 0.0, EPSILON);
-	EXPECT_NEAR(second.distanceTo(first), 0.0, EPSILON);
+	EXPECT_NEAR(first.distanceTo(second).distance, 0.0, EPSILON);
+	EXPECT_NEAR(second.distanceTo(first).distance, 0.0, EPSILON);
 }
 
 // HEAVY TESTS FOR POLYGON DISTANCE CALCULATION (MAINLY USED IN DRC)
@@ -422,7 +422,11 @@ TEST(PolygonTest, CalculatesDistanceBetweenSeparatedPolygons)
         Point(8.0, 5.0)
         });
 
-    EXPECT_NEAR(first.distanceTo(second), 3.0, EPSILON);
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, 3.0, EPSILON);
+    ASSERT_TRUE(result.firstEdgeIndex < first.getEdges().size());
+    ASSERT_TRUE(result.secondEdgeIndex < second.getEdges().size());
 }
 
 TEST(PolygonTest, IntersectingPolygonsHaveZeroDistance)
@@ -441,7 +445,11 @@ TEST(PolygonTest, IntersectingPolygonsHaveZeroDistance)
         Point(4.0, 8.0)
         });
 
-    EXPECT_NEAR(first.distanceTo(second), 0.0, EPSILON);
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, 0.0, EPSILON);
+    ASSERT_TRUE(result.firstEdgeIndex < first.getEdges().size());
+    ASSERT_TRUE(result.secondEdgeIndex < second.getEdges().size());
 }
 
 TEST(PolygonTest, PolygonDistanceIsSymmetric)
@@ -459,7 +467,7 @@ TEST(PolygonTest, PolygonDistanceIsSymmetric)
 		Point(8.0, 5.0)
 		});
 
-    EXPECT_NEAR(first.distanceTo(second), second.distanceTo(first), EPSILON);
+    EXPECT_NEAR(first.distanceTo(second).distance, second.distanceTo(first).distance, EPSILON);
 }
 
 TEST(PolygonTest, DistanceToContainedPolygonIsZero)
@@ -476,7 +484,12 @@ TEST(PolygonTest, DistanceToContainedPolygonIsZero)
 		Point(7.0, 7.0),
 		Point(3.0, 7.0)
 		});
-	EXPECT_NEAR(outer.distanceTo(inner), 0.0, EPSILON);
+
+    const auto result = outer.distanceTo(inner);
+
+    EXPECT_NEAR(result.distance, 0.0, EPSILON);
+    ASSERT_TRUE(result.firstEdgeIndex < outer.getEdges().size());
+    ASSERT_TRUE(result.secondEdgeIndex < inner.getEdges().size());
 }
 
 TEST(PolygonTest, DistanceToTouchingPolygonsIsZero)
@@ -493,42 +506,57 @@ TEST(PolygonTest, DistanceToTouchingPolygonsIsZero)
 		Point(10.0, 5.0),
 		Point(5.0, 5.0)
 		});
-	EXPECT_NEAR(first.distanceTo(second), 0.0, EPSILON);
+	
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, 0.0, EPSILON);
+    ASSERT_TRUE(result.firstEdgeIndex < first.getEdges().size());
+    ASSERT_TRUE(result.secondEdgeIndex < second.getEdges().size());
 }
 
 TEST(PolygonTest, DistanceToTouchingVertexPolygonsIsZero)
 {
-	Polygon first({
-		Point(0.0, 0.0),
-		Point(5.0, 0.0),
-		Point(5.0, 5.0),
-		Point(0.0, 5.0)
-		});
-	Polygon second({
-		Point(5.0, 5.0),
-		Point(9.0, 5.0),
-		Point(9.0, 9.0),
-		Point(5.0, 9.0)
-		});
-	EXPECT_NEAR(first.distanceTo(second), 0.0, EPSILON);
+    Polygon first({
+        Point(0.0, 0.0),
+        Point(5.0, 0.0),
+        Point(5.0, 5.0),
+        Point(0.0, 5.0)
+        });
+    Polygon second({
+        Point(5.0, 5.0),
+        Point(9.0, 5.0),
+        Point(9.0, 9.0),
+        Point(5.0, 9.0)
+        });
+
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, 0.0, EPSILON);
+    ASSERT_TRUE(result.firstEdgeIndex < first.getEdges().size());
+    ASSERT_TRUE(result.secondEdgeIndex < second.getEdges().size());
 }
 
 TEST(PolygonTest, DistanceToConcavePolygon)
 {
-	Polygon first({
+    Polygon first({
         Point(0.0, 11.0),
         Point(10.0, 11.0),
         Point(10.0, 15.0),
         Point(0.0, 16.0)
-		});
-	Polygon second({
+        });
+    Polygon second({
         Point(0.0, 0.0),
         Point(5.0, 5.0),
         Point(10.0, 0.0),
         Point(10.0, 10.0),
         Point(0.0, 10.0)
         });
-	EXPECT_NEAR(first.distanceTo(second), 1.0, EPSILON);
+
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, 1.0, EPSILON);
+    ASSERT_TRUE(result.firstEdgeIndex < first.getEdges().size());
+    ASSERT_TRUE(result.secondEdgeIndex < second.getEdges().size());
 }
 
 TEST(PolygonTest, CalculatesMinimumWidthOfRectangle)
@@ -539,8 +567,14 @@ TEST(PolygonTest, CalculatesMinimumWidthOfRectangle)
         Point(12.0, 4.0),
         Point(0.0, 4.0)
         });
+    const auto result = polygon.minWidth();
+    const auto edges = polygon.getEdges();
 
-    EXPECT_NEAR(polygon.minWidth(), 4.0, EPSILON);
+    EXPECT_NEAR(result.distance, 4.0, EPSILON);
+    EXPECT_NEAR(Point::vectorBetween(result.firstPoint, result.secondPoint).length(), result.distance, EPSILON);
+    // First point returned must be on First edge returned
+    EXPECT_TRUE(edges[result.firstEdgeIndex].contains(result.firstPoint));
+    EXPECT_TRUE(edges[result.secondEdgeIndex].contains(result.secondPoint));
 }
 
 TEST(PolygonTest, CalculatesMinimumWidthOfTallRectangle)
@@ -552,7 +586,7 @@ TEST(PolygonTest, CalculatesMinimumWidthOfTallRectangle)
         Point(0.0, 15.0)
         });
 
-    EXPECT_NEAR(polygon.minWidth(), 3.0, EPSILON);
+    EXPECT_NEAR(polygon.minWidth().distance, 3.0, EPSILON);
 }
 
 TEST(PolygonTest, CalculatesMinimumWidthOfSquare)
@@ -564,7 +598,7 @@ TEST(PolygonTest, CalculatesMinimumWidthOfSquare)
         Point(0.0, 5.0)
         });
 
-    EXPECT_NEAR(polygon.minWidth(), 5.0, EPSILON);
+    EXPECT_NEAR(polygon.minWidth().distance, 5.0, EPSILON);
 }
 
 TEST(PolygonTest, MinimumWidthDoesNotDependOnVertexOrientation)
@@ -576,7 +610,7 @@ TEST(PolygonTest, MinimumWidthDoesNotDependOnVertexOrientation)
         Point(12.0, 0.0)
         });
 
-    EXPECT_NEAR(polygon.minWidth(), 4.0, EPSILON);
+    EXPECT_NEAR(polygon.minWidth().distance, 4.0, EPSILON);
 }
 
 TEST(PolygonTest, MinimumWidthRejectsUnsupportedPolygon)
@@ -587,7 +621,7 @@ TEST(PolygonTest, MinimumWidthRejectsUnsupportedPolygon)
         Point(2.5, 5.0)
         });
 
-    EXPECT_THROW(polygon.minWidth(), std::logic_error);
+    EXPECT_THROW(polygon.minWidth().distance, std::logic_error);
 }
 
 // TESTS for Orthogonal (Manhatan) Polygon Minimum Width Calculation
@@ -603,7 +637,7 @@ TEST(PolygonTest, CalculatesLShapeMinimumWidth)
         Point(0.0, 8.0)
         });
 
-    EXPECT_NEAR(polygon.minWidth(), 3.0, EPSILON);
+    EXPECT_NEAR(polygon.minWidth().distance, 3.0, EPSILON);
 }
 
 TEST(PolygonTest, CalculatesUShapeMinimumWidth)
@@ -618,7 +652,7 @@ TEST(PolygonTest, CalculatesUShapeMinimumWidth)
 		Point(10.0, 10.0),
 		Point(0.0, 10.0)
 		});
-	EXPECT_NEAR(polygon.minWidth(), 3.0, EPSILON);
+	EXPECT_NEAR(polygon.minWidth().distance, 3.0, EPSILON);
 }
 
 TEST(PolygonTest, CalculatesComplexOrthogonalPolygonMinimumWidth)
@@ -635,7 +669,7 @@ TEST(PolygonTest, CalculatesComplexOrthogonalPolygonMinimumWidth)
 		Point(4.0, 6.0),
 		Point(0.0, 6.0)
 		});
-	EXPECT_NEAR(polygon.minWidth(), 3.0, EPSILON);
+	EXPECT_NEAR(polygon.minWidth().distance, 3.0, EPSILON);
 }
 
 TEST(PolygonTest, MinimumWidthRejectsNonOrthogonalPolygon)
@@ -648,7 +682,7 @@ TEST(PolygonTest, MinimumWidthRejectsNonOrthogonalPolygon)
         Point(3.0, 6.0),
         Point(0.0, 3.0)
 		});
-	EXPECT_THROW(polygon.minWidth(), std::logic_error);
+	EXPECT_THROW(polygon.minWidth().distance, std::logic_error);
 }
 
 TEST(PolygonTest, MinmumWidthPolygonWithANotch) {
@@ -662,7 +696,7 @@ TEST(PolygonTest, MinmumWidthPolygonWithANotch) {
         Point(2.0, 2.0),
         Point(2.0, 0.0)
 		});
-	EXPECT_NEAR(polygon.minWidth(), 2.0, EPSILON);
+	EXPECT_NEAR(polygon.minWidth().distance, 2.0, EPSILON);
 }
 
 TEST(PolygonTest, MinimumWidthOfPolygonWithMultipleConcavities) {
@@ -680,7 +714,7 @@ TEST(PolygonTest, MinimumWidthOfPolygonWithMultipleConcavities) {
         Point(6.0, 1.0),
         Point(6.0, 0.0)
 		});
-	EXPECT_NEAR(polygon.minWidth(), 1.0, EPSILON);
+	EXPECT_NEAR(polygon.minWidth().distance, 1.0, EPSILON);
 }
 
 TEST(PolygonTest, MinimumWidthOfHPolygon) {
@@ -698,7 +732,7 @@ TEST(PolygonTest, MinimumWidthOfHPolygon) {
         Point(3.0, 2.0),
         Point(0.0, 2.0)
         });
-    EXPECT_NEAR(polygon.minWidth(), 1.0, EPSILON);
+    EXPECT_NEAR(polygon.minWidth().distance, 1.0, EPSILON);
 }
 
 TEST(PolygonTest, InnerPolygonCompletelyInsideConcavePolygon) {
@@ -721,4 +755,106 @@ TEST(PolygonTest, InnerPolygonCompletelyInsideConcavePolygon) {
         });
     EXPECT_FALSE(firstPolygon.contains(secondPolygon));
     EXPECT_TRUE(secondPolygon.contains(firstPolygon));
+}
+
+// Tests for witness reporting (closest verticies and edges)
+
+TEST(PolygonTest, DistanceBetweenSeparatedRectangles)
+{
+    Polygon first({
+        Point(0, 0),
+        Point(4, 0),
+        Point(4, 4),
+        Point(0, 4)
+        });
+
+    Polygon second({
+        Point(7, 0),
+        Point(10, 0),
+        Point(10, 4),
+        Point(7, 4)
+        });
+
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, 3.0, EPSILON);
+    EXPECT_LT(result.firstEdgeIndex, first.getEdges().size());
+    EXPECT_LT(result.secondEdgeIndex, second.getEdges().size());
+    EXPECT_NEAR(Point::vectorBetween(result.firstPoint,result.secondPoint).length(), 3.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getX(), 4.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 7.0, EPSILON);
+}
+
+TEST(PolygonTest, DistanceToContainedPolygonIsZeroWithWitness)
+{
+    Polygon outer({
+        Point(0.0, 0.0),
+        Point(10.0, 0.0),
+        Point(10.0, 10.0),
+        Point(0.0, 10.0)
+        });
+    Polygon inner({
+        Point(4.0, 4.0),
+        Point(8.0, 4.0),
+        Point(8.0, 7.0),
+        Point(4.0, 7.0)
+        });
+
+    const auto result = outer.distanceTo(inner);
+
+    EXPECT_NEAR(result.distance, 0.0, EPSILON);
+    EXPECT_LT(result.firstEdgeIndex, outer.getEdges().size());
+    EXPECT_LT(result.secondEdgeIndex, inner.getEdges().size());
+    EXPECT_NEAR(result.firstPoint.getX(), 10.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 8.0, EPSILON);
+}
+
+TEST(PolygonTest, DistanceToContainedPolygonValueWithWitness)
+{
+    Polygon outer({
+        Point(0.0, 0.0),
+        Point(10.0, 0.0),
+        Point(10.0, 10.0),
+        Point(0.0, 10.0)
+        });
+    Polygon inner({
+        Point(4.0, 4.0),
+        Point(8.0, 4.0),
+        Point(8.0, 7.0),
+        Point(4.0, 7.0)
+        });
+
+    const auto result = outer.distanceTo(inner, false);
+
+    EXPECT_NEAR(result.distance, 2.0, EPSILON);
+    EXPECT_LT(result.firstEdgeIndex, outer.getEdges().size());
+    EXPECT_LT(result.secondEdgeIndex, inner.getEdges().size());
+    EXPECT_NEAR(result.firstPoint.getX(), 10.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getX(), 8.0, EPSILON);
+}
+
+TEST(PolygonTest, SeparatedRectanglesWithUniqueWitness)
+{
+    Polygon first({
+        Point(0, 0),
+        Point(4, 0),
+        Point(4, 4),
+        Point(0, 4)
+        });
+
+    Polygon second({
+        Point(1, 6),
+        Point(3, 6),
+        Point(3, 10),
+        Point(1, 10)
+        });
+
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, 2.0, EPSILON);
+    EXPECT_EQ(result.firstEdgeIndex, 2);
+    EXPECT_EQ(result.secondEdgeIndex, 0);
+    EXPECT_NEAR(Point::vectorBetween(result.firstPoint, result.secondPoint).length(), 2.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 4.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 6.0, EPSILON);
 }

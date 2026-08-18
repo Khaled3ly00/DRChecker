@@ -83,7 +83,7 @@ namespace drcheck::geometry {
 		return false;
 	}
 	// Calculate the shortest distance from a point to the segment
-	double Segment::distanceTo(const Point& point) const
+	DistanceResult Segment::distanceTo(const Point& point) const
 	{
 		// Vector from start to end of the segment
 		Vector segVector = Point::vectorBetween(start, end);
@@ -92,30 +92,73 @@ namespace drcheck::geometry {
 		double segLengthSquared = segVector.dot(segVector);
 		// Project pointVector onto segVector and find the projection scalar
 		double t = pointVector.dot(segVector) / segLengthSquared;
+		Point closestPoint = start;
 		if (t < 0.0) {
 			// Closest to start point
-			return Point::vectorBetween(start, point).length();
+			closestPoint = start;
 		}
 		else if (t > 1.0) {
 			// Closest to end point
-			return Point::vectorBetween(end, point).length();
+			closestPoint = end;
 		}
 		else {
 			// Projection falls on the segment
-			return std::abs(segVector.cross(pointVector)) / segVector.length();
+			closestPoint = Point(start.getX() + t * segVector.getX(), start.getY() + t * segVector.getY());
 		}
+		const double distance = Point::vectorBetween(closestPoint, point).length();
+		return {distance, closestPoint, point};
 	}
 	// Calculate the shortest distance between two segments
-	double Segment::distanceTo(const Segment& other) const
+	DistanceResult Segment::distanceTo(const Segment& other) const
 	{
 		if (intersects(other)) {
-			return 0.0; // Segments intersect, so distance is zero
+			// Endpoint touching or collinear overlap.
+			if (other.contains(start)) {
+				return { 0.0, start, start };
+			}
+
+			if (other.contains(end)) {
+				return { 0.0, end, end };
+			}
+			if (contains(other.getStart())) {
+				return { 0.0, other.getStart(), other.getStart()};
+			}
+			if (contains(other.getEnd())) {
+				return { 0.0, other.getEnd(), other.getEnd()};
+			}
+			// Proper interior intersection.
+			const Vector firstDirection = Point::vectorBetween(start, end);
+			const Vector secondDirection = Point::vectorBetween(other.getStart(), other.getEnd());
+
+			const Vector betweenStarts = Point::vectorBetween(start, other.getStart());
+
+			const double denominator = firstDirection.cross(secondDirection);
+
+			const double t = betweenStarts.cross(secondDirection) / denominator;
+
+			const Point intersectionPoint(start.getX() + t * firstDirection.getX(), start.getY() + t * firstDirection.getY());
+
+			return {0.0, intersectionPoint, intersectionPoint};
 		}
 		// Calculate distances from endpoints of one segment to the other segment
-		double d1 = distanceTo(other.getStart());
-		double d2 = distanceTo(other.getEnd());
-		double d3 = other.distanceTo(start);
-		double d4 = other.distanceTo(end);
-		return std::min({ d1, d2, d3, d4 });
+		const DistanceResult r1 = distanceTo(other.getStart());
+		const DistanceResult r2 = distanceTo(other.getEnd());
+		const DistanceResult r3 = other.distanceTo(start);
+		const DistanceResult r4 = other.distanceTo(end);
+
+		DistanceResult result = r1;
+
+		if (r2.distance < result.distance) {
+			result = r2;
+		}
+		// Swap points as we calling other.distanceTo
+		if (r3.distance < result.distance) {
+			result = {r3.distance, r3.secondPoint, r3.firstPoint };
+		}
+		if (r4.distance < result.distance) {
+			result = { r4.distance, r4.secondPoint, r4.firstPoint };
+		}
+
+		return result;
 	}
 }
