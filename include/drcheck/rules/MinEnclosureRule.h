@@ -9,7 +9,7 @@ class MinEnclosureRule : public Rule
 public:
     MinEnclosureRule(domain::Layer innerLayer, domain::Layer outerLayer, double minimumEnclosure);
 
-    std::vector<domain::Violation> check(const std::vector<domain::Shape>& shapes) const override;
+    std::vector<domain::Violation> check(const std::vector<domain::Shape>& shapes, const spatial::LayerSpatialIndex& spatialIndex) const override;
 
     domain::Layer getInnerLayer() const;
     domain::Layer getOuterLayer() const;

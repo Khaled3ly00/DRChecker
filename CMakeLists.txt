@@ -49,6 +49,7 @@ add_library(drchecker
 
     # Spatial
     src/spatial/QuadTree.cpp
+    src/spatial/LayerSpatialIndex.cpp
 )
 
 target_include_directories(drchecker
@@ -116,6 +117,7 @@ if(DRCHECK_BUILD_TESTS)
 
         # Spatial
         tests/spatial/QuadTreeTest.cpp
+        tests/spatial/LayerSpatialIndexTest.cpp
     )
 
     target_link_libraries(

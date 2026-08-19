@@ -16,7 +16,7 @@ MinWidthRule::MinWidthRule(domain::Layer layer, double minimumWidth)
 }
 
 // Checks the shapes for violations of the minimum width rule
-std::vector<domain::Violation> MinWidthRule::check(const std::vector<domain::Shape>& shapes) const {
+std::vector<domain::Violation> MinWidthRule::check(const std::vector<domain::Shape>& shapes, const spatial::LayerSpatialIndex&) const {
 	std::vector<domain::Violation> violations; // Create a vector to hold any violations found
 	// Iterate through each shape and check if it violates the minimum width rule
 	for (const domain::Shape& shape : shapes)

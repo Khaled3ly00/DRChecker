@@ -1,16 +1,9 @@
 #include "drcheck/rules/MinSpacingRule.h"
-#include "drcheck/spatial/Quadtree.h"
 #include "drcheck/geometry/Constants.h"
 #include "drcheck/geometry/Polygon.h"
+#include "drcheck/spatial/LayerSpatialIndex.h"
 
 #include <stdexcept>
-
-namespace {
-    // Values obtained from tuning
-    constexpr std::size_t QUADTREE_CAPACITY = 16;
-    constexpr std::size_t QUADTREE_MAX_DEPTH = 8;
-
-}
 
 namespace drcheck::rules {
 MinSpacingRule::MinSpacingRule(domain::Layer layer, double minimumSpacing)
@@ -22,62 +15,35 @@ MinSpacingRule::MinSpacingRule(domain::Layer layer, double minimumSpacing)
         );
     }
 }
-std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::Shape>& shapes) const
+std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::Shape>& shapes, const spatial::LayerSpatialIndex& spatialIndex) const
 {
     std::vector<domain::Violation> violations;
-    const domain::Shape* firstTargetShape = nullptr;
 
-    // Check if there's any shape with the same layer
-    for (const domain::Shape& shape : shapes) {
-        if (shape.getLayer() == layer) {
-            firstTargetShape = &shape;
-            break;
-        }
-    }
-    if (!firstTargetShape) {
-        return violations;
-    }
-    // Merge all bounding boxes for shapes with same layer to get root boundary
-    geometry::BoundingBox boundary = firstTargetShape->getPolygon().getBoundingBox();
-    for (const domain::Shape& shape : shapes) {
-        if (shape.getLayer() != layer) {
+    for (const domain::Shape& firstShape : shapes) {
+        // Confirm first shape follows rule layer
+        if (firstShape.getLayer() != layer)
+        {
             continue;
         }
-        boundary = boundary.mergedWith(shape.getPolygon().getBoundingBox());
-    }
-    // Build QuadTree
-    // Capacity and maxDepth parameter are tuned using MinSpacingBenchmark.cpp
-    spatial::QuadTree tree(boundary, QUADTREE_CAPACITY, QUADTREE_MAX_DEPTH);
-    for (const domain::Shape& shape : shapes) {
-        if (shape.getLayer() != layer) {
-            continue;
-        }
-        tree.insert(shape);
-    }
-    // Create query for each shape to get candidates
-    // Then calculate distance between each pair
-    for (const domain::Shape& shape : shapes) {
-        if (shape.getLayer() != layer) {
-            continue;
-        }
-        const geometry::BoundingBox searchRegion =shape.getPolygon().getBoundingBox().expanded(minimumSpacing);
-        const auto candidates = tree.query(searchRegion);
+        const geometry::BoundingBox searchRegion = firstShape.getPolygon().getBoundingBox().expanded(minimumSpacing);
+        // Query Expanded Bounding Box For Shapes Within Same Layer
+        const auto candidates = spatialIndex.query(layer, searchRegion);
         
-        for (const domain::Shape* candidate :candidates)
+        for (const domain::Shape* secondShape : candidates)
         {
             // Avoid checking the shape against itself.
-            if (candidate == &shape) {
+            if (secondShape == &firstShape) {
                 continue;
             }
 
             // Prevent duplicate A-B / B-A checks.
             // Shapes have unique IDs arranged ascendingly 
-            if (candidate->getId() <= shape.getId())
+            if (secondShape->getId() <= firstShape.getId())
             {
                 continue;
             }
 
-            const geometry::PolygonEdgePairResult actualSpacing = shape.getPolygon().distanceTo(candidate->getPolygon());
+            const geometry::PolygonEdgePairResult actualSpacing = firstShape.getPolygon().distanceTo(secondShape->getPolygon());
 
             if (actualSpacing.distance + geometry::EPSILON < minimumSpacing)
             {
@@ -88,7 +54,7 @@ std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::S
                     actualSpacing.secondEdgeIndex
                 };
 
-                violations.emplace_back(domain::ViolationType::MinSpacing, std::vector<std::size_t>{shape.getId(), candidate->getId()},
+                violations.emplace_back(domain::ViolationType::MinSpacing, std::vector<std::size_t>{firstShape.getId(), secondShape->getId()},
                     "Minimum spacing violation", actualSpacing.distance, minimumSpacing, marker);
             }
         }

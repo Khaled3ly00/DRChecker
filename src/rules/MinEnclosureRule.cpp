@@ -19,7 +19,7 @@ MinEnclosureRule::MinEnclosureRule(domain::Layer innerLayer, domain::Layer outer
     }
 }
 
-std::vector<domain::Violation>MinEnclosureRule::check(const std::vector<domain::Shape>& shapes) const
+std::vector<domain::Violation>MinEnclosureRule::check(const std::vector<domain::Shape>& shapes, const spatial::LayerSpatialIndex&) const
 {
     std::vector<domain::Violation> violations;
 

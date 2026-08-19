@@ -24,7 +24,9 @@ TEST(MinWidthRuleTest, DetectsMinWidthViolation)
     });
     Shape shape(1,Layer::Metal1,std::move(polygon));
     MinWidthRule rule(Layer::Metal1,4.0);
-    const auto violations = rule.check({shape});
+    const std::vector<Shape> shapes{ shape };
+    LayerSpatialIndex spatialIndex(shapes);
+    const auto violations = rule.check(shapes, spatialIndex);
     ASSERT_EQ(violations.size(), 1);
     EXPECT_EQ(violations[0].getType(), ViolationType::MinWidth);
     EXPECT_EQ(violations[0].getShapeIds()[0], 1);
@@ -54,8 +56,9 @@ TEST(MinWidthRuleTest, AcceptsShapeMeetingMinWidth)
     Shape shape(1, Layer::Metal1, std::move(polygon));
 
     MinWidthRule rule(Layer::Metal1, 4.0);
-
-    EXPECT_TRUE(rule.check({shape}).empty());
+    const std::vector<Shape> shapes{ shape };
+    LayerSpatialIndex spatialIndex(shapes);
+    EXPECT_TRUE(rule.check(shapes, spatialIndex).empty());
 }
 
 TEST(MinWidthRuleTest, AcceptsShapeExactlyAtMinimumWidth)
@@ -68,7 +71,9 @@ TEST(MinWidthRuleTest, AcceptsShapeExactlyAtMinimumWidth)
 		});
 	Shape shape(1, Layer::Metal1, std::move(polygon));
 	MinWidthRule rule(Layer::Metal1, 4.0);
-	EXPECT_TRUE(rule.check({shape}).empty());
+    const std::vector<Shape> shapes{ shape };
+    LayerSpatialIndex spatialIndex(shapes);
+    EXPECT_TRUE(rule.check(shapes, spatialIndex).empty());
 }
 
 TEST(MinWidthRuleTest, IgnoresShapesOnOtherLayers)
@@ -81,7 +86,9 @@ TEST(MinWidthRuleTest, IgnoresShapesOnOtherLayers)
         });
     Shape shape(7, Layer::Metal2, std::move(polygon));
     MinWidthRule rule(Layer::Metal1, 4.0);
-    EXPECT_TRUE(rule.check({shape}).empty());
+    const std::vector<Shape> shapes{ shape };
+    LayerSpatialIndex spatialIndex(shapes);
+    EXPECT_TRUE(rule.check(shapes, spatialIndex).empty());
 }
 
 TEST(MinWidthRuleTest, ThrowsOnNonPositiveMinimumWidth)
@@ -114,7 +121,9 @@ TEST(MinWidthRuleTest, MultipleShapesAgainstMinWidth)
 		});
 	Shape shape3(3, Layer::Metal1, std::move(polygon3));
 	MinWidthRule rule(Layer::Metal1, 4.0);
-	const auto violations = rule.check({ shape1, shape2, shape3 });
+    const std::vector<Shape> shapes{ shape1, shape2, shape3 };
+    LayerSpatialIndex spatialIndex(shapes);
+    const auto violations = rule.check(shapes, spatialIndex);
     ASSERT_EQ(violations.size(), 1);
 	EXPECT_EQ(violations[0].getShapeIds()[0], 1);
 }
@@ -136,7 +145,9 @@ TEST(MinWidthRuleTest, MinimumWidthRuleOfHShape) {
         });
 	Shape shape(10, Layer::Metal1, std::move(polygon));
 	MinWidthRule rule(Layer::Metal1, 1.5);
-    const auto violations = rule.check({shape});
+    const std::vector<Shape> shapes{ shape };
+    LayerSpatialIndex spatialIndex(shapes);
+    const auto violations = rule.check(shapes, spatialIndex);
     ASSERT_EQ(violations.size(), 1);
     EXPECT_EQ(violations[0].getType(), ViolationType::MinWidth);
     EXPECT_EQ(violations[0].getShapeIds()[0], 10);
@@ -162,6 +173,8 @@ TEST(MinWidthRuleTest, WorksThroughRuleInterface)
         Point(0,5)
         });
     Shape shape2(2, Layer::Metal1, std::move(polygon2));
-    const auto violations = rule->check({shape1, shape2});
+    const std::vector<Shape> shapes{ shape1, shape2 };
+    LayerSpatialIndex spatialIndex(shapes);
+    const auto violations = rule->check(shapes, spatialIndex);
     EXPECT_EQ(violations.size(), 1);
 }

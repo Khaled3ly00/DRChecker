@@ -31,7 +31,8 @@ TEST(MinSpacingRuleTest, DetectsSpacingViolation)
     Shape second(2, Layer::Metal1, std::move(secondPolygon));
     MinSpacingRule rule(Layer::Metal1, 3.0);
     const std::vector<Shape> shapes{first, second};
-    const auto violations = rule.check(shapes);
+	LayerSpatialIndex spatialIndex(shapes);
+	const auto violations = rule.check(shapes, spatialIndex);
 
     ASSERT_EQ(violations.size(), 1);
     ASSERT_EQ(violations[0].getShapeIds().size(), 2);
@@ -65,7 +66,8 @@ TEST(MinSpacingRuleTest, AcceptsShapesMeetingMinimumSpacing)
 	Shape second(4, Layer::Metal1, std::move(secondPolygon));
 	MinSpacingRule rule(Layer::Metal1, 3.0);
 	const std::vector<Shape> shapes{first, second};
-	const auto violations = rule.check(shapes);
+	LayerSpatialIndex spatialIndex(shapes);
+	const auto violations = rule.check(shapes, spatialIndex);
 	EXPECT_TRUE(violations.empty());
 }
 
@@ -87,7 +89,8 @@ TEST(MinSpacingRuleTest, AcceptsShapesLargerThanMinimumSpacing)
 	Shape second(4, Layer::Metal1, std::move(secondPolygon));
 	MinSpacingRule rule(Layer::Metal1, 2.0);
 	const std::vector<Shape> shapes{ first, second };
-	const auto violations = rule.check(shapes);
+	LayerSpatialIndex spatialIndex(shapes);
+	const auto violations = rule.check(shapes, spatialIndex);
 	EXPECT_TRUE(violations.empty());
 }
 
@@ -109,7 +112,8 @@ TEST(MinSpacingRuleTest, IgnoresShapesOnOtherLayers)
 	Shape second(6, Layer::Metal2, std::move(secondPolygon));
 	MinSpacingRule rule(Layer::Metal1, 3.0);
 	const std::vector<Shape> shapes{ first, second };
-	const auto violations = rule.check(shapes);
+	LayerSpatialIndex spatialIndex(shapes);
+	const auto violations = rule.check(shapes, spatialIndex);
 	EXPECT_TRUE(violations.empty());
 }
 
@@ -143,7 +147,9 @@ TEST(MinSpacingRuleTest, MultipleShapesAgainstMinSpacing)
 		});
 	Shape shape3(3, Layer::Metal1, std::move(polygon3));
 	MinSpacingRule rule(Layer::Metal1, 3.0);
-	const auto violations = rule.check({ shape1, shape2, shape3 });
+	const std::vector<Shape> shapes{ shape1, shape2, shape3 };
+	LayerSpatialIndex spatialIndex(shapes);
+	const auto violations = rule.check(shapes, spatialIndex);
 	ASSERT_EQ(violations.size(), 1);
 	EXPECT_EQ(violations[0].getShapeIds()[0], 1);
 	EXPECT_EQ(violations[0].getShapeIds()[1], 2);
@@ -165,7 +171,9 @@ TEST(MinSpacingRuleTest, IntersectingShapesAgainstMinSpacing) {
 		});
 	Shape shape2(2, Layer::Metal2, std::move(polygon2));
 	MinSpacingRule rule(Layer::Metal2, 3.0);
-	const auto violations = rule.check({shape1, shape2});
+	const std::vector<Shape> shapes{ shape1, shape2 };
+	LayerSpatialIndex spatialIndex(shapes);
+	const auto violations = rule.check(shapes, spatialIndex);
 	ASSERT_EQ(violations.size(), 1);
 	EXPECT_EQ(violations[0].getShapeIds()[0], 1);
 	EXPECT_EQ(violations[0].getShapeIds()[1], 2);
@@ -194,7 +202,9 @@ TEST(MinSpacingRuleTest, LShapesAgainstMinSpacing) {
 		});
 	Shape shape2(2, Layer::Metal2, std::move(polygon2));
 	MinSpacingRule rule(Layer::Metal2, 1.0);
-	const auto violations = rule.check({ shape1, shape2 });
+	const std::vector<Shape> shapes{ shape1, shape2 };
+	LayerSpatialIndex spatialIndex(shapes);
+	const auto violations = rule.check(shapes, spatialIndex);
 	EXPECT_TRUE(violations.empty());
 }
 
@@ -218,7 +228,9 @@ TEST(MinSpacingRuleTest, WorksThroughRuleInterface)
 		Point(0,5)
 		});
 	Shape shape2(2, Layer::Metal1, std::move(polygon2));
-	const auto violations = rule->check({shape1, shape2});
+	const std::vector<Shape> shapes{ shape1, shape2 };
+	LayerSpatialIndex spatialIndex(shapes);
+	const auto violations = rule->check(shapes, spatialIndex);
 	ASSERT_EQ(violations.size(), 1);
 	EXPECT_EQ(violations[0].getShapeIds()[0], 1);
 	EXPECT_EQ(violations[0].getShapeIds()[1], 2);
@@ -277,7 +289,8 @@ TEST(MinSpacingRuleTest, DetectsViolationAcrossQuadTreeQuadrants)
 
 	MinSpacingRule rule(Layer::Metal1, 3.0);
 
-	const auto violations = rule.check(shapes);
+	LayerSpatialIndex spatialIndex(shapes);
+	const auto violations = rule.check(shapes, spatialIndex);
 
 	ASSERT_EQ(violations.size(), 1);
 
@@ -341,7 +354,8 @@ TEST(MinSpacingRuleTest, ShapeCrossingQuadTreeQuadrants)
 
 	MinSpacingRule rule(Layer::Metal1, 3.0);
 
-	const auto violations = rule.check(shapes);
+	LayerSpatialIndex spatialIndex(shapes);
+	const auto violations = rule.check(shapes, spatialIndex);
 
 	ASSERT_EQ(violations.size(), 1);
 
@@ -371,7 +385,8 @@ TEST(MinSpacingRuleTest, DetectsContainedPolygon)
 	Shape second(2, Layer::Metal1, std::move(inner));
 	MinSpacingRule rule(Layer::Metal1, 3.0);
 	const std::vector<Shape> shapes{ first, second };
-	const auto violations = rule.check(shapes);
+	LayerSpatialIndex spatialIndex(shapes);
+	const auto violations = rule.check(shapes, spatialIndex);
 
 	ASSERT_EQ(violations.size(), 1);
 	ASSERT_EQ(violations[0].getShapeIds().size(), 2);
