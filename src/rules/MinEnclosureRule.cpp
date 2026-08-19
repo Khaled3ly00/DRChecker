@@ -1,5 +1,6 @@
 #include "drcheck/rules/MinEnclosureRule.h"
 #include "drcheck/geometry/Constants.h"
+#include "drcheck/spatial/LayerSpatialIndex.h"
 
 #include <stdexcept>
 
@@ -19,32 +20,35 @@ MinEnclosureRule::MinEnclosureRule(domain::Layer innerLayer, domain::Layer outer
     }
 }
 
-std::vector<domain::Violation>MinEnclosureRule::check(const std::vector<domain::Shape>& shapes, const spatial::LayerSpatialIndex&) const
+std::vector<domain::Violation>MinEnclosureRule::check(const std::vector<domain::Shape>& shapes, const spatial::LayerSpatialIndex& spatialIndex) const
 {
     std::vector<domain::Violation> violations;
 
-    for (const domain::Shape& inner : shapes)
+    for (const domain::Shape& innerShape : shapes)
     {
-        if (inner.getLayer() != innerLayer) {
+        if (innerShape.getLayer() != innerLayer) {
             continue;
         }
 
         bool foundContainingOuter = false;
 
-        for (const domain::Shape& outer : shapes)
-        {
-            if (outer.getLayer() != outerLayer) {
-                continue;
-            }
+        const auto innerBox = innerShape.getPolygon().getBoundingBox();
+        // query() return any outerLayer shapes that have shared area with innerBox 
+        const auto candidates = spatialIndex.query(outerLayer, innerBox);
 
-            if (!outer.getPolygon().contains(inner.getPolygon()))
+        for (const domain::Shape* outerShape : candidates)
+        {
+            const auto& innerPolygon = innerShape.getPolygon();
+            const auto& outerPolygon = outerShape->getPolygon();
+
+            if (!outerPolygon.contains(innerPolygon))
             {
                 continue;
             }
 
             foundContainingOuter = true;
 
-            const geometry::PolygonEdgePairResult actualEnclosure = inner.getPolygon().distanceTo(outer.getPolygon(), false);
+            const geometry::PolygonEdgePairResult actualEnclosure = innerPolygon.distanceTo(outerPolygon, false);
 
             if (actualEnclosure.distance + geometry::EPSILON < minimumEnclosure)
             {
@@ -56,7 +60,7 @@ std::vector<domain::Violation>MinEnclosureRule::check(const std::vector<domain::
                 };
 
                 violations.emplace_back(
-                    domain::ViolationType::Enclosure, std::vector<std::size_t>{inner.getId(), outer.getId()}, "Enclosure violation", actualEnclosure.distance, minimumEnclosure, marker);
+                    domain::ViolationType::Enclosure, std::vector<std::size_t>{innerShape.getId(), outerShape->getId()}, "Enclosure violation", actualEnclosure.distance, minimumEnclosure, marker);
             }
 
             // Current assumption:
@@ -66,7 +70,7 @@ std::vector<domain::Violation>MinEnclosureRule::check(const std::vector<domain::
 
         if (!foundContainingOuter)
         {
-            violations.emplace_back(domain::ViolationType::Enclosure, std::vector<std::size_t>{ inner.getId()}, "Inner shape is not enclosed by any outer shape", 0.0, minimumEnclosure);
+            violations.emplace_back(domain::ViolationType::Enclosure, std::vector<std::size_t>{ innerShape.getId()}, "Inner shape is not enclosed by any outer shape", 0.0, minimumEnclosure);
         }
     }
 

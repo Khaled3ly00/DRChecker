@@ -156,18 +156,35 @@ target_compile_definitions(
 )
 
 add_executable(
-    drcheck_benchmark
+    drcheck_spacing_benchmark
     benchmarks/MinSpacingBenchmark.cpp
 )
 
 target_link_libraries(
-    drcheck_benchmark
+    drcheck_spacing_benchmark
     PRIVATE
         drchecker
 )
 
 target_compile_definitions(
-    drcheck_benchmark
+    drcheck_spacing_benchmark
+    PRIVATE
+        DRCHECK_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
+)
+
+add_executable(
+    drcheck_enclosure_benchmark
+    benchmarks/MinEnclosureBenchmark.cpp
+)
+
+target_link_libraries(
+    drcheck_enclosure_benchmark
+    PRIVATE
+        drchecker
+)
+
+target_compile_definitions(
+    drcheck_enclosure_benchmark
     PRIVATE
         DRCHECK_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
 )

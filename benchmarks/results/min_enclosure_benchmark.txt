@@ -1,0 +1,51 @@
+MinEnclosure Benchmark
+
+
+-----------------
+Via Count: 100
+Total Shapes: 200
+Brute-Force Containment Checks: 5050
+Spatial (QuadTree) Containment Checks: 100
+Violation Count: 100
+Check Reduction:  98.019802%
+Brute Time: 3.370500
+Index Build Time: 0.380200
+Spatial Rule Time:  2.642000
+Rule Speedup: 1.275738x
+
+-----------------
+Via Count: 500
+Total Shapes: 1000
+Brute-Force Containment Checks: 125250
+Spatial (QuadTree) Containment Checks: 500
+Violation Count: 500
+Check Reduction:  99.600798%
+Brute Time: 32.703700
+Index Build Time: 1.550400
+Spatial Rule Time:  14.414200
+Rule Speedup: 2.268853x
+
+-----------------
+Via Count: 1000
+Total Shapes: 2000
+Brute-Force Containment Checks: 500500
+Spatial (QuadTree) Containment Checks: 1000
+Violation Count: 1000
+Check Reduction:  99.800200%
+Brute Time: 120.605900
+Index Build Time: 2.703100
+Spatial Rule Time:  25.305100
+Rule Speedup: 4.766071x
+
+-----------------
+Via Count: 2000
+Total Shapes: 4000
+Brute-Force Containment Checks: 2001000
+Spatial (QuadTree) Containment Checks: 2000
+Violation Count: 2000
+Check Reduction:  99.900050%
+Brute Time: 392.974700
+Index Build Time: 6.404200
+Spatial Rule Time:  80.904700
+Rule Speedup: 4.857254x
+
