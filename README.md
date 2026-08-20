@@ -9,11 +9,11 @@ The current end-to-end application can:
 - build one shared, layer-aware spatial index for a rule run;
 - report actual and required rule values;
 - attach optional witness geometry to violations; and
-- write machine-readable JSON reports.
+- write machine-readable JSON reports and optional SVG visualizations.
 
 ## Current Status
 
-The geometry core, domain model, rule framework, JSON input/output path, CLI, violation metadata, QuadTree optimization, and reusable spatial-index architecture are implemented and covered by tests.
+The geometry core, domain model, rule framework, JSON input/output path, CLI, violation metadata, SVG visualization, QuadTree optimization, and reusable spatial-index architecture are implemented and covered by tests.
 
 The latest architectural change introduces `LayerSpatialIndex`. `DRCEngine` builds it once from the current shape collection and passes it to every rule. `MinSpacingRule` and `MinEnclosureRule` now reuse that index instead of building rule-local trees or scanning every possible shape.
 
@@ -46,9 +46,13 @@ JSONLayoutParser          JSONRuleParser
                     |
                     v
           vector<Violation>
-                    |
-                    v
-            JSONReportWriter
+                    +------------------+
+                    |                  |
+                    v                  v
+            JSONReportWriter    SVGReportWriter
+                    |                  |
+                    v                  v
+              report.json        report.svg
 ```
 
 The design keeps responsibilities separated:
@@ -60,7 +64,7 @@ The design keeps responsibilities separated:
 | `spatial/` | QuadTree storage and layer-aware candidate queries |
 | `rules/` | Rule-specific DRC semantics |
 | `engine/` | Shared-index construction and rule orchestration |
-| `io/` | JSON layout/rule parsing and report serialization |
+| `io/` | JSON layout/rule parsing, JSON report serialization, and SVG visualization |
 
 ## Shared `LayerSpatialIndex`
 
@@ -156,6 +160,20 @@ A `Violation` records:
 - an optional `ViolationMarker`.
 
 `ViolationMarker` preserves two witness points and their polygon-edge indices when the geometry operation provides a meaningful edge pair. `JSONReportWriter` serializes marker data only when it is present, preserving a compact report for violations without witness geometry.
+
+## SVG Visualization
+
+`SVGReportWriter` creates an optional browser-viewable representation of the checked layout and its violations. The visualization includes:
+
+- polygons with layer-specific fill and stroke colors;
+- shape IDs;
+- highlighted offending polygon edges;
+- witness connectors and endpoint markers; and
+- labels containing the violation type and actual/required values.
+
+Layout coordinates are translated, scaled, padded, and vertically inverted when written to SVG so the result preserves the layout's conventional Cartesian orientation. SVG generation is a presentation step only and does not affect rule evaluation or JSON report contents.
+
+Only violations containing witness-marker geometry are drawn as violation annotations. All violations remain available in the JSON report.
 
 ## Implemented Rules
 
@@ -278,14 +296,26 @@ Run the full suite through CTest:
 ctest --test-dir build --output-on-failure
 ```
 
-The test suite covers geometry invariants and algorithms, parser validation, rule behavior, report serialization, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end JSON processing.
+The test suite covers geometry invariants and algorithms, parser validation, rule behavior, JSON and SVG report generation, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end processing.
 
 ## Running DRCheck
 
-The CLI accepts a layout file, a rule file, and an output report path:
+The CLI requires a layout file, a rule file, and a JSON report path. A fourth path can be supplied to generate an SVG visualization:
 
 ```bash
 drcheck layout.json rules.json report.json
+```
+
+This preserves the JSON-only workflow. To generate both reports, run:
+
+```bash
+drcheck layout.json rules.json report.json report.svg
+```
+
+The complete command syntax is:
+
+```text
+drcheck <layout.json> <rules.json> <report.json> [report.svg]
 ```
 
 The high-level flow is:
@@ -297,8 +327,14 @@ layout JSON + rule JSON
        DRCEngine
           |
           v
-    violation report JSON
+   vector<Violation>
+          / \
+         v   v
+ report.json report.svg
+               optional
 ```
+
+The JSON report is always produced. The SVG report is generated only when the optional output path is provided. Open the resulting `.svg` file in a modern web browser to inspect the layout and witness geometry visually.
 
 See `examples/` for sample inputs.
 
@@ -322,13 +358,15 @@ The current implementation intentionally favors a clear, well-tested architectur
 - The current enclosure assumption is at most one relevant containing outer polygon per rule evaluation.
 - QuadTree queries can return false-positive candidates; exact geometry remains required.
 - Spatial-index performance depends on geometry distribution and can degrade toward brute-force behavior in unfavorable layouts.
-- Violation witness selection can have multiple equally valid edge pairs; deterministic tie-breaking should be completed before visualization work depends on a unique marker.
+- Violation witness selection can have multiple equally valid edge pairs; the SVG displays the marker selected by the current geometry result.
+- SVG annotations are available only for violations that contain witness-marker geometry.
+- SVG output is static and does not currently provide zoom controls, filtering, or interactive inspection.
 - The current JSON format and rule set are intentionally simplified.
 
 ## Next Development Areas
 
-- deterministic tie-breaking for equal-distance edge-pair witnesses;
-- SVG visualization of layouts and violation markers;
+- density design-rule checking;
+- sweep-line and other spatial optimizations where benchmarks justify them;
 - additional design-rule types and broader polygon support;
 - Tcl-based rule decks;
 - cross-platform CI and build verification; and

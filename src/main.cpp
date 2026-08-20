@@ -4,6 +4,7 @@
 #include "drcheck/io/JSONLayoutParser.h"
 #include "drcheck/io/JSONRuleParser.h"
 #include "drcheck/io/JSONReportWriter.h"
+#include "drcheck/io/SVGReportWriter.h"
 
 int main(int argc, char* argv[])
 {
@@ -11,9 +12,10 @@ int main(int argc, char* argv[])
     // argv[0] → executable name 
     // argv[1] → layout path 
     // argv[2] → rules path
-    // argv[3] → output report path
-    if (argc != 4) {
-        std::cerr<< "Usage: drchecker <layout.json> <rules.json> <report.json>\n";
+    // argv[3] → JSON output report path
+    // argv[4] → SVG output report path
+    if (argc != 4 && argc != 5) {
+        std::cerr<< "Usage: drchecker <layout.json> <rules.json> <report.json>  [report.svg]\n";
         return 1;
     }
 
@@ -22,7 +24,7 @@ int main(int argc, char* argv[])
         drcheck::io::JSONLayoutParser layoutParser;
         drcheck::io::JSONRuleParser ruleParser;
         drcheck::engine::DRCEngine engine;
-        drcheck::io::JSONReportWriter reportWriter;
+        drcheck::io::JSONReportWriter JSONWriter;
 
         const auto shapes = layoutParser.load(argv[1]);
 
@@ -30,7 +32,15 @@ int main(int argc, char* argv[])
 
         const auto violations = engine.run(shapes, rules);
 
-        reportWriter.write(violations, argv[3]);
+        JSONWriter.write(violations, argv[3]);
+
+        const bool writeSvg = argc == 5;
+
+        if (argc == 5)
+        {
+            const std::string svgPath = argv[4];
+            drcheck::io::SVGReportWriter::write(shapes, violations, svgPath);
+        }
 
         std::cout
             << "DRC completed.\n"

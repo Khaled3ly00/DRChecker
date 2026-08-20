@@ -46,6 +46,7 @@ add_library(drchecker
     src/io/JSONLayoutParser.cpp
     src/io/JSONRuleParser.cpp
     src/io/JSONReportWriter.cpp
+    src/io/SVGReportWriter.cpp
 
     # Spatial
     src/spatial/QuadTree.cpp
@@ -107,10 +108,11 @@ if(DRCHECK_BUILD_TESTS)
         # Engine Tests
         tests/engine/DRCEngineTest.cpp
 
-        # JSONParser Tests
+        # Parser Tests
         tests/io/JSONLayoutParserTest.cpp
         tests/io/JSONRuleParserTest.cpp
         tests/io/JSONReportWriterTest.cpp
+        tests/io/SVGReportWriterTest.cpp
 
         # EndToEnd Tests
         tests/integration/EndtoEndTest.cpp
