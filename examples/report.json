@@ -34,14 +34,14 @@
             "marker": {
                 "firstPoint": {
                     "x": 2.0,
-                    "y": 0.0
+                    "y": 5.0
                 },
                 "secondPoint": {
                     "x": 4.0,
-                    "y": 0.0
+                    "y": 5.0
                 },
-                "firstEdgeIndex": 0,
-                "secondEdgeIndex": 0
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 3
             }
         },
         {
@@ -56,13 +56,13 @@
             "marker": {
                 "firstPoint": {
                     "x": 5.0,
-                    "y": 2.0
+                    "y": 3.0
                 },
                 "secondPoint": {
                     "x": 4.0,
-                    "y": 2.0
+                    "y": 3.0
                 },
-                "firstEdgeIndex": 0,
+                "firstEdgeIndex": 3,
                 "secondEdgeIndex": 3
             }
         }

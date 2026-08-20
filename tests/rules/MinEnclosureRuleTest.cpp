@@ -97,7 +97,7 @@ TEST(MinEnclosureRuleTest, RejectsLessThanMinEnclosure)
     const auto& marker = violations[0].getMarker().value();
     // First nearst edge (point)
     EXPECT_EQ(marker.firstEdgeIndex, 0);
-    EXPECT_EQ(marker.secondEdgeIndex, 0);
+    EXPECT_EQ(marker.secondEdgeIndex, 3);
     EXPECT_NEAR(Point::vectorBetween(marker.firstPoint, marker.secondPoint).length(), 2.0, EPSILON);
     const auto innerEdges = second.getPolygon().getEdges();
     const auto outerEdges = first.getPolygon().getEdges();

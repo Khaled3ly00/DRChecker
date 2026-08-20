@@ -43,8 +43,8 @@ TEST(MinSpacingRuleTest, DetectsSpacingViolation)
 	ASSERT_TRUE(violations[0].getMarker().has_value());
 	const auto& marker = violations[0].getMarker().value();
 	// First nearst edge (point)
-	EXPECT_EQ(marker.firstEdgeIndex, 0);
-	EXPECT_EQ(marker.secondEdgeIndex, 0);
+	EXPECT_EQ(marker.firstEdgeIndex, 1);
+	EXPECT_EQ(marker.secondEdgeIndex, 3);
 	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint,marker.secondPoint).length(), 2.0, EPSILON);
 }
 
@@ -398,7 +398,7 @@ TEST(MinSpacingRuleTest, DetectsContainedPolygon)
 	const auto& marker = violations[0].getMarker().value();
 	// First nearst edge (point)
 	EXPECT_EQ(marker.firstEdgeIndex, 1);
-	EXPECT_EQ(marker.secondEdgeIndex, 0);
+	EXPECT_EQ(marker.secondEdgeIndex, 1);
 	// Distance can be retrieved as we calculate distance between 2 points
 	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint, marker.secondPoint).length(), 2.0, EPSILON);
 }

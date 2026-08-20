@@ -195,8 +195,24 @@ namespace drcheck::geometry {
 		for (std::size_t i = 0; i < thisEdges.size(); ++i) {
 			for (std::size_t j = 0; j < otherEdges.size(); ++j) {
 				const DistanceResult result = thisEdges[i].distanceTo(otherEdges[j]);
-				if (result.distance < best.distance) {
+				if (result.distance + EPSILON < best.distance) {
 					best = {result.distance, result.firstPoint, result.secondPoint, i, j};
+				}
+				// If there's multiple edges pair with same spacing
+				else if (std::abs(result.distance - best.distance) <= EPSILON) {
+					if (result.distance <= EPSILON)
+					{
+						continue;
+					}
+					// Calculate candidate pair score
+					const double candidateScore = edgePairFacingScore(thisEdges[i], otherEdges[j], result.firstPoint, result.secondPoint);
+					// Calculate best pair score
+					const double bestScore = edgePairFacingScore(thisEdges[best.firstEdgeIndex], otherEdges[best.secondEdgeIndex], best.firstPoint, best.secondPoint);
+					// Lower score wins (more perpendicular to the connector pair)
+					if (candidateScore + EPSILON < bestScore)
+					{
+						best = { result.distance, result.firstPoint, result.secondPoint, i, j };
+					}
 				}
 			}
 		}
@@ -373,5 +389,27 @@ namespace drcheck::geometry {
 			overlapMin,
 			overlapMax
 		);
+	}
+	// Calculates a score that represents how much these pair of edges are perpendicular to connector 
+	// (0: perpendicular, 2: parallel)
+	// Used to select correct violating Min Spacing edge pair,
+	// Where lower score is better pair
+	double Polygon::edgePairFacingScore(const Segment& firstEdge, const Segment& secondEdge, const Point& firstPoint, const Point& secondPoint) const {
+	
+		const Vector connector = Point::vectorBetween(firstPoint, secondPoint);
+		const Vector firstEdgeVector = Point::vectorBetween(firstEdge.getStart(), firstEdge.getEnd());
+		const Vector secondEdgeVector = Point::vectorBetween(secondEdge.getStart(), secondEdge.getEnd());
+
+		const double connectorLength = connector.length();
+		// A zero-length connector has no meaningful direction,
+		// so a facing score cannot be calculated.
+		if (connectorLength <= EPSILON)
+		{
+			return 0.0;
+		}
+		const double firstEdgeScore = std::abs(firstEdgeVector.dot(connector)) / (firstEdgeVector.length() * connectorLength);
+		const double secondEdgeScore = std::abs(secondEdgeVector.dot(connector)) / (secondEdgeVector.length() * connectorLength);
+
+		return firstEdgeScore + secondEdgeScore;
 	}
 }

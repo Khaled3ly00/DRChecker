@@ -426,7 +426,14 @@ TEST(PolygonTest, CalculatesDistanceBetweenSeparatedPolygons)
 
     EXPECT_NEAR(result.distance, 3.0, EPSILON);
     ASSERT_TRUE(result.firstEdgeIndex < first.getEdges().size());
+    EXPECT_EQ(result.firstEdgeIndex, 1);
     ASSERT_TRUE(result.secondEdgeIndex < second.getEdges().size());
+    EXPECT_EQ(result.secondEdgeIndex, 3);
+
+    const auto firstEdges = first.getEdges();
+    const auto secondEdges = second.getEdges();
+    EXPECT_TRUE(firstEdges[result.firstEdgeIndex].contains(result.firstPoint));
+    EXPECT_TRUE(secondEdges[result.secondEdgeIndex].contains(result.secondPoint));
 }
 
 TEST(PolygonTest, IntersectingPolygonsHaveZeroDistance)
@@ -450,6 +457,10 @@ TEST(PolygonTest, IntersectingPolygonsHaveZeroDistance)
     EXPECT_NEAR(result.distance, 0.0, EPSILON);
     ASSERT_TRUE(result.firstEdgeIndex < first.getEdges().size());
     ASSERT_TRUE(result.secondEdgeIndex < second.getEdges().size());
+    const auto firstEdges = first.getEdges();
+    const auto secondEdges = second.getEdges();
+    EXPECT_TRUE(firstEdges[result.firstEdgeIndex].contains(result.firstPoint));
+    EXPECT_TRUE(secondEdges[result.secondEdgeIndex].contains(result.secondPoint));
 }
 
 TEST(PolygonTest, PolygonDistanceIsSymmetric)

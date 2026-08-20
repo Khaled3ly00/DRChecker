@@ -51,5 +51,6 @@ namespace drcheck::geometry {
 		bool hasSelfIntersection() const;
 		bool isOrthogonal() const;
 		static std::optional<std::pair<double, double>>positiveOverlapInterval(double minA, double maxA, double minB, double maxB);
+		double edgePairFacingScore(const Segment& firstEdge, const Segment& secondEdge, const Point& firstPoint, const Point& secondPoint) const;
 	};
 }
