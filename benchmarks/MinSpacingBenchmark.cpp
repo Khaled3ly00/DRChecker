@@ -12,7 +12,7 @@
 #include "drcheck/geometry/Constants.h"
 #include "drcheck/geometry/Point.h"
 #include "drcheck/geometry/Polygon.h"
-#include "drcheck/spatial/Quadtree.h"
+#include "drcheck/spatial/QuadTree.h"
 #include "drcheck/geometry/BoundingBox.h"
 
 struct BenchmarkResult
