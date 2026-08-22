@@ -869,3 +869,137 @@ TEST(PolygonTest, SeparatedRectanglesWithUniqueWitness)
     EXPECT_NEAR(result.firstPoint.getY(), 4.0, EPSILON);
     EXPECT_NEAR(result.secondPoint.getY(), 6.0, EPSILON);
 }
+
+
+TEST(PolygonTest, AreaInsideReturnsFullAreaWhenPolygonInsideWindow)
+{
+    Polygon polygon({
+        Point(2, 2),
+        Point(8, 2),
+        Point(8, 8),
+        Point(2, 8)
+        });
+
+    BoundingBox window(0, 0, 10, 10);
+
+    EXPECT_NEAR(polygon.areaInsideWindow(window), 36.0, EPSILON);
+}
+
+TEST(PolygonTest, AreaInsideReturnsWindowAreaWhenRegionInsidePolygon)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+
+    BoundingBox window(2, 2, 8, 8);
+
+    EXPECT_NEAR(polygon.areaInsideWindow(window), 36.0, EPSILON);
+}
+
+TEST(PolygonTest, AreaInsideReturnsPartialOverlapArea)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+
+    BoundingBox window(5, 0, 15, 10);
+
+    EXPECT_NEAR(polygon.areaInsideWindow(window), 50.0, EPSILON);
+}
+
+TEST(PolygonTest, AreaInsideReturnsZeroWhenSeparated)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+
+    BoundingBox window(20, 20, 30, 30);
+
+    EXPECT_NEAR(polygon.areaInsideWindow(window), 0.0, EPSILON);
+}
+
+TEST(PolygonTest, AreaInsideReturnsZeroForEdgeTouching)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+
+    BoundingBox window(10, 0, 20, 10);
+
+    EXPECT_NEAR(polygon.areaInsideWindow(window), 0.0, EPSILON);
+}
+
+TEST(PolygonTest, AreaInsideReturnsZeroForVertexTouching)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+
+    BoundingBox window(10, 10, 20, 20);
+
+    EXPECT_NEAR(polygon.areaInsideWindow(window), 0.0, EPSILON);
+}
+
+TEST(PolygonTest, AreaInsideReturnsCornerOverlapArea)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+
+    BoundingBox window(5, 5, 15, 15);
+
+    EXPECT_NEAR(polygon.areaInsideWindow(window), 25.0, EPSILON);
+}
+
+TEST(PolygonTest, AreaInsideReturnsPartialConcavePolygonArea)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(6, 0),
+        Point(6, 2),
+        Point(2, 2),
+        Point(2, 6),
+        Point(0, 6)
+        });
+
+    BoundingBox window(1, 1, 5, 5);
+
+    EXPECT_NEAR(polygon.areaInsideWindow(window), 7.0, EPSILON);
+}
+
+
+TEST(PolygonTest, AreaInsideReturnsPartialUShapedPolygonArea)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(7, 10),
+        Point(7, 3),
+        Point(3, 3),
+        Point(3, 10),
+        Point(0, 10)
+        });
+
+    BoundingBox window(0, 5, 10, 8);
+
+    EXPECT_NEAR(polygon.areaInsideWindow(window), 18.0, EPSILON);
+}

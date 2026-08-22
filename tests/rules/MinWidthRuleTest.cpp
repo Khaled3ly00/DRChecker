@@ -38,10 +38,12 @@ TEST(MinWidthRuleTest, DetectsMinWidthViolation)
     ASSERT_TRUE(marker.firstEdgeIndex.has_value());
     ASSERT_TRUE(marker.secondEdgeIndex.has_value());
     const auto edges = shape.getPolygon().getEdges();
-    EXPECT_TRUE(edges[marker.firstEdgeIndex.value()].contains(marker.firstPoint));
-    EXPECT_TRUE(edges[marker.secondEdgeIndex.value()].contains(marker.secondPoint));
+    ASSERT_TRUE(marker.firstPoint.has_value());
+    ASSERT_TRUE(marker.secondPoint.has_value());
+    EXPECT_TRUE(edges[marker.firstEdgeIndex.value()].contains(marker.firstPoint.value()));
+    EXPECT_TRUE(edges[marker.secondEdgeIndex.value()].contains(marker.secondPoint.value()));
     // Distance can be retrieved as we calculate distance between 2 points
-    EXPECT_NEAR(Point::vectorBetween(marker.firstPoint, marker.secondPoint).length(), 3.0, EPSILON);
+    EXPECT_NEAR(Point::vectorBetween(marker.firstPoint.value(), marker.secondPoint.value()).length(), 3.0, EPSILON);
 }
 
 TEST(MinWidthRuleTest, AcceptsShapeMeetingMinWidth)

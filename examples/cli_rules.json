@@ -15,6 +15,14 @@
       "innerLayer": "Via12",
       "outerLayer": "Metal1",
       "value": 2.0
+    },
+    {
+      "type": "Density",
+      "layer": "Metal1",
+      "limit": "Minimum",
+      "requiredDensity": 0.50,
+      "windowSize": 10.0,
+      "windowStep": 10.0
     }
   ]
 }

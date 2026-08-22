@@ -6,6 +6,7 @@ using namespace drcheck::rules;
 using namespace drcheck::domain;
 using drcheck::geometry::Polygon;
 using drcheck::geometry::Point;
+using drcheck::geometry::BoundingBox;
 using drcheck::engine::DRCEngine;
 
 TEST(DRCEngineTest, CollectsViolationFromOneRule)
@@ -311,4 +312,69 @@ TEST(DRCEngineTest, Via12FailsEnclosureByBothMetalLayers) {
     const auto violations = engine.run(shapes, rules);
 
     ASSERT_EQ(violations.size(), 2);
+}
+
+TEST(DRCEngineTest, RunsDensityRule)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(2, 0),
+        Point(2, 10),
+        Point(0, 10)
+        });
+
+    std::vector<Shape> shapes;
+    shapes.emplace_back(1, Layer::Metal1, std::move(polygon));
+
+    std::vector<std::unique_ptr<Rule>> rules;
+    rules.push_back(std::make_unique<DensityRule>(Layer::Metal1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 10, 10)));
+
+    DRCEngine engine;
+
+    const auto violations = engine.run(shapes, rules);
+
+    ASSERT_EQ(violations.size(), 1);
+
+    EXPECT_EQ(violations[0].getType(), ViolationType::MinDensity);
+    EXPECT_DOUBLE_EQ(violations[0].getActualValue(), 0.20);
+    EXPECT_DOUBLE_EQ(violations[0].getRequiredValue(), 0.30);
+
+    ASSERT_TRUE(violations[0].getMarker().has_value());
+
+    const auto& marker = violations[0].getMarker().value();
+
+    ASSERT_TRUE(marker.region.has_value());
+
+    EXPECT_DOUBLE_EQ(marker.region->getMinX(), 0.0);
+    EXPECT_DOUBLE_EQ(marker.region->getMinY(), 0.0);
+    EXPECT_DOUBLE_EQ(marker.region->getMaxX(), 10.0);
+    EXPECT_DOUBLE_EQ(marker.region->getMaxY(), 10.0);
+}
+
+TEST(DRCEngineTest, RunsDensityRuleWithOtherRules)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(2, 0),
+        Point(2, 10),
+        Point(0, 10)
+        });
+
+    std::vector<Shape> shapes;
+    shapes.emplace_back(1, Layer::Metal1, std::move(polygon));
+
+    std::vector<std::unique_ptr<Rule>> rules;
+
+    rules.push_back(std::make_unique<MinWidthRule>(Layer::Metal1, 3.0));
+
+    rules.push_back(std::make_unique<DensityRule>(Layer::Metal1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 10, 10)));
+
+    DRCEngine engine;
+
+    const auto violations = engine.run(shapes, rules);
+
+    ASSERT_EQ(violations.size(), 2);
+
+    EXPECT_EQ(violations[0].getType(), ViolationType::MinWidth);
+    EXPECT_EQ(violations[1].getType(), ViolationType::MinDensity);
 }

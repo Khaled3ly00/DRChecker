@@ -96,15 +96,19 @@ TEST(MinEnclosureRuleTest, RejectsLessThanMinEnclosure)
     ASSERT_TRUE(violations[0].getMarker().has_value());
     const auto& marker = violations[0].getMarker().value();
     // First nearst edge (point)
+    ASSERT_TRUE(marker.firstEdgeIndex.has_value());
     EXPECT_EQ(marker.firstEdgeIndex, 0);
+    ASSERT_TRUE(marker.secondEdgeIndex.has_value());
     EXPECT_EQ(marker.secondEdgeIndex, 3);
-    EXPECT_NEAR(Point::vectorBetween(marker.firstPoint, marker.secondPoint).length(), 2.0, EPSILON);
+    ASSERT_TRUE(marker.firstPoint.has_value());
+    ASSERT_TRUE(marker.secondPoint.has_value());
+    EXPECT_NEAR(Point::vectorBetween(marker.firstPoint.value(), marker.secondPoint.value()).length(), 2.0, EPSILON);
     const auto innerEdges = second.getPolygon().getEdges();
     const auto outerEdges = first.getPolygon().getEdges();
     ASSERT_TRUE(marker.firstEdgeIndex.has_value());
     ASSERT_TRUE(marker.secondEdgeIndex.has_value());
-    EXPECT_TRUE(innerEdges[marker.firstEdgeIndex.value()].contains(marker.firstPoint));
-    EXPECT_TRUE(outerEdges[marker.secondEdgeIndex.value()].contains(marker.secondPoint));
+    EXPECT_TRUE(innerEdges[marker.firstEdgeIndex.value()].contains(marker.firstPoint.value()));
+    EXPECT_TRUE(outerEdges[marker.secondEdgeIndex.value()].contains(marker.secondPoint.value()));
 
 }
 

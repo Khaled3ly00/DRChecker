@@ -25,6 +25,36 @@
       "innerLayer": "Via12",
       "outerLayer": "Metal1",
       "value": 2
+    },
+    {
+      "type": "Density",
+      "layer": "Metal1",
+      "limit": "Minimum",
+      "requiredDensity": 0.30,
+      "windowSize": 10.0,
+      "windowStep": 5.0
+    },
+    {
+      "type": "Density",
+      "layer": "Metal2",
+      "limit": "Maximum",
+      "requiredDensity": 0.70,
+      "windowSize": 20.0,
+      "windowStep": 10.0
+    },
+    {
+      "type": "Density",
+      "layer": "Metal1",
+      "limit": "Minimum",
+      "requiredDensity": 0.40,
+      "windowSize": 10.0,
+      "windowStep": 5.0,
+      "analysisWindow": {
+        "minX": 10.0,
+        "minY": 20.0,
+        "maxX": 50.0,
+        "maxY": 70.0
+      }
     }
   ]
 }

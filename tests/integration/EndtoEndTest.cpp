@@ -36,5 +36,5 @@ TEST(EndToEndTest, ParsesFilesAndDetectsExpectedViolations)
     const std::filesystem::path SVG_report_path = std::filesystem::path(DRCHECK_SOURCE_DIR) / "examples" / "report.svg";
     SVG.write(shapes, violations, SVG_report_path.string());
 
-    ASSERT_EQ(violations.size(), 3);
+    ASSERT_EQ(violations.size(), 5);
 }

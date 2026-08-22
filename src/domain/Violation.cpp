@@ -26,6 +26,12 @@ std::string Violation::getTypeAsString() const {
 
     case ViolationType::Enclosure:
         return "Enclosure";
+
+    case ViolationType::MinDensity:
+        return "MinDensity";
+
+    case ViolationType::MaxDensity:
+        return "MaxDensity";
     }
     throw std::logic_error("Unknown violation type");
 }

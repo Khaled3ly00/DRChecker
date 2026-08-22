@@ -6,27 +6,39 @@
 #include <optional>
 
 #include "drcheck/geometry/Point.h"
+#include "drcheck/geometry/BoundingBox.h"
 
 namespace drcheck::domain {
+
 struct ViolationMarker
 {
-    // For two-shape violations:
-    // first fields correspond to shapeIds[0],
-    // second fields correspond to shapeIds[1].
+    // For point/edge-based violations:
+    // - Two-shape violations (MinSpacing, MinEnclosure):
+    //   first fields correspond to shapeIds[0],
+    //   second fields correspond to shapeIds[1].
     //
-    // For one-shape violations: (MinWidth)
-    // both fields correspond to shapeIds[0].
-    geometry::Point firstPoint;
-    geometry::Point secondPoint;
+    // - One-shape violations (MinWidth):
+    //   both fields correspond to shapeIds[0].
+    //
+    // For region-based violations (Density):
+    // region stores the violating sampling window.
+
+    std::optional<geometry::Point> firstPoint;
+    std::optional<geometry::Point> secondPoint;
 
     std::optional<std::size_t> firstEdgeIndex;
     std::optional<std::size_t> secondEdgeIndex;
+
+    std::optional<geometry::BoundingBox> region;
 };
+
 enum class ViolationType
 {
     MinWidth,
     MinSpacing,
-    Enclosure
+    Enclosure,
+    MinDensity,
+    MaxDensity
 };
 
 class Violation

@@ -43,9 +43,13 @@ TEST(MinSpacingRuleTest, DetectsSpacingViolation)
 	ASSERT_TRUE(violations[0].getMarker().has_value());
 	const auto& marker = violations[0].getMarker().value();
 	// First nearst edge (point)
+	ASSERT_TRUE(marker.firstEdgeIndex.has_value());
+	ASSERT_TRUE(marker.secondEdgeIndex.has_value());
 	EXPECT_EQ(marker.firstEdgeIndex, 1);
 	EXPECT_EQ(marker.secondEdgeIndex, 3);
-	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint,marker.secondPoint).length(), 2.0, EPSILON);
+	ASSERT_TRUE(marker.firstPoint.has_value());
+	ASSERT_TRUE(marker.secondPoint.has_value());
+	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint.value(), marker.secondPoint.value()).length(), 2.0, EPSILON);
 }
 
 TEST(MinSpacingRuleTest, AcceptsShapesMeetingMinimumSpacing)
@@ -179,9 +183,13 @@ TEST(MinSpacingRuleTest, IntersectingShapesAgainstMinSpacing) {
 	EXPECT_EQ(violations[0].getShapeIds()[1], 2);
 	ASSERT_TRUE(violations[0].getMarker().has_value());
 	const auto& marker = violations[0].getMarker().value();
+	ASSERT_TRUE(marker.firstEdgeIndex.has_value());
+	ASSERT_TRUE(marker.secondEdgeIndex.has_value());
 	EXPECT_EQ(marker.firstEdgeIndex, 0);
 	EXPECT_EQ(marker.secondEdgeIndex, 0);
-	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint, marker.secondPoint).length(), 0.0, EPSILON);
+	ASSERT_TRUE(marker.firstPoint.has_value());
+	ASSERT_TRUE(marker.secondPoint.has_value());
+	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint.value(), marker.secondPoint.value()).length(), 0.0, EPSILON);
 }
 
 TEST(MinSpacingRuleTest, LShapesAgainstMinSpacing) {
@@ -397,8 +405,12 @@ TEST(MinSpacingRuleTest, DetectsContainedPolygon)
 	ASSERT_TRUE(violations[0].getMarker().has_value());
 	const auto& marker = violations[0].getMarker().value();
 	// First nearst edge (point)
+	ASSERT_TRUE(marker.firstEdgeIndex.has_value());
+	ASSERT_TRUE(marker.secondEdgeIndex.has_value());
 	EXPECT_EQ(marker.firstEdgeIndex, 1);
 	EXPECT_EQ(marker.secondEdgeIndex, 1);
+	ASSERT_TRUE(marker.firstPoint.has_value());
+	ASSERT_TRUE(marker.secondPoint.has_value());
 	// Distance can be retrieved as we calculate distance between 2 points
-	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint, marker.secondPoint).length(), 2.0, EPSILON);
+	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint.value(), marker.secondPoint.value()).length(), 2.0, EPSILON);
 }

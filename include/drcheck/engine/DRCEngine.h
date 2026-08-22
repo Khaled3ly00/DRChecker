@@ -9,6 +9,7 @@
 #include "drcheck/rules/MinWidthRule.h"
 #include "drcheck/rules/MinSpacingRule.h"
 #include "drcheck/rules/MinEnclosureRule.h"
+#include "drcheck/rules/DensityRule.h"
 
 namespace drcheck::engine {
 

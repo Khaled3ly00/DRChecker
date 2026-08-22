@@ -29,22 +29,21 @@ void JSONReportWriter::write(const std::vector<domain::Violation>& violations, c
         if (violation.getMarker().has_value())
         {
             const auto& marker = violation.getMarker().value();
-            violationJson["marker"] = {
-                {
-                    "firstPoint",
-                    {
-                        { "x", marker.firstPoint.getX() },
-                        { "y", marker.firstPoint.getY() }
-                    }
-                },
-                {
-                    "secondPoint",
-                    {
-                        { "x", marker.secondPoint.getX() },
-                        { "y", marker.secondPoint.getY() }
-                    }
-                }
-            };
+            if (marker.firstPoint.has_value())
+            {
+                violationJson["marker"]["firstPoint"] = {
+                    {"x", marker.firstPoint->getX()},
+                    {"y", marker.firstPoint->getY()}
+                };
+            }
+
+            if (marker.secondPoint.has_value())
+            {
+                violationJson["marker"]["secondPoint"] = {
+                    {"x", marker.secondPoint->getX()},
+                    {"y", marker.secondPoint->getY()}
+                };
+            }
             if (marker.firstEdgeIndex.has_value())
             {
                 violationJson["marker"]["firstEdgeIndex"] = marker.firstEdgeIndex.value();
@@ -53,6 +52,27 @@ void JSONReportWriter::write(const std::vector<domain::Violation>& violations, c
             if (marker.secondEdgeIndex.has_value())
             {
                 violationJson["marker"]["secondEdgeIndex"] = marker.secondEdgeIndex.value();
+            }
+            if (marker.region.has_value())
+            {
+                violationJson["marker"]["region"] = {
+                    {
+                        "minX",
+                        marker.region->getMinX()
+                    },
+                    {
+                        "minY",
+                        marker.region->getMinY()
+                    },
+                    {
+                        "maxX",
+                        marker.region->getMaxX()
+                    },
+                    {
+                        "maxY",
+                        marker.region->getMaxY()
+                    }
+                };
             }
         }
         // Push violationJson to violations

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "drcheck/io/JSONReportWriter.h"
+#include "drcheck/geometry/BoundingBox.h"
 
 #include <nlohmann/json.hpp>
 #include <cstdio>
@@ -112,6 +113,34 @@ TEST(JSONReportWriterTest, CreatingMultipleViolationReport) {
     EXPECT_EQ(json["violations"][1]["message"].get<std::string>(), "Minimum enclosure violation");
     EXPECT_FALSE(json["violations"][0].contains("marker"));
     EXPECT_FALSE(json["violations"][1].contains("marker"));
+    input.close();
+    std::remove(outputPath.c_str());
+}
+
+TEST(JSONReportWriterTest, CreatesReigonMarker) {
+    std::vector<Violation> violations;
+    ViolationMarker marker{
+    .region = drcheck::geometry::BoundingBox(20, 0, 23, 10)
+    };
+    violations.emplace_back(ViolationType::MinDensity, std::vector<std::size_t>{}, "Minimum Density violation", 0.3, 0.7, marker);
+
+    const std::string outputPath = "json_report_writer_test.json";
+
+    JSONReportWriter writer;
+    writer.write(violations, outputPath);
+
+    std::ifstream input(outputPath);
+
+    ASSERT_TRUE(input.is_open());
+
+    nlohmann::json json;
+    input >> json;
+
+    ASSERT_TRUE(json["violations"][0].contains("marker"));
+    ASSERT_TRUE(json["violations"][0]["marker"].contains("region"));
+    EXPECT_EQ(json["violations"][0]["marker"]["region"]["minX"], 20);
+    EXPECT_EQ(json["violations"][0]["marker"]["region"]["maxX"], 23);
+    EXPECT_FALSE(json["violations"][0]["marker"].contains("firstPoint"));
     input.close();
     std::remove(outputPath.c_str());
 }

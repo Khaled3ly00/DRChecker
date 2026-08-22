@@ -2,7 +2,7 @@
 
 #include <fstream>
 #include <stdexcept>
-#include <nlohmann/json.hpp>
+
 
 namespace drcheck::io {
     std::vector<std::unique_ptr<rules::Rule>> JSONRuleParser::load(const std::string& filePath) const {
@@ -55,11 +55,54 @@ namespace drcheck::io {
 
                 parsedRules.push_back(std::make_unique<rules::MinEnclosureRule>(innerLayer, outerLayer, value));
             }
+            else if (type == "Density")
+            {
+                const domain::Layer layer = domain::layerFromString(ruleJson.at("layer").get<std::string>());
+                const rules::DensityLimit limit = limitFromString(ruleJson.at("limit").get<std::string>());
+                const double requiredDensity = ruleJson.at("requiredDensity").get<double>();
+                const double windowSize = ruleJson.at("windowSize").get<double>();
+                const double windowStep = ruleJson.at("windowStep").get<double>();
+                if (ruleJson.contains("analysisWindow"))
+                {
+                    const geometry::BoundingBox analysisWindow = parseBoundingBox(ruleJson.at("analysisWindow"));
+
+                    parsedRules.push_back(std::make_unique<rules::DensityRule>(layer, limit, requiredDensity, windowSize, windowStep, analysisWindow));
+                }
+                else
+                {
+                    parsedRules.push_back(std::make_unique<rules::DensityRule>(layer, limit, requiredDensity, windowSize, windowStep));
+                }
+            }
             else
             {
                 throw std::invalid_argument("Unknown rule type: " + type);
             }
         }
         return parsedRules;
+    }
+
+    rules::DensityLimit JSONRuleParser::limitFromString(const std::string& limit)
+    {
+        if (limit == "Minimum")
+        {
+            return rules::DensityLimit::Minimum;
+        }
+
+        if (limit == "Maximum")
+        {
+            return rules::DensityLimit::Maximum;
+        }
+
+        throw std::invalid_argument("Unknown density limit: " + limit);
+    }
+
+    geometry::BoundingBox JSONRuleParser::parseBoundingBox(const nlohmann::json& json)
+    {
+        return geometry::BoundingBox(
+            json.at("minX").get<double>(),
+            json.at("minY").get<double>(),
+            json.at("maxX").get<double>(),
+            json.at("maxY").get<double>()
+        );
     }
 }

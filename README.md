@@ -5,17 +5,18 @@ DRCheck is a C++ Design Rule Checker for simplified IC layouts. The project focu
 The current end-to-end application can:
 
 - load layout geometry and rule definitions from JSON;
-- run minimum-width, minimum-spacing, and minimum-enclosure rules;
+- run minimum-width, minimum-spacing, minimum-enclosure, and per-layer minimum/maximum density rules;
 - build one shared, layer-aware spatial index for a rule run;
 - report actual and required rule values;
-- attach optional witness geometry to violations; and
-- write machine-readable JSON reports and optional SVG visualizations.
+- attach optional point/edge or region-based witness geometry to violations;
+- write machine-readable JSON reports; and
+- render SVG layouts with highlighted violation geometry, including density regions.
 
 ## Current Status
 
-The geometry core, domain model, rule framework, JSON input/output path, CLI, violation metadata, SVG visualization, QuadTree optimization, and reusable spatial-index architecture are implemented and covered by tests.
+The geometry core, domain model, rule framework, JSON input/output path, CLI, SVG visualization, violation metadata, QuadTree optimization, reusable spatial-index architecture, and density-rule pipeline are implemented and covered by tests.
 
-The latest architectural change introduces `LayerSpatialIndex`. `DRCEngine` builds it once from the current shape collection and passes it to every rule. `MinSpacingRule` and `MinEnclosureRule` now reuse that index instead of building rule-local trees or scanning every possible shape.
+`DRCEngine` builds one `LayerSpatialIndex` from the current shape collection and passes it to every rule. `MinSpacingRule`, `MinEnclosureRule`, and `DensityRule` reuse that index for layer-specific candidate discovery instead of building rule-local trees or scanning every possible shape.
 
 Detailed benchmark methodology, results, and QuadTree tuning data have moved to [BENCHMARKS.md](BENCHMARKS.md).
 
@@ -35,24 +36,22 @@ JSONLayoutParser          JSONRuleParser
          one QuadTree per populated layer
                     |
                     | shared read-only access
-          +---------+----------+
-          |                    |
-          v                    v
-   MinSpacingRule       MinEnclosureRule
-          |                    |
-          +---------+----------+
+          +---------+----------+---------+
+          |         |          |         |
+          v         v          v         v
+ MinWidthRule MinSpacingRule MinEnclosureRule DensityRule
+          |         |          |         |
+          +---------+----------+---------+
                     |
-            exact geometry checks
+          exact geometry and density checks
                     |
                     v
           vector<Violation>
-                    +------------------+
-                    |                  |
-                    v                  v
-            JSONReportWriter    SVGReportWriter
-                    |                  |
-                    v                  v
-              report.json        report.svg
+                    |
+          +---------+---------+
+          |                   |
+          v                   v
+  JSONReportWriter      SVG visualization
 ```
 
 The design keeps responsibilities separated:
@@ -64,7 +63,7 @@ The design keeps responsibilities separated:
 | `spatial/` | QuadTree storage and layer-aware candidate queries |
 | `rules/` | Rule-specific DRC semantics |
 | `engine/` | Shared-index construction and rule orchestration |
-| `io/` | JSON layout/rule parsing, JSON report serialization, and SVG visualization |
+| `io/` | JSON layout/rule parsing and report serialization |
 
 ## Shared `LayerSpatialIndex`
 
@@ -107,7 +106,7 @@ Polygon::distanceTo() / Polygon::contains()
     -> exact DRC decision
 ```
 
-This distinction is important for concave polygons and other cases where overlapping or containing bounding boxes do not prove the corresponding polygon relationship.
+`DensityRule` uses the same broad-phase contract: it queries only its target layer for each density window, then calls `Polygon::areaInside()` for exact covered-area calculation. This distinction is important for concave polygons and other cases where bounding-box overlap alone does not prove the corresponding polygon relationship or coverage.
 
 ## Geometry Core
 
@@ -142,6 +141,7 @@ The geometry layer is isolated under `drcheck::geometry` and contains no rule or
 - point and polygon containment;
 - polygon intersection and polygon-to-polygon distance;
 - minimum width for orthogonal polygons;
+- polygon area clipped to an axis-aligned bounding box through `areaInside()`; and
 - detailed edge-pair and closest-point results.
 
 Detailed measurements preserve the geometry that produced them. `DistanceResult` stores the distance and closest points, while `PolygonEdgePairResult` also identifies the corresponding polygon edges. Rules use those results to create optional `ViolationMarker` data.
@@ -159,21 +159,9 @@ A `Violation` records:
 - required rule value; and
 - an optional `ViolationMarker`.
 
-`ViolationMarker` preserves two witness points and their polygon-edge indices when the geometry operation provides a meaningful edge pair. `JSONReportWriter` serializes marker data only when it is present, preserving a compact report for violations without witness geometry.
+`ViolationMarker` supports two forms of violation geometry. Distance- and width-based rules can preserve two witness points and their polygon-edge indices, while window-based rules can preserve a region. `DensityRule` uses the region form to identify the exact window that violated its threshold.
 
-## SVG Visualization
-
-`SVGReportWriter` creates an optional browser-viewable representation of the checked layout and its violations. The visualization includes:
-
-- polygons with layer-specific fill and stroke colors;
-- shape IDs;
-- highlighted offending polygon edges;
-- witness connectors and endpoint markers; and
-- labels containing the violation type and actual/required values.
-
-Layout coordinates are translated, scaled, padded, and vertically inverted when written to SVG so the result preserves the layout's conventional Cartesian orientation. SVG generation is a presentation step only and does not affect rule evaluation or JSON report contents.
-
-Only violations containing witness-marker geometry are drawn as violation annotations. All violations remain available in the JSON report.
+`JSONReportWriter` serializes marker data only when it is present. Point/edge markers retain their witness fields, and region markers emit the region bounds needed by downstream consumers. The SVG output highlights these regions directly on the rendered layout.
 
 ## Implemented Rules
 
@@ -213,6 +201,24 @@ For every inner-layer shape, the rule:
 
 The current rule setup checks `Via12` enclosure against `Metal1` and `Metal2` independently through separate rule instances. Spatial filtering reduces candidate discovery work, while `contains()` remains necessary because a bounding-box match alone cannot prove polygon containment.
 
+### `DensityRule`
+
+Checks either a minimum or maximum density threshold on one target layer. Each rule accepts a user-provided `windowSize` and `windowStep`, then evaluates a fixed grid of windows over its analysis bounds.
+
+The analysis bounds can be supplied explicitly. When they are omitted, the rule uses the merged bounding box of the complete layout. An explicit analysis region therefore also allows density checking on an empty layout; without one, an empty layout has no bounds to infer and is rejected.
+
+For every window, the rule:
+
+1. clips the window at the analysis-region boundary, retaining partial edge windows;
+2. queries the shared `LayerSpatialIndex` for candidates on the target layer only;
+3. uses exact clipped polygon area to calculate covered area;
+4. divides by the actual clipped-window area rather than the nominal full-window area; and
+5. emits `MinDensity` or `MaxDensity` when the measured ratio violates the configured threshold.
+
+Each density violation carries the evaluated window as a region-based `ViolationMarker`, so JSON and SVG outputs identify the failing area even when no individual shape is the sole cause.
+
+`JSONRuleParser` constructs density rules from the same rule-definition input path as the existing rule types, including the target layer, limit direction, threshold, window size, window step, and optional explicit analysis bounds.
+
 ## Rule and Engine Interface
 
 Rules receive the shape collection and the shared index as read-only inputs:
@@ -224,7 +230,7 @@ virtual std::vector<domain::Violation> check(
 ) const = 0;
 ```
 
-`DRCEngine::run()` constructs one `LayerSpatialIndex`, passes it to each rule, and aggregates their violations. Rules that do not need spatial queries, such as `MinWidthRule`, accept the same interface but operate directly on the shapes.
+`DRCEngine::run()` constructs one `LayerSpatialIndex`, passes it to each rule, and aggregates their violations. `DensityRule` participates through this same polymorphic pipeline. Rules that do not need spatial queries, such as `MinWidthRule`, accept the same interface but operate directly on the shapes.
 
 ## Project Structure
 
@@ -296,26 +302,14 @@ Run the full suite through CTest:
 ctest --test-dir build --output-on-failure
 ```
 
-The test suite covers geometry invariants and algorithms, parser validation, rule behavior, JSON and SVG report generation, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end processing.
+The test suite covers geometry invariants and algorithms, parser validation, rule behavior, report serialization, SVG output, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end JSON processing. Density coverage includes minimum and maximum limits, target-layer filtering, explicit and inferred analysis bounds, empty-layout behavior, partial edge windows, region markers, parser/report integration, SVG highlighting, and execution through `DRCEngine` alongside existing rules.
 
 ## Running DRCheck
 
-The CLI requires a layout file, a rule file, and a JSON report path. A fourth path can be supplied to generate an SVG visualization:
+The CLI accepts a layout file, a rule file, and an output report path:
 
 ```bash
 drcheck layout.json rules.json report.json
-```
-
-This preserves the JSON-only workflow. To generate both reports, run:
-
-```bash
-drcheck layout.json rules.json report.json report.svg
-```
-
-The complete command syntax is:
-
-```text
-drcheck <layout.json> <rules.json> <report.json> [report.svg]
 ```
 
 The high-level flow is:
@@ -327,14 +321,8 @@ layout JSON + rule JSON
        DRCEngine
           |
           v
-   vector<Violation>
-          / \
-         v   v
- report.json report.svg
-               optional
+    violation report JSON
 ```
-
-The JSON report is always produced. The SVG report is generated only when the optional output path is provided. Open the resulting `.svg` file in a modern web browser to inspect the layout and witness geometry visually.
 
 See `examples/` for sample inputs.
 
@@ -358,19 +346,17 @@ The current implementation intentionally favors a clear, well-tested architectur
 - The current enclosure assumption is at most one relevant containing outer polygon per rule evaluation.
 - QuadTree queries can return false-positive candidates; exact geometry remains required.
 - Spatial-index performance depends on geometry distribution and can degrade toward brute-force behavior in unfavorable layouts.
-- Violation witness selection can have multiple equally valid edge pairs; the SVG displays the marker selected by the current geometry result.
-- SVG annotations are available only for violations that contain witness-marker geometry.
-- SVG output is static and does not currently provide zoom controls, filtering, or interactive inspection.
+- `DensityRule` uses a fixed, axis-aligned grid with one `windowSize` and `windowStep`; adaptive or multiscale density analysis is not implemented.
+- Automatic density analysis bounds require at least one layout shape; an explicit analysis region is required for an empty layout.
 - The current JSON format and rule set are intentionally simplified.
 
 ## Next Development Areas
 
-- density design-rule checking;
-- sweep-line and other spatial optimizations where benchmarks justify them;
-- additional design-rule types and broader polygon support;
+- GDSII layout import;
+- AI-assisted translation from natural-language requirements into executable design rules;
+- minimum-width support for non-Manhattan polygons;
+- sweep-line optimization for geometry-intensive rule checks;
 - Tcl-based rule decks;
-- cross-platform CI and build verification; and
-- continued benchmark regression as shared-index consumers are added.
 
 ## Project Goal
 

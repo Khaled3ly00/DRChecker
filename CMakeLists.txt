@@ -38,6 +38,7 @@ add_library(drchecker
     src/rules/MinWidthRule.cpp
     src/rules/MinSpacingRule.cpp
     src/rules/MinEnclosureRule.cpp
+    src/rules/DensityRule.cpp
 
     # Engine
     src/engine/DRCEngine.cpp
@@ -104,6 +105,7 @@ if(DRCHECK_BUILD_TESTS)
         tests/rules/MinWidthRuleTest.cpp
         tests/rules/MinSpacingRuleTest.cpp
         tests/rules/MinEnclosureRuleTest.cpp
+        tests/rules/DensityRuleTest.cpp
 
         # Engine Tests
         tests/engine/DRCEngineTest.cpp

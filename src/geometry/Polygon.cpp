@@ -412,4 +412,123 @@ namespace drcheck::geometry {
 
 		return firstEdgeScore + secondEdgeScore;
 	}
+	// Sutherland-Hodgman helper
+	bool Polygon::isPointInsideWindow(const Point& point, const BoundingBox& window, ClipBoundary boundary) const
+	{
+		switch (boundary)
+		{
+		case ClipBoundary::Left:
+			return point.getX() >= window.getMinX();
+
+		case ClipBoundary::Right:
+			return point.getX() <= window.getMaxX();
+
+		case ClipBoundary::Bottom:
+			return point.getY() >= window.getMinY();
+
+		case ClipBoundary::Top:
+			return point.getY() <= window.getMaxY();
+		}
+		throw std::logic_error("Unknown window clipping boundary");
+	}
+	// Sutherland-Hodgman helper
+	Point Polygon::intersectionPointWithWindowBoundary(const Point& first, const Point& second, const BoundingBox& window, ClipBoundary boundary) const
+	{
+		const double dx = second.getX() - first.getX();
+		const double dy = second.getY() - first.getY();
+
+		switch (boundary)
+		{
+		case ClipBoundary::Left:
+		{
+			const double x = window.getMinX();
+			const double t = (x - first.getX()) / dx;
+			return Point(x, first.getY() + t * dy);
+		}
+		case ClipBoundary::Right:
+		{
+			const double x = window.getMaxX();
+			const double t = (x - first.getX()) / dx;
+			return Point(x, first.getY() + t * dy);
+		}
+		case ClipBoundary::Bottom:
+		{
+			const double y = window.getMinY();
+			const double t = (y - first.getY()) / dy;
+			return Point(first.getX() + t * dx, y);
+		}
+		case ClipBoundary::Top:
+		{
+			const double y = window.getMaxY();
+			const double t = (y - first.getY()) / dy;
+			return Point(first.getX() + t * dx, y);
+		}
+		}
+		throw std::logic_error("Unknown window clipping boundary");
+	}
+	// Sutherland-Hodgman Algorithm
+	// input: polygon vertices		window: Scan Window		boundary: Scan Window Boundary
+	std::vector<Point> Polygon::clipAgainstWindowBoundary(const std::vector<Point>& input, const BoundingBox& window, ClipBoundary boundary) const
+	{
+		std::vector<Point> output;
+
+		if (input.empty())
+		{
+			return output;
+		}
+		Point previous = input.back();
+		bool previousInside = isPointInsideWindow(previous, window, boundary);
+
+		for (const Point& current : input)
+		{
+			const bool currentInside = isPointInsideWindow(current, window, boundary);
+			// Inside -> Inside
+			if (previousInside && currentInside)
+			{
+				output.push_back(current);
+			}
+			// Inside -> Outside
+			else if (previousInside && !currentInside)
+			{
+				output.push_back(intersectionPointWithWindowBoundary(previous, current, window, boundary));
+			}
+			// Outside -> Inside
+			else if (!previousInside && currentInside)
+			{
+				output.push_back(intersectionPointWithWindowBoundary(previous, current, window, boundary));
+				output.push_back(current);
+			}
+			previous = current;
+			previousInside = currentInside;
+		}
+		return output;
+	}
+	// Returns area of current polygon object that's within window
+	double Polygon::areaInsideWindow(const BoundingBox& window) const {
+		if (!getBoundingBox().overlaps(window))
+		{
+			return 0.0;
+		}
+		std::vector<Point> clipped = vertices;
+		clipped = clipAgainstWindowBoundary(clipped, window,ClipBoundary::Left);
+		clipped = clipAgainstWindowBoundary(clipped, window, ClipBoundary::Right);
+		clipped = clipAgainstWindowBoundary(clipped, window, ClipBoundary::Bottom);
+		clipped = clipAgainstWindowBoundary(clipped, window, ClipBoundary::Top);
+		if (clipped.size() < 3)
+		{
+			return 0.0;
+		}
+		// Shoelace Formula. Don't use Polygon.signedArea() as polygon may not be constructed due to violation (less than 3 points, .. etc)
+		double twiceArea = 0.0;
+
+		for (std::size_t i = 0; i < clipped.size(); ++i)
+		{
+			const Point& current = clipped[i];
+			const Point& next = clipped[(i + 1) % clipped.size()];
+
+			twiceArea += current.getX() * next.getY() - next.getX() * current.getY();
+		}
+
+		return std::abs(twiceArea) / 2.0;
+	}
 }
