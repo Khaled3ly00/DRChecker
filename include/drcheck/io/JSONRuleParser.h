@@ -1,11 +1,8 @@
 #pragma once
 
 #include "drcheck/rules/Rule.h"
-#include "drcheck/rules/MinWidthRule.h"
-#include "drcheck/rules/MinSpacingRule.h"
-#include "drcheck/rules/MinEnclosureRule.h"
-#include "drcheck/rules/DensityRule.h"
 
+#include "drcheck/rules/DensityRule.h"
 #include <nlohmann/json.hpp>
 #include <string>
 #include <memory>

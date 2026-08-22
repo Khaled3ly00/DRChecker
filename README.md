@@ -5,6 +5,7 @@ DRCheck is a C++ Design Rule Checker for simplified IC layouts. The project focu
 The current end-to-end application can:
 
 - load layout geometry and rule definitions from JSON;
+- translate parsed rule parameters into validated polymorphic rules through a central factory;
 - run minimum-width, minimum-spacing, minimum-enclosure, and per-layer minimum/maximum density rules;
 - build one shared, layer-aware spatial index for a rule run;
 - report actual and required rule values;
@@ -14,21 +15,28 @@ The current end-to-end application can:
 
 ## Current Status
 
-The geometry core, domain model, rule framework, JSON input/output path, CLI, SVG visualization, violation metadata, QuadTree optimization, reusable spatial-index architecture, and density-rule pipeline are implemented and covered by tests.
+The geometry core, domain model, rule framework, centralized `RuleFactory`, JSON input/output path, CLI, SVG visualization, violation metadata, QuadTree optimization, reusable spatial-index architecture, and density-rule pipeline are implemented and covered by tests.
 
 `DRCEngine` builds one `LayerSpatialIndex` from the current shape collection and passes it to every rule. `MinSpacingRule`, `MinEnclosureRule`, and `DensityRule` reuse that index for layer-specific candidate discovery instead of building rule-local trees or scanning every possible shape.
+
+Rule construction is now separated from JSON decoding. `JSONRuleParser` validates and converts the input fields into `RuleParameters`, then delegates concrete rule creation and required-parameter validation to `RuleFactory`.
 
 Detailed benchmark methodology, results, and QuadTree tuning data have moved to [BENCHMARKS.md](BENCHMARKS.md).
 
 ## Architecture
 
 ```text
-layout.json                 rules.json
-     |                          |
-     v                          v
-JSONLayoutParser          JSONRuleParser
-     |                          |
-     +---------> DRCEngine <----+
+layout.json                        rules.json
+     |                                 |
+     v                                 v
+JSONLayoutParser               JSONRuleParser
+     |                                 |
+     |                          RuleParameters
+     |                                 |
+     |                                 v
+     |                           RuleFactory
+     |                                 |
+     +-----------> DRCEngine <----------+
                     |
                     | builds once per run
                     v
@@ -61,9 +69,59 @@ The design keeps responsibilities separated:
 | `geometry/` | Geometry primitives, predicates, measurements, and witness results |
 | `domain/` | Layers, shapes, violations, and violation markers |
 | `spatial/` | QuadTree storage and layer-aware candidate queries |
-| `rules/` | Rule-specific DRC semantics |
+| `rules/` | Rule-specific DRC semantics and centralized rule construction |
 | `engine/` | Shared-index construction and rule orchestration |
-| `io/` | JSON layout/rule parsing and report serialization |
+| `io/` | JSON layout/rule parsing, parameter conversion, and report serialization |
+
+## Rule Construction and JSON Parsing
+
+`RuleFactory` centralizes construction of every supported concrete rule behind one interface:
+
+```cpp
+static std::unique_ptr<Rule> create(
+    const std::string& type,
+    const RuleParameters& params
+);
+```
+
+`RuleParameters` is a shared parameter object containing optional fields for single-layer rules, inner/outer-layer rules, numeric thresholds, density configuration, and an optional `BoundingBox` analysis window. The factory validates the fields required by the requested rule before returning a `std::unique_ptr<Rule>`.
+
+| JSON rule type | Factory key | Required parameters | Optional parameters |
+|---|---|---|---|
+| `MinWidth` | `min_width` | `layer`, `value` | none |
+| `MinSpacing` | `min_spacing` | `layer`, `value` | none |
+| `MinEnclosure` | `min_enclosure` | `innerLayer`, `outerLayer`, `value` | none |
+| `Density` | `density` | `layer`, `limit`, `value`, `windowSize`, `windowStep` | `analysisWindow` |
+
+`JSONRuleParser` remains responsible for the JSON-facing concerns:
+
+1. opening and decoding the rule file;
+2. requiring a top-level `rules` array and an object for each rule entry;
+3. converting layer names through `layerFromString()`;
+4. converting density limits from `Minimum` or `Maximum`;
+5. parsing optional analysis-window bounds from `minX`, `minY`, `maxX`, and `maxY`;
+6. populating `RuleParameters`; and
+7. mapping the external JSON type to the internal factory key and delegating construction.
+
+```text
+JSON rule object
+       |
+       v
+JSONRuleParser
+field validation and conversion
+       |
+       v
+RuleParameters
+       |
+       v
+RuleFactory::create()
+required-parameter validation
+       |
+       v
+unique_ptr<Rule>
+```
+
+The factory rejects missing required parameters and unknown factory keys with `std::invalid_argument`. The parser separately rejects malformed rule-file structure, unknown JSON rule types, and unsupported density-limit strings. This keeps JSON representation concerns out of concrete rule constructors while giving programmatic callers the same validated construction path.
 
 ## Shared `LayerSpatialIndex`
 
@@ -217,7 +275,7 @@ For every window, the rule:
 
 Each density violation carries the evaluated window as a region-based `ViolationMarker`, so JSON and SVG outputs identify the failing area even when no individual shape is the sole cause.
 
-`JSONRuleParser` constructs density rules from the same rule-definition input path as the existing rule types, including the target layer, limit direction, threshold, window size, window step, and optional explicit analysis bounds.
+`JSONRuleParser` parses density rules through the same rule-definition input path as the existing rule types, including the target layer, limit direction, threshold, window size, window step, and optional explicit analysis bounds. It stores those values in `RuleParameters` and delegates construction to `RuleFactory`.
 
 ## Rule and Engine Interface
 
@@ -236,41 +294,107 @@ virtual std::vector<domain::Violation> check(
 
 ```text
 drcheck/
-├── CMakeLists.txt
-├── README.md
-├── BENCHMARKS.md
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── benchmarks/
+│   ├── results/
+│   │   ├── min_enclosure_benchmark.txt
+│   │   ├── min_spacing_dense_benchmark.txt
+│   │   ├── min_spacing_sparse_benchmark.txt
+│   │   └── quadtree_parameter_tuning.txt
+│   ├── MinEnclosureBenchmark.cpp
+│   └── MinSpacingBenchmark.cpp
+├── examples/
 ├── include/drcheck/
-│   ├── geometry/
 │   ├── domain/
-│   ├── spatial/
-│   │   ├── QuadTree.h
-│   │   └── LayerSpatialIndex.h
-│   ├── rules/
+│   │   ├── Layer.h
+│   │   ├── Shape.h
+│   │   └── Violation.h
 │   ├── engine/
-│   └── io/
-├── src/
+│   │   └── DRCEngine.h
 │   ├── geometry/
-│   ├── domain/
-│   ├── spatial/
-│   │   ├── QuadTree.cpp
-│   │   └── LayerSpatialIndex.cpp
-│   ├── rules/
-│   ├── engine/
+│   │   ├── BoundingBox.h
+│   │   ├── Constants.h
+│   │   ├── Point.h
+│   │   ├── Polygon.h
+│   │   ├── Segment.h
+│   │   └── Vector.h
 │   ├── io/
+│   │   ├── JSONLayoutParser.h
+│   │   ├── JSONReportWriter.h
+│   │   ├── JSONRuleParser.h
+│   │   └── SVGReportWriter.h
+│   ├── rules/
+│   │   ├── DensityRule.h
+│   │   ├── MinEnclosureRule.h
+│   │   ├── MinSpacingRule.h
+│   │   ├── MinWidthRule.h
+│   │   ├── Rule.h
+│   │   └── RuleFactory.h
+│   └── spatial/
+│       ├── LayerSpatialIndex.h
+│       └── QuadTree.h
+├── src/
+│   ├── domain/
+│   │   ├── Layer.cpp
+│   │   ├── Shape.cpp
+│   │   └── Violation.cpp
+│   ├── engine/
+│   │   └── DRCEngine.cpp
+│   ├── geometry/
+│   │   ├── BoundingBox.cpp
+│   │   ├── Point.cpp
+│   │   ├── Polygon.cpp
+│   │   ├── Segment.cpp
+│   │   └── Vector.cpp
+│   ├── io/
+│   │   ├── JSONLayoutParser.cpp
+│   │   ├── JSONReportWriter.cpp
+│   │   ├── JSONRuleParser.cpp
+│   │   └── SVGReportWriter.cpp
+│   ├── rules/
+│   │   ├── DensityRule.cpp
+│   │   ├── MinEnclosureRule.cpp
+│   │   ├── MinSpacingRule.cpp
+│   │   ├── MinWidthRule.cpp
+│   │   └── RuleFactory.cpp
+│   ├── spatial/
+│   │   ├── LayerSpatialIndex.cpp
+│   │   └── QuadTree.cpp
 │   └── main.cpp
 ├── tests/
-│   ├── geometry/
 │   ├── domain/
-│   ├── spatial/
-│   ├── rules/
+│   │   ├── LayerTest.cpp
+│   │   ├── ShapeTest.cpp
+│   │   └── ViolationTest.cpp
 │   ├── engine/
+│   │   └── DRCEngineTest.cpp
+│   ├── geometry/
+│   │   ├── BoundingBoxTest.cpp
+│   │   ├── PointTest.cpp
+│   │   ├── PolygonTest.cpp
+│   │   ├── SegmentTest.cpp
+│   │   └── VectorTest.cpp
+│   ├── integration/
+│   │   └── EndtoEndTest.cpp
 │   ├── io/
-│   └── integration/
-├── benchmarks/
-│   ├── MinSpacingBenchmark.cpp
-│   ├── MinEnclosureBenchmark.cpp
-│   └── results/
-└── examples/
+│   │   ├── JSONLayoutParserTest.cpp
+│   │   ├── JSONReportWriterTest.cpp
+│   │   ├── JSONRuleParserTest.cpp
+│   │   └── SVGReportWriterTest.cpp
+│   ├── rules/
+│   │   ├── DensityRuleTest.cpp
+│   │   ├── MinEnclosureRuleTest.cpp
+│   │   ├── MinSpacingRuleTest.cpp
+│   │   ├── MinWidthRuleTest.cpp
+│   │   └── RuleFactoryTest.cpp
+│   └── spatial/
+│       ├── LayerSpatialIndexTest.cpp
+│       └── QuadTreeTest.cpp
+├── BENCHMARKS.md
+├── CMakeLists.txt
+└── README.md
 ```
 
 ## Building
@@ -302,7 +426,7 @@ Run the full suite through CTest:
 ctest --test-dir build --output-on-failure
 ```
 
-The test suite covers geometry invariants and algorithms, parser validation, rule behavior, report serialization, SVG output, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end JSON processing. Density coverage includes minimum and maximum limits, target-layer filtering, explicit and inferred analysis bounds, empty-layout behavior, partial edge windows, region markers, parser/report integration, SVG highlighting, and execution through `DRCEngine` alongside existing rules.
+The test suite covers geometry invariants and algorithms, parser validation, factory construction and validation, rule behavior, report serialization, SVG output, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end JSON processing. `RuleFactoryTest` verifies construction of every supported rule type, representative missing-parameter rejection, and unknown-type rejection. `JSONRuleParserTest` verifies the parser-to-factory path for width, spacing, enclosure, minimum/maximum density, and density with an explicit analysis window. Density coverage also includes target-layer filtering, inferred analysis bounds, empty-layout behavior, partial edge windows, region markers, report integration, SVG highlighting, and execution through `DRCEngine` alongside existing rules.
 
 ## Running DRCheck
 
@@ -365,6 +489,7 @@ DRCheck is intended to demonstrate strong C++ design and EDA-oriented problem so
 - isolated, testable computational geometry;
 - explicit ownership and lifetime rules;
 - polymorphic rule execution;
+- centralized, validated rule construction;
 - reusable spatial acceleration;
 - structured violation reporting; and
 - performance claims backed by correctness-checked benchmarks.

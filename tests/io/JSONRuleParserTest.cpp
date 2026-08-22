@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 
 #include "drcheck/io/JSONRuleParser.h"
+#include "drcheck/rules/MinSpacingRule.h"
+#include "drcheck/rules/MinWidthRule.h"
+#include "drcheck/rules/MinEnclosureRule.h"
+#include "drcheck/rules/DensityRule.h"
 
 #include <filesystem>
 

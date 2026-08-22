@@ -1,4 +1,5 @@
 #include "drcheck/io/JSONRuleParser.h"
+#include "drcheck/rules/RuleFactory.h"
 
 #include <fstream>
 #include <stdexcept>
@@ -33,45 +34,45 @@ namespace drcheck::io {
 
             const std::string type = ruleJson.at("type").get<std::string>();
 
+            rules::RuleParameters params;
+
             if (type == "MinWidth")
             {
-                const domain::Layer layer = domain::layerFromString(ruleJson.at("layer").get<std::string>());
-                const double value = ruleJson.at("value").get<double>();
 
-                parsedRules.push_back(std::make_unique<rules::MinWidthRule>(layer, value));
+                params.layer = domain::layerFromString(ruleJson.at("layer").get<std::string>());
+                params.value = ruleJson.at("value").get<double>();
+
+                parsedRules.push_back(rules::RuleFactory::create("min_width", params));
             }
             else if (type == "MinSpacing")
             {
-                const domain::Layer layer = domain::layerFromString(ruleJson.at("layer").get<std::string>());
-                const double value = ruleJson.at("value").get<double>();
+                params.layer = domain::layerFromString(ruleJson.at("layer").get<std::string>());
+                params.value = ruleJson.at("value").get<double>();
 
-                parsedRules.push_back(std::make_unique<rules::MinSpacingRule>(layer, value));
+                parsedRules.push_back(rules::RuleFactory::create("min_spacing", params));
             }
             else if (type == "MinEnclosure")
             {
-                const domain::Layer innerLayer = domain::layerFromString(ruleJson.at("innerLayer").get<std::string>());
-                const domain::Layer outerLayer = domain::layerFromString(ruleJson.at("outerLayer").get<std::string>());
-                const double value = ruleJson.at("value").get<double>();
+                params.innerLayer = domain::layerFromString(ruleJson.at("innerLayer").get<std::string>());
+                params.outerLayer = domain::layerFromString(ruleJson.at("outerLayer").get<std::string>());
+                params.value = ruleJson.at("value").get<double>();
 
-                parsedRules.push_back(std::make_unique<rules::MinEnclosureRule>(innerLayer, outerLayer, value));
+                parsedRules.push_back(rules::RuleFactory::create("min_enclosure", params));
             }
             else if (type == "Density")
             {
-                const domain::Layer layer = domain::layerFromString(ruleJson.at("layer").get<std::string>());
-                const rules::DensityLimit limit = limitFromString(ruleJson.at("limit").get<std::string>());
-                const double requiredDensity = ruleJson.at("requiredDensity").get<double>();
-                const double windowSize = ruleJson.at("windowSize").get<double>();
-                const double windowStep = ruleJson.at("windowStep").get<double>();
+                params.layer = domain::layerFromString(ruleJson.at("layer").get<std::string>());
+                params.densityLimit = limitFromString(ruleJson.at("limit").get<std::string>());
+                params.value = ruleJson.at("value").get<double>();
+                params.windowSize = ruleJson.at("windowSize").get<double>();
+                params.windowStep = ruleJson.at("windowStep").get<double>();
+
                 if (ruleJson.contains("analysisWindow"))
                 {
-                    const geometry::BoundingBox analysisWindow = parseBoundingBox(ruleJson.at("analysisWindow"));
+                    params.analysisWindow = parseBoundingBox(ruleJson.at("analysisWindow"));
+                }
 
-                    parsedRules.push_back(std::make_unique<rules::DensityRule>(layer, limit, requiredDensity, windowSize, windowStep, analysisWindow));
-                }
-                else
-                {
-                    parsedRules.push_back(std::make_unique<rules::DensityRule>(layer, limit, requiredDensity, windowSize, windowStep));
-                }
+                parsedRules.push_back(rules::RuleFactory::create("density", params));
             }
             else
             {

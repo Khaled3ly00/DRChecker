@@ -30,7 +30,7 @@
       "type": "Density",
       "layer": "Metal1",
       "limit": "Minimum",
-      "requiredDensity": 0.30,
+      "value": 0.30,
       "windowSize": 10.0,
       "windowStep": 5.0
     },
@@ -38,7 +38,7 @@
       "type": "Density",
       "layer": "Metal2",
       "limit": "Maximum",
-      "requiredDensity": 0.70,
+      "value": 0.70,
       "windowSize": 20.0,
       "windowStep": 10.0
     },
@@ -46,7 +46,7 @@
       "type": "Density",
       "layer": "Metal1",
       "limit": "Minimum",
-      "requiredDensity": 0.40,
+      "value": 0.40,
       "windowSize": 10.0,
       "windowStep": 5.0,
       "analysisWindow": {

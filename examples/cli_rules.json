@@ -20,7 +20,7 @@
       "type": "Density",
       "layer": "Metal1",
       "limit": "Minimum",
-      "requiredDensity": 0.50,
+      "value": 0.50,
       "windowSize": 10.0,
       "windowStep": 10.0
     }
