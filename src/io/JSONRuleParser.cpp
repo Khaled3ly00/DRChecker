@@ -1,12 +1,41 @@
 #include "drcheck/io/JSONRuleParser.h"
 #include "drcheck/rules/RuleFactory.h"
+#include "drcheck/geometry/BoundingBox.h"
+#include "drcheck/rules/DensityRule.h"
 
+#include <nlohmann/json.hpp>
 #include <fstream>
 #include <stdexcept>
 
+namespace {
 
+drcheck::rules::DensityLimit limitFromString(const std::string& limit)
+{
+    if (limit == "Minimum")
+    {
+        return drcheck::rules::DensityLimit::Minimum;
+    }
+
+    if (limit == "Maximum")
+    {
+        return drcheck::rules::DensityLimit::Maximum;
+    }
+
+    throw std::invalid_argument("Unknown density limit: " + limit);
+}
+drcheck::geometry::BoundingBox parseBoundingBox(const nlohmann::json& json)
+{
+    return drcheck::geometry::BoundingBox(
+        json.at("minX").get<double>(),
+        json.at("minY").get<double>(),
+        json.at("maxX").get<double>(),
+        json.at("maxY").get<double>()
+    );
+}
+
+}
 namespace drcheck::io {
-    std::vector<std::unique_ptr<rules::Rule>> JSONRuleParser::load(const std::string& filePath) const {
+    std::vector<std::unique_ptr<rules::Rule>> JSONRuleParser::load(const std::string& filePath) {
         std::ifstream input(filePath);
 
         if (!input) {
@@ -80,30 +109,5 @@ namespace drcheck::io {
             }
         }
         return parsedRules;
-    }
-
-    rules::DensityLimit JSONRuleParser::limitFromString(const std::string& limit)
-    {
-        if (limit == "Minimum")
-        {
-            return rules::DensityLimit::Minimum;
-        }
-
-        if (limit == "Maximum")
-        {
-            return rules::DensityLimit::Maximum;
-        }
-
-        throw std::invalid_argument("Unknown density limit: " + limit);
-    }
-
-    geometry::BoundingBox JSONRuleParser::parseBoundingBox(const nlohmann::json& json)
-    {
-        return geometry::BoundingBox(
-            json.at("minX").get<double>(),
-            json.at("minY").get<double>(),
-            json.at("maxX").get<double>(),
-            json.at("maxY").get<double>()
-        );
     }
 }

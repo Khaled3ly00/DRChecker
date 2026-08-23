@@ -1,44 +1,99 @@
 #include <iostream>
+#include <filesystem>
+#include <string>
+#include <vector>
+#include <memory>
+#include <stdexcept>
 
 #include "drcheck/engine/DRCEngine.h"
 #include "drcheck/io/JSONLayoutParser.h"
 #include "drcheck/io/JSONRuleParser.h"
 #include "drcheck/io/JSONReportWriter.h"
 #include "drcheck/io/SVGReportWriter.h"
+#include "drcheck/io/TclRuleParser.h"
 
 int main(int argc, char* argv[])
 {
-    // Required argument count = 3 
-    // argv[0] → executable name 
-    // argv[1] → layout path 
-    // argv[2] → rules path
-    // argv[3] → JSON output report path
-    // argv[4] → SVG output report path
-    if (argc != 4 && argc != 5) {
-        std::cerr<< "Usage: drchecker <layout.json> <rules.json> <report.json>  [report.svg]\n";
-        return 1;
-    }
-
+    // Usage: drcheck --layout layout.json --rules rules.tcl --report report.json [--svg report.svg]
     try
     {
-        drcheck::io::JSONLayoutParser layoutParser;
-        drcheck::io::JSONRuleParser ruleParser;
-        drcheck::engine::DRCEngine engine;
-        drcheck::io::JSONReportWriter JSONWriter;
+        std::string layoutPath;
+        std::string rulesPath;
+        std::string reportPath;
+        std::string svgPath;
 
-        const auto shapes = layoutParser.load(argv[1]);
-
-        const auto rules = ruleParser.load(argv[2]);
-
-        const auto violations = engine.run(shapes, rules);
-
-        JSONWriter.write(violations, argv[3]);
-
-        const bool writeSvg = argc == 5;
-
-        if (argc == 5)
+        for (int i = 1; i < argc; i += 2)
         {
-            const std::string svgPath = argv[4];
+            if (i + 1 >= argc)
+            {
+                throw std::invalid_argument("Missing value for argument: " + std::string(argv[i]));
+            }
+
+            const std::string argument = argv[i];
+            const std::string value = argv[i + 1];
+
+            if (argument == "--layout")
+            {
+                layoutPath = value;
+            }
+            else if (argument == "--rules")
+            {
+                rulesPath = value;
+            }
+            else if (argument == "--report")
+            {
+                reportPath = value;
+            }
+            else if (argument == "--svg")
+            {
+                svgPath = value;
+            }
+            else
+            {
+                throw std::invalid_argument("Usage: drcheck --layout layout.json --rules rules.tcl --report report.json [--svg report.svg]");
+            }
+        }
+
+        if (layoutPath.empty())
+        {
+            throw std::invalid_argument("Missing required argument: --layout");
+        }
+
+        if (rulesPath.empty())
+        {
+            throw std::invalid_argument("Missing required argument: --rules");
+        }
+
+        if (reportPath.empty())
+        {
+            throw std::invalid_argument("Missing required argument: --report");
+        }
+
+        const auto shapes = drcheck::io::JSONLayoutParser::load(layoutPath);
+
+        std::vector<std::unique_ptr<drcheck::rules::Rule>> rules;
+
+        const std::string extension = std::filesystem::path(rulesPath).extension().string();
+
+        if (extension == ".json")
+        {
+            rules = drcheck::io::JSONRuleParser::load(rulesPath);
+        }
+        else if (extension == ".tcl")
+        {
+            rules = drcheck::io::TclRuleParser::load(rulesPath);
+        }
+        else
+        {
+            throw std::invalid_argument("Unsupported rule file format: " + extension);
+        }
+
+        const auto violations = drcheck::engine::DRCEngine::run(shapes, rules);
+
+        drcheck::io::JSONReportWriter::write(violations, reportPath);
+
+        if (!svgPath.empty())
+        {
             drcheck::io::SVGReportWriter::write(shapes, violations, svgPath);
         }
 

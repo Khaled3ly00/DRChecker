@@ -1,0 +1,28 @@
+{
+  "rules": [
+    {
+      "type": "MinWidth",
+      "layer": "Metal1",
+      "value": 3.0
+    },
+    {
+      "type": "MinSpacing",
+      "layer": "Metal1",
+      "value": 2.0
+    },
+    {
+      "type": "MinEnclosure",
+      "innerLayer": "Via12",
+      "outerLayer": "Metal1",
+      "value": 1.0
+    },
+    {
+      "type": "Density",
+      "layer": "Metal1",
+      "limit": "Minimum",
+      "value": 0.30,
+      "windowSize": 10.0,
+      "windowStep": 5.0
+    }
+  ]
+}

@@ -16,7 +16,7 @@ namespace drcheck::engine {
 class DRCEngine
 {
 public:
-    std::vector<domain::Violation> run (const std::vector<domain::Shape>& shapes, const std::vector<std::unique_ptr<rules::Rule>>& rules) const;
+    static std::vector<domain::Violation> run (const std::vector<domain::Shape>& shapes, const std::vector<std::unique_ptr<rules::Rule>>& rules);
 };
 
 }

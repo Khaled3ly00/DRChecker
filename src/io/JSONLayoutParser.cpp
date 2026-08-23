@@ -7,7 +7,7 @@
 #include <nlohmann/json.hpp>
 
 namespace drcheck::io {
-std::vector<domain::Shape> JSONLayoutParser::load(const std::string& filePath) const {
+std::vector<domain::Shape> JSONLayoutParser::load(const std::string& filePath) {
     std::ifstream input(filePath);
 
     if (!input) {

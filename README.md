@@ -1,10 +1,12 @@
 # DRCheck
 
+[![CI](https://github.com/Khaled3ly00/DRChecker/actions/workflows/ci.yml/badge.svg)](https://github.com/Khaled3ly00/DRChecker/actions/workflows/ci.yml)
+
 DRCheck is a C++ Design Rule Checker for simplified IC layouts. The project focuses on modern C++, computational geometry, IC verification concepts, unit testing, spatial indexing, and evidence-based performance optimization.
 
 The current end-to-end application can:
 
-- load layout geometry and rule definitions from JSON;
+- load layout geometry from JSON and rule definitions from JSON or Tcl;
 - translate parsed rule parameters into validated polymorphic rules through a central factory;
 - run minimum-width, minimum-spacing, minimum-enclosure, and per-layer minimum/maximum density rules;
 - build one shared, layer-aware spatial index for a rule run;
@@ -15,28 +17,28 @@ The current end-to-end application can:
 
 ## Current Status
 
-The geometry core, domain model, rule framework, centralized `RuleFactory`, JSON input/output path, CLI, SVG visualization, violation metadata, QuadTree optimization, reusable spatial-index architecture, and density-rule pipeline are implemented and covered by tests.
+The geometry core, domain model, rule framework, centralized `RuleFactory`, JSON and Tcl rule-deck input paths, CLI, SVG visualization, violation metadata, QuadTree optimization, reusable spatial-index architecture, density-rule pipeline, and cross-platform CI workflow are implemented and covered by tests.
 
 `DRCEngine` builds one `LayerSpatialIndex` from the current shape collection and passes it to every rule. `MinSpacingRule`, `MinEnclosureRule`, and `DensityRule` reuse that index for layer-specific candidate discovery instead of building rule-local trees or scanning every possible shape.
 
-Rule construction is now separated from JSON decoding. `JSONRuleParser` validates and converts the input fields into `RuleParameters`, then delegates concrete rule creation and required-parameter validation to `RuleFactory`.
+Rule construction is separated from rule-deck decoding. `JSONRuleParser` and `TclRuleParser` validate and convert their input fields into `RuleParameters`, then delegate concrete rule creation and required-parameter validation to `RuleFactory`.
 
 Detailed benchmark methodology, results, and QuadTree tuning data have moved to [BENCHMARKS.md](BENCHMARKS.md).
 
 ## Architecture
 
 ```text
-layout.json                        rules.json
-     |                                 |
-     v                                 v
-JSONLayoutParser               JSONRuleParser
-     |                                 |
-     |                          RuleParameters
-     |                                 |
-     |                                 v
-     |                           RuleFactory
-     |                                 |
-     +-----------> DRCEngine <----------+
+layout.json                    rules.json / rules.tcl
+     |                                  |
+     v                                  v
+JSONLayoutParser         JSONRuleParser / TclRuleParser
+     |                                  |
+     |                           RuleParameters
+     |                                  |
+     |                                  v
+     |                            RuleFactory
+     |                                  |
+     +-----------> DRCEngine <-----------+
                     |
                     | builds once per run
                     v
@@ -71,7 +73,7 @@ The design keeps responsibilities separated:
 | `spatial/` | QuadTree storage and layer-aware candidate queries |
 | `rules/` | Rule-specific DRC semantics and centralized rule construction |
 | `engine/` | Shared-index construction and rule orchestration |
-| `io/` | JSON layout/rule parsing, parameter conversion, and report serialization |
+| `io/` | JSON layout parsing, JSON/Tcl rule-deck parsing, parameter conversion, and report serialization |
 
 ## Rule Construction and JSON Parsing
 
@@ -103,6 +105,8 @@ static std::unique_ptr<Rule> create(
 6. populating `RuleParameters`; and
 7. mapping the external JSON type to the internal factory key and delegating construction.
 
+`JSONRuleParser::load()` is now a static entry point. JSON-specific density-limit and bounding-box helpers remain inside the implementation file, keeping `nlohmann/json` and density parsing details out of the public parser header.
+
 ```text
 JSON rule object
        |
@@ -122,6 +126,48 @@ unique_ptr<Rule>
 ```
 
 The factory rejects missing required parameters and unknown factory keys with `std::invalid_argument`. The parser separately rejects malformed rule-file structure, unknown JSON rule types, and unsupported density-limit strings. This keeps JSON representation concerns out of concrete rule constructors while giving programmatic callers the same validated construction path.
+
+## Tcl Rule-Deck Parsing
+
+`TclRuleParser` adds a second rule-deck front end without changing the rule or engine interfaces. Its static `load()` function creates a Tcl interpreter, registers one DRCheck-specific object command named `rule`, evaluates the requested file, and returns the resulting polymorphic rules.
+
+The supported Tcl declarations mirror the four JSON rule families:
+
+```tcl
+rule min_width -layer Metal1 -value 0.20
+rule min_spacing -layer Metal1 -value 0.25
+rule min_enclosure -inner Via12 -outer Metal1 -value 0.10
+rule density -layer Metal1 -limit minimum -value 0.30 -window_size 10 -window_step 5
+rule density -layer Metal2 -limit maximum -value 0.70 -window_size 20 -window_step 10 -region {0 0 100 100}
+```
+
+Rule options are parsed as `-option value` pairs and stored by name, so their order does not affect the result. The parser rejects malformed pairs, duplicate options, missing required options, unexpected rule-specific options, unsupported rule types, invalid numeric values, and density limits other than `minimum` or `maximum`.
+
+For density rules, `-region` is optional. When present, it must be a Tcl list containing exactly four numeric values in `minX minY maxX maxY` order. The parser uses Tcl's list API rather than splitting the string manually and uses the count type required by either Tcl 8 or Tcl 9 at compile time.
+
+```text
+rules.tcl
+    |
+    v
+Tcl_EvalFile()
+    |
+    v
+registered rule command
+option validation and conversion
+    |
+    v
+RuleParameters
+    |
+    v
+RuleFactory::create()
+    |
+    v
+unique_ptr<Rule>
+```
+
+The callback converts C++ exceptions into Tcl command errors. If deck evaluation fails, `TclRuleParser` captures the interpreter message, destroys the interpreter, and reports the failure as `std::invalid_argument`. No Tcl-specific object crosses the `RuleFactory` boundary.
+
+CMake adds `TclRuleParser.cpp` to the main library, discovers Tcl through `find_package(TCL REQUIRED)`, and keeps the Tcl include path and library linkage private to the `drchecker` target.
 
 ## Shared `LayerSpatialIndex`
 
@@ -277,6 +323,8 @@ Each density violation carries the evaluated window as a region-based `Violation
 
 `JSONRuleParser` parses density rules through the same rule-definition input path as the existing rule types, including the target layer, limit direction, threshold, window size, window step, and optional explicit analysis bounds. It stores those values in `RuleParameters` and delegates construction to `RuleFactory`.
 
+`TclRuleParser` supplies the same density configuration through `-layer`, `-limit`, `-value`, `-window_size`, `-window_step`, and the optional `-region` list before delegating to the same factory.
+
 ## Rule and Engine Interface
 
 Rules receive the shape collection and the shared index as read-only inputs:
@@ -289,6 +337,8 @@ virtual std::vector<domain::Violation> check(
 ```
 
 `DRCEngine::run()` constructs one `LayerSpatialIndex`, passes it to each rule, and aggregates their violations. `DensityRule` participates through this same polymorphic pipeline. Rules that do not need spatial queries, such as `MinWidthRule`, accept the same interface but operate directly on the shapes.
+
+The CLI integration uses stateless static entry points for `JSONLayoutParser::load()`, `JSONRuleParser::load()`, `TclRuleParser::load()`, `DRCEngine::run()`, and `JSONReportWriter::write()`. JSON and Tcl decks therefore converge on the same rule vector before engine execution.
 
 ## Project Structure
 
@@ -324,7 +374,8 @@ drcheck/
 │   │   ├── JSONLayoutParser.h
 │   │   ├── JSONReportWriter.h
 │   │   ├── JSONRuleParser.h
-│   │   └── SVGReportWriter.h
+│   │   ├── SVGReportWriter.h
+│   │   └── TclRuleParser.h
 │   ├── rules/
 │   │   ├── DensityRule.h
 │   │   ├── MinEnclosureRule.h
@@ -352,7 +403,8 @@ drcheck/
 │   │   ├── JSONLayoutParser.cpp
 │   │   ├── JSONReportWriter.cpp
 │   │   ├── JSONRuleParser.cpp
-│   │   └── SVGReportWriter.cpp
+│   │   ├── SVGReportWriter.cpp
+│   │   └── TclRuleParser.cpp
 │   ├── rules/
 │   │   ├── DensityRule.cpp
 │   │   ├── MinEnclosureRule.cpp
@@ -382,7 +434,8 @@ drcheck/
 │   │   ├── JSONLayoutParserTest.cpp
 │   │   ├── JSONReportWriterTest.cpp
 │   │   ├── JSONRuleParserTest.cpp
-│   │   └── SVGReportWriterTest.cpp
+│   │   ├── SVGReportWriterTest.cpp
+│   │   └── TclRuleParserTest.cpp
 │   ├── rules/
 │   │   ├── DensityRuleTest.cpp
 │   │   ├── MinEnclosureRuleTest.cpp
@@ -403,7 +456,22 @@ Requirements:
 
 - CMake 3.20 or newer;
 - a C++20 compiler;
+- Tcl development headers and library discoverable by CMake's `find_package(TCL REQUIRED)`;
 - Git when dependencies are fetched by CMake.
+
+On Ubuntu, install the Tcl development package before configuring:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y tcl-dev
+```
+
+On Windows, the CI workflow uses vcpkg and its CMake toolchain:
+
+```powershell
+vcpkg install tcl:x64-windows
+cmake -S . -B build "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+```
 
 Configure and build:
 
@@ -426,26 +494,75 @@ Run the full suite through CTest:
 ctest --test-dir build --output-on-failure
 ```
 
-The test suite covers geometry invariants and algorithms, parser validation, factory construction and validation, rule behavior, report serialization, SVG output, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end JSON processing. `RuleFactoryTest` verifies construction of every supported rule type, representative missing-parameter rejection, and unknown-type rejection. `JSONRuleParserTest` verifies the parser-to-factory path for width, spacing, enclosure, minimum/maximum density, and density with an explicit analysis window. Density coverage also includes target-layer filtering, inferred analysis bounds, empty-layout behavior, partial edge windows, region markers, report integration, SVG highlighting, and execution through `DRCEngine` alongside existing rules.
+The test suite covers geometry invariants and algorithms, JSON and Tcl parser validation, factory construction and validation, rule behavior, report serialization, SVG output, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end rule-deck processing. `RuleFactoryTest` verifies construction of every supported rule type, representative missing-parameter rejection, and unknown-type rejection. `JSONRuleParserTest` verifies the JSON parser-to-factory path for width, spacing, enclosure, minimum/maximum density, and density with an explicit analysis window. Density coverage also includes target-layer filtering, inferred analysis bounds, empty-layout behavior, partial edge windows, region markers, report integration, SVG highlighting, and execution through `DRCEngine` alongside existing rules.
+
+`TclRuleParserTest` covers all supported Tcl rule families, option-order independence, minimum and maximum density, optional density regions, and invalid-deck rejection. The end-to-end suite loads equivalent JSON and Tcl decks, runs each through `DRCEngine`, and compares rule counts, violation counts, violation types, participating shape IDs, and actual/required values.
+
+## Continuous Integration
+
+GitHub Actions provides cross-platform CI through `.github/workflows/ci.yml`. The workflow runs automatically on pushes and pull requests and validates the project on both Ubuntu and Windows.
+
+For each platform, CI:
+
+1. checks out the repository;
+2. installs the Tcl development dependency using `tcl-dev` on Ubuntu or vcpkg on Windows;
+3. configures the project with CMake, using the vcpkg toolchain on Windows;
+4. builds the project in Release configuration; and
+5. runs the test suite through CTest with failure output enabled.
+
+```text
+push / pull request
+        |
+        v
+GitHub Actions
+      /               \
+     v                 v
+  Ubuntu             Windows
+     |                 |
+  tcl-dev          vcpkg Tcl
+     |                 |
+CMake configure   CMake + vcpkg toolchain
+      \               /
+       v             v
+        Build + CTest
+             |
+             v
+          pass/fail
+```
+
+The Windows job also adds the installed Tcl DLL directory to `PATH` for test execution. The cross-platform workflow helps catch portability issues that may not appear during local Windows development, such as case-sensitive include-path mismatches on Linux, while compiling the Tcl list-handling path against the platform-provided Tcl API.
 
 ## Running DRCheck
 
-The CLI accepts a layout file, a rule file, and an output report path:
+The CLI uses named argument/value pairs, which can appear in any order. `--layout`, `--rules`, and `--report` are required, while `--svg` is optional. The rule-deck parser is selected from the `.json` or `.tcl` file extension.
+
+Run with a JSON rule deck:
 
 ```bash
-drcheck layout.json rules.json report.json
+drcheck --layout layout.json --rules rules.json --report report.json
+```
+
+Run with a Tcl rule deck and optional SVG output:
+
+```bash
+drcheck --layout layout.json --rules rules.tcl --report report.json --svg report.svg
 ```
 
 The high-level flow is:
 
 ```text
-layout JSON + rule JSON
-          |
-          v
-       DRCEngine
-          |
-          v
-    violation report JSON
+layout JSON + JSON/Tcl rule deck
+                 |
+                 v
+       extension-based parser
+                 |
+                 v
+             DRCEngine
+                 |
+          +------+------+
+          |             |
+          v             v
+   JSON report     optional SVG
 ```
 
 See `examples/` for sample inputs.
@@ -472,7 +589,8 @@ The current implementation intentionally favors a clear, well-tested architectur
 - Spatial-index performance depends on geometry distribution and can degrade toward brute-force behavior in unfavorable layouts.
 - `DensityRule` uses a fixed, axis-aligned grid with one `windowSize` and `windowStep`; adaptive or multiscale density analysis is not implemented.
 - Automatic density analysis bounds require at least one layout shape; an explicit analysis region is required for an empty layout.
-- The current JSON format and rule set are intentionally simplified.
+- The CLI selects rule-deck parsers by the exact `.json` or `.tcl` extension; other extensions are rejected.
+- The only DRCheck-specific Tcl command is `rule`;
 
 ## Next Development Areas
 
@@ -480,7 +598,7 @@ The current implementation intentionally favors a clear, well-tested architectur
 - AI-assisted translation from natural-language requirements into executable design rules;
 - minimum-width support for non-Manhattan polygons;
 - sweep-line optimization for geometry-intensive rule checks;
-- Tcl-based rule decks;
+- Tcl-based DRC execution and automation commands beyond rule declaration;
 
 ## Project Goal
 
@@ -490,6 +608,7 @@ DRCheck is intended to demonstrate strong C++ design and EDA-oriented problem so
 - explicit ownership and lifetime rules;
 - polymorphic rule execution;
 - centralized, validated rule construction;
+- JSON and Tcl rule-deck front ends sharing the same factory and engine;
 - reusable spatial acceleration;
 - structured violation reporting; and
 - performance claims backed by correctness-checked benchmarks.

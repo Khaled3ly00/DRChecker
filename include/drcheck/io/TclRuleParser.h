@@ -1,14 +1,17 @@
 #pragma once
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "drcheck/rules/Rule.h"
 
-#include <string>
-#include <memory>
-
 namespace drcheck::io {
-class JSONRuleParser
+
+class TclRuleParser
 {
 public:
     static std::vector<std::unique_ptr<rules::Rule>> load(const std::string& filePath);
 };
+
 }

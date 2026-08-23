@@ -17,6 +17,8 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(json)
 
+find_package(TCL REQUIRED)
+
 # --------------------------------------------------
 # DRChecker library
 # --------------------------------------------------
@@ -44,11 +46,12 @@ add_library(drchecker
     # Engine
     src/engine/DRCEngine.cpp
 
-    # Parser
+    # I/O
     src/io/JSONLayoutParser.cpp
     src/io/JSONRuleParser.cpp
     src/io/JSONReportWriter.cpp
     src/io/SVGReportWriter.cpp
+    src/io/TclRuleParser.cpp
 
     # Spatial
     src/spatial/QuadTree.cpp
@@ -56,16 +59,21 @@ add_library(drchecker
 )
 
 target_include_directories(drchecker
+    # Public: Targets using my target can access it
     PUBLIC
         ${PROJECT_SOURCE_DIR}/include
+    # Private: Only targets under drchecker can access it
+    PRIVATE
+        ${TCL_INCLUDE_PATH}
+)
+
+target_link_libraries(drchecker
+    PRIVATE
+        nlohmann_json::nlohmann_json
+        ${TCL_LIBRARY}
 )
 
 target_compile_features(drchecker PUBLIC cxx_std_20)
-
-target_link_libraries(drchecker
-    PUBLIC
-        nlohmann_json::nlohmann_json
-)
 
 # --------------------------------------------------
 # Tests
@@ -112,11 +120,12 @@ if(DRCHECK_BUILD_TESTS)
         # Engine Tests
         tests/engine/DRCEngineTest.cpp
 
-        # Parser Tests
+        # I/O Tests
         tests/io/JSONLayoutParserTest.cpp
         tests/io/JSONRuleParserTest.cpp
         tests/io/JSONReportWriterTest.cpp
         tests/io/SVGReportWriterTest.cpp
+        tests/io/TclRuleParserTest.cpp
 
         # EndToEnd Tests
         tests/integration/EndtoEndTest.cpp
@@ -131,6 +140,7 @@ if(DRCHECK_BUILD_TESTS)
         PRIVATE
             drchecker
             GTest::gtest_main
+            nlohmann_json::nlohmann_json
     )
 
     target_compile_definitions(
@@ -153,12 +163,6 @@ target_link_libraries(
     drcheck
     PRIVATE
         drchecker
-)
-
-target_compile_definitions(
-    drcheck
-    PRIVATE
-        DRCHECK_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
 )
 
 add_executable(
@@ -194,3 +198,4 @@ target_compile_definitions(
     PRIVATE
         DRCHECK_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
 )
+

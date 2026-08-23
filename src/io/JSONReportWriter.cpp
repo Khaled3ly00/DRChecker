@@ -6,7 +6,7 @@
 #include <nlohmann/json.hpp>
 
 namespace drcheck::io {
-void JSONReportWriter::write(const std::vector<domain::Violation>& violations, const std::string& filePath) const
+void JSONReportWriter::write(const std::vector<domain::Violation>& violations, const std::string& filePath)
 {
     nlohmann::ordered_json report;
     // Create JSON element violationCount

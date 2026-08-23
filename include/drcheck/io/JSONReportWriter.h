@@ -10,7 +10,7 @@ namespace drcheck::io {
     class JSONReportWriter
     {
     public:
-        void write(const std::vector<domain::Violation>& violations, const std::string& filePath) const;
+        static void write(const std::vector<domain::Violation>& violations, const std::string& filePath);
     };
 
 }

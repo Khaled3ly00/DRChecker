@@ -9,7 +9,7 @@ namespace drcheck::io {
 class JSONLayoutParser
 {
 public:
-    std::vector<domain::Shape> load(const std::string& filePath) const;
+    static std::vector<domain::Shape> load(const std::string& filePath);
 };
 
 }

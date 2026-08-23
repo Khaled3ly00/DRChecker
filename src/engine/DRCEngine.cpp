@@ -3,7 +3,7 @@
 
 namespace drcheck::engine {
 
-std::vector<domain::Violation> DRCEngine::run(const std::vector<domain::Shape>& shapes, const std::vector<std::unique_ptr<rules::Rule>>& rules) const
+std::vector<domain::Violation> DRCEngine::run(const std::vector<domain::Shape>& shapes, const std::vector<std::unique_ptr<rules::Rule>>& rules)
 {
     std::vector<domain::Violation> violations;
     spatial::LayerSpatialIndex spatialIndex(shapes);
