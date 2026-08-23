@@ -49,6 +49,7 @@ add_library(drchecker
 
     # Engine
     src/engine/DRCEngine.cpp
+    src/engine/DRCRunner.cpp
 
     # I/O
     src/io/JSONLayoutParser.cpp
@@ -56,6 +57,7 @@ add_library(drchecker
     src/io/JSONReportWriter.cpp
     src/io/SVGReportWriter.cpp
     src/io/TclRuleParser.cpp
+    src/io/TclAutomationRunner.cpp
 
     # Spatial
     src/spatial/QuadTree.cpp
@@ -123,6 +125,7 @@ if(DRCHECK_BUILD_TESTS)
 
         # Engine Tests
         tests/engine/DRCEngineTest.cpp
+        tests/engine/DRCRunnerTest.cpp
 
         # I/O Tests
         tests/io/JSONLayoutParserTest.cpp
@@ -130,6 +133,7 @@ if(DRCHECK_BUILD_TESTS)
         tests/io/JSONReportWriterTest.cpp
         tests/io/SVGReportWriterTest.cpp
         tests/io/TclRuleParserTest.cpp
+        tests/io/TclAutomationRunnerTest.cpp
 
         # EndToEnd Tests
         tests/integration/EndtoEndTest.cpp

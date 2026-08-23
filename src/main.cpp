@@ -1,22 +1,32 @@
 #include <iostream>
-#include <filesystem>
 #include <string>
 #include <vector>
 #include <memory>
 #include <stdexcept>
 
-#include "drcheck/engine/DRCEngine.h"
-#include "drcheck/io/JSONLayoutParser.h"
-#include "drcheck/io/JSONRuleParser.h"
-#include "drcheck/io/JSONReportWriter.h"
-#include "drcheck/io/SVGReportWriter.h"
-#include "drcheck/io/TclRuleParser.h"
+#include "drcheck/engine/DRCRunner.h"
+#include "drcheck/io/TclAutomationRunner.h"
 
 int main(int argc, char* argv[])
 {
     // Usage: drcheck --layout layout.json --rules rules.tcl --report report.json [--svg report.svg]
     try
     {
+        if (argc >= 2 && std::string(argv[1]) == "--script" && argc != 3)
+        {
+            throw std::invalid_argument("Usage: drcheck --script <automation.tcl>");
+        }
+        if (argc == 3 && std::string(argv[1]) == "--script")
+        {
+            const std::string scriptPath = argv[2];
+
+            const auto violations = drcheck::io::TclAutomationRunner::run(scriptPath);
+
+            std::cout
+                << "Script completed.\n";
+
+            return 0;
+        }
         std::string layoutPath;
         std::string rulesPath;
         std::string reportPath;
@@ -54,48 +64,17 @@ int main(int argc, char* argv[])
             }
         }
 
-        if (layoutPath.empty())
-        {
-            throw std::invalid_argument("Missing required argument: --layout");
-        }
+        drcheck::engine::DRCRunConfig config;
 
-        if (rulesPath.empty())
-        {
-            throw std::invalid_argument("Missing required argument: --rules");
-        }
-
-        if (reportPath.empty())
-        {
-            throw std::invalid_argument("Missing required argument: --report");
-        }
-
-        const auto shapes = drcheck::io::JSONLayoutParser::load(layoutPath);
-
-        std::vector<std::unique_ptr<drcheck::rules::Rule>> rules;
-
-        const std::string extension = std::filesystem::path(rulesPath).extension().string();
-
-        if (extension == ".json")
-        {
-            rules = drcheck::io::JSONRuleParser::load(rulesPath);
-        }
-        else if (extension == ".tcl")
-        {
-            rules = drcheck::io::TclRuleParser::load(rulesPath);
-        }
-        else
-        {
-            throw std::invalid_argument("Unsupported rule file format: " + extension);
-        }
-
-        const auto violations = drcheck::engine::DRCEngine::run(shapes, rules);
-
-        drcheck::io::JSONReportWriter::write(violations, reportPath);
-
+        config.layoutPath = layoutPath;
+        config.rulesPath = rulesPath;
+        config.reportPath = reportPath;
         if (!svgPath.empty())
         {
-            drcheck::io::SVGReportWriter::write(shapes, violations, svgPath);
+            config.svgPath = svgPath;
         }
+
+        const auto violations = drcheck::engine::DRCRunner::run(config);
 
         std::cout
             << "DRC completed.\n"

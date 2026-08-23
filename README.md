@@ -8,6 +8,7 @@ The current end-to-end application can:
 
 - load layout geometry from JSON and rule definitions from JSON or Tcl;
 - translate parsed rule parameters into validated polymorphic rules through a central factory;
+- run the complete DRC/report workflow directly or from Tcl automation scripts;
 - run minimum-width, minimum-spacing, minimum-enclosure, and per-layer minimum/maximum density rules;
 - build one shared, layer-aware spatial index for a rule run;
 - report actual and required rule values;
@@ -17,11 +18,13 @@ The current end-to-end application can:
 
 ## Current Status
 
-The geometry core, domain model, rule framework, centralized `RuleFactory`, JSON and Tcl rule-deck input paths, CLI, SVG visualization, violation metadata, QuadTree optimization, reusable spatial-index architecture, density-rule pipeline, and cross-platform CI workflow are implemented and covered by tests.
+The geometry core, domain model, rule framework, centralized `RuleFactory`, JSON and Tcl rule-deck input paths, reusable `DRCRunner`, Tcl automation runner and commands, dual-mode CLI, SVG visualization, violation metadata, QuadTree optimization, reusable spatial-index architecture, density-rule pipeline, and cross-platform CI workflow are implemented and covered by tests.
 
 `DRCEngine` builds one `LayerSpatialIndex` from the current shape collection and passes it to every rule. `MinSpacingRule`, `MinEnclosureRule`, and `DensityRule` reuse that index for layer-specific candidate discovery instead of building rule-local trees or scanning every possible shape.
 
 Rule construction is separated from rule-deck decoding. `JSONRuleParser` and `TclRuleParser` validate and convert their input fields into `RuleParameters`, then delegate concrete rule creation and required-parameter validation to `RuleFactory`.
+
+Complete DRC execution is now separated from `main()`. `DRCRunner` owns layout loading, rule-deck selection, engine execution, and report generation, allowing direct CLI runs and Tcl automation commands to share one workflow.
 
 Detailed benchmark methodology, results, and QuadTree tuning data have moved to [BENCHMARKS.md](BENCHMARKS.md).
 
@@ -72,8 +75,8 @@ The design keeps responsibilities separated:
 | `domain/` | Layers, shapes, violations, and violation markers |
 | `spatial/` | QuadTree storage and layer-aware candidate queries |
 | `rules/` | Rule-specific DRC semantics and centralized rule construction |
-| `engine/` | Shared-index construction and rule orchestration |
-| `io/` | JSON layout parsing, JSON/Tcl rule-deck parsing, parameter conversion, and report serialization |
+| `engine/` | Shared-index construction, rule orchestration, and reusable end-to-end DRC execution |
+| `io/` | JSON layout parsing, JSON/Tcl rule-deck parsing, Tcl automation, parameter conversion, and report serialization |
 
 ## Rule Construction and JSON Parsing
 
@@ -167,7 +170,71 @@ unique_ptr<Rule>
 
 The callback converts C++ exceptions into Tcl command errors. If deck evaluation fails, `TclRuleParser` captures the interpreter message, destroys the interpreter, and reports the failure as `std::invalid_argument`. No Tcl-specific object crosses the `RuleFactory` boundary.
 
-CMake adds `TclRuleParser.cpp` to the main library, discovers Tcl through `find_package(TCL REQUIRED)`, and keeps the Tcl include path and library linkage private to the `drchecker` target.
+CMake adds the Tcl parser and automation sources to the main library, probes for Tcl with `find_package(TCL QUIET)`, emits an explicit fatal error when the development files are unavailable, and keeps the Tcl include path and library linkage private to the `drchecker` target.
+
+## Reusable DRC Execution and Tcl Automation
+
+`DRCRunner` extracts the complete application workflow from `main()` into a reusable engine-level service. Callers supply one configuration object:
+
+```cpp
+struct DRCRunConfig
+{
+    std::string layoutPath;
+    std::string rulesPath;
+    std::string reportPath;
+    std::optional<std::string> svgPath;
+};
+```
+
+`DRCRunner::run()` then:
+
+1. loads the JSON layout;
+2. selects `JSONRuleParser` or `TclRuleParser` from the rule-deck extension;
+3. runs the rules through `DRCEngine`;
+4. always writes the configured JSON report;
+5. writes an SVG report when `svgPath` is present; and
+6. returns the generated violations.
+
+This same function is used by direct CLI mode and Tcl automation, so parsing, execution, and report behavior are not duplicated in `main()` or Tcl callbacks.
+
+`TclAutomationRunner::run()` creates a Tcl interpreter with two DRCheck-specific commands:
+
+| Command | Parameters | Behavior |
+|---|---|---|
+| `drc_run` | required `-layout`, `-rules`, `-report`; optional `-svg` | Builds a `DRCRunConfig`, executes the complete workflow, and stores the resulting violations as the latest run |
+| `drc_error_count` | none | Returns the latest run's violation count as a Tcl integer |
+
+`drc_run` accepts option/value pairs in any order and rejects malformed pairs, duplicate options, missing required options, and unknown options. Because report generation is already part of `DRCRunner`, the automation interface does not add a separate export command.
+
+Automation scripts can combine these commands with Tcl's existing variables, command substitution, conditionals, output, and file-path operations; more in examples/
+
+Resolving paths from `[info script]` makes the automation file independent of the executable's working directory.
+
+One automation script can call `drc_run` multiple times. Each call executes and writes its own report, while the shared automation context replaces its stored violation vector with the newest result. Consequently, `drc_error_count` and the vector returned by `TclAutomationRunner::run()` describe only the most recent run; V1 does not retain run history.
+
+```text
+main()
+  |
+  +-- direct options --------------------+
+  |                                      |
+  |                                      v
+  |                                  DRCRunner
+  |                                      ^
+  +-- --script --> TclAutomationRunner --+
+                       |
+                       +-- drc_run
+                       +-- drc_error_count
+
+DRCRunner
+  -> load layout
+  -> load JSON/Tcl rules
+  -> DRCEngine
+  -> JSON report
+  -> optional SVG report
+  -> violations
+```
+
+Tcl command exceptions are returned through the interpreter as command errors. If script evaluation fails, `TclAutomationRunner` captures the Tcl message, destroys the interpreter, and throws `std::invalid_argument`.
 
 ## Shared `LayerSpatialIndex`
 
@@ -338,7 +405,7 @@ virtual std::vector<domain::Violation> check(
 
 `DRCEngine::run()` constructs one `LayerSpatialIndex`, passes it to each rule, and aggregates their violations. `DensityRule` participates through this same polymorphic pipeline. Rules that do not need spatial queries, such as `MinWidthRule`, accept the same interface but operate directly on the shapes.
 
-The CLI integration uses stateless static entry points for `JSONLayoutParser::load()`, `JSONRuleParser::load()`, `TclRuleParser::load()`, `DRCEngine::run()`, and `JSONReportWriter::write()`. JSON and Tcl decks therefore converge on the same rule vector before engine execution.
+`DRCRunner` composes the stateless static entry points `JSONLayoutParser::load()`, `JSONRuleParser::load()`, `TclRuleParser::load()`, `DRCEngine::run()`, and `JSONReportWriter::write()`. Direct CLI mode and Tcl automation therefore converge on the same parser, engine, and reporting path.
 
 ## Project Structure
 
@@ -362,7 +429,8 @@ drcheck/
 │   │   ├── Shape.h
 │   │   └── Violation.h
 │   ├── engine/
-│   │   └── DRCEngine.h
+│   │   ├── DRCEngine.h
+│   │   └── DRCRunner.h
 │   ├── geometry/
 │   │   ├── BoundingBox.h
 │   │   ├── Constants.h
@@ -375,6 +443,7 @@ drcheck/
 │   │   ├── JSONReportWriter.h
 │   │   ├── JSONRuleParser.h
 │   │   ├── SVGReportWriter.h
+│   │   ├── TclAutomationRunner.h
 │   │   └── TclRuleParser.h
 │   ├── rules/
 │   │   ├── DensityRule.h
@@ -392,7 +461,8 @@ drcheck/
 │   │   ├── Shape.cpp
 │   │   └── Violation.cpp
 │   ├── engine/
-│   │   └── DRCEngine.cpp
+│   │   ├── DRCEngine.cpp
+│   │   └── DRCRunner.cpp
 │   ├── geometry/
 │   │   ├── BoundingBox.cpp
 │   │   ├── Point.cpp
@@ -404,6 +474,7 @@ drcheck/
 │   │   ├── JSONReportWriter.cpp
 │   │   ├── JSONRuleParser.cpp
 │   │   ├── SVGReportWriter.cpp
+│   │   ├── TclAutomationRunner.cpp
 │   │   └── TclRuleParser.cpp
 │   ├── rules/
 │   │   ├── DensityRule.cpp
@@ -421,7 +492,8 @@ drcheck/
 │   │   ├── ShapeTest.cpp
 │   │   └── ViolationTest.cpp
 │   ├── engine/
-│   │   └── DRCEngineTest.cpp
+│   │   ├── DRCEngineTest.cpp
+│   │   └── DRCRunnerTest.cpp
 │   ├── geometry/
 │   │   ├── BoundingBoxTest.cpp
 │   │   ├── PointTest.cpp
@@ -435,6 +507,7 @@ drcheck/
 │   │   ├── JSONReportWriterTest.cpp
 │   │   ├── JSONRuleParserTest.cpp
 │   │   ├── SVGReportWriterTest.cpp
+│   │   ├── TclAutomationRunnerTest.cpp
 │   │   └── TclRuleParserTest.cpp
 │   ├── rules/
 │   │   ├── DensityRuleTest.cpp
@@ -456,7 +529,7 @@ Requirements:
 
 - CMake 3.20 or newer;
 - a C++20 compiler;
-- Tcl development headers and library discoverable by CMake's `find_package(TCL REQUIRED)`;
+- Tcl development headers and library discoverable by CMake;
 - Git when dependencies are fetched by CMake.
 
 On Ubuntu, install the Tcl development package before configuring:
@@ -497,6 +570,8 @@ ctest --test-dir build --output-on-failure
 The test suite covers geometry invariants and algorithms, JSON and Tcl parser validation, factory construction and validation, rule behavior, report serialization, SVG output, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end rule-deck processing. `RuleFactoryTest` verifies construction of every supported rule type, representative missing-parameter rejection, and unknown-type rejection. `JSONRuleParserTest` verifies the JSON parser-to-factory path for width, spacing, enclosure, minimum/maximum density, and density with an explicit analysis window. Density coverage also includes target-layer filtering, inferred analysis bounds, empty-layout behavior, partial edge windows, region markers, report integration, SVG highlighting, and execution through `DRCEngine` alongside existing rules.
 
 `TclRuleParserTest` covers all supported Tcl rule families, option-order independence, minimum and maximum density, optional density regions, and invalid-deck rejection. The end-to-end suite loads equivalent JSON and Tcl decks, runs each through `DRCEngine`, and compares rule counts, violation counts, violation types, participating shape IDs, and actual/required values.
+
+`DRCRunnerTest` exercises the extracted end-to-end workflow with a Tcl rule deck and report path. `TclAutomationRunnerTest` verifies a complete `drc_run`, the latest-run result returned to C++, multiple independent runs in one script, `drc_error_count` checks inside Tcl, and generation of both reports from a two-run script.
 
 ## Continuous Integration
 
@@ -548,21 +623,35 @@ Run with a Tcl rule deck and optional SVG output:
 drcheck --layout layout.json --rules rules.tcl --report report.json --svg report.svg
 ```
 
+Run a Tcl automation script through the separate script mode:
+
+```bash
+drcheck --script examples/automation.tcl
+```
+
+Script mode requires exactly one script path. `main()` delegates the file to `TclAutomationRunner`, prints `Script completed.` after successful evaluation, and returns without entering the direct argument-processing path.
+
 The high-level flow is:
 
 ```text
-layout JSON + JSON/Tcl rule deck
-                 |
-                 v
-       extension-based parser
-                 |
-                 v
-             DRCEngine
-                 |
-          +------+------+
-          |             |
-          v             v
-   JSON report     optional SVG
+direct CLI options                    --script automation.tcl
+        |                                      |
+        v                                      v
+  DRCRunConfig                        TclAutomationRunner
+        |                                      |
+        |                                  drc_run
+        |                                      |
+        +--------------> DRCRunner <------------+
+                               |
+                  layout + JSON/Tcl rules
+                               |
+                               v
+                           DRCEngine
+                               |
+                        +------+------+
+                        |             |
+                        v             v
+                 JSON report     optional SVG
 ```
 
 See `examples/` for sample inputs.
@@ -590,7 +679,9 @@ The current implementation intentionally favors a clear, well-tested architectur
 - `DensityRule` uses a fixed, axis-aligned grid with one `windowSize` and `windowStep`; adaptive or multiscale density analysis is not implemented.
 - Automatic density analysis bounds require at least one layout shape; an explicit analysis region is required for an empty layout.
 - The CLI selects rule-deck parsers by the exact `.json` or `.tcl` extension; other extensions are rejected.
-- The only DRCheck-specific Tcl command is `rule`;
+- Tcl rule decks expose `rule`, while automation scripts expose only `drc_run` and `drc_error_count` as DRCheck-specific commands.
+- `drc_run` always writes its JSON report immediately and optionally writes SVG; deferred export is not implemented.
+- Automation state retains only the most recent run's violations.
 
 ## Next Development Areas
 
@@ -598,7 +689,7 @@ The current implementation intentionally favors a clear, well-tested architectur
 - AI-assisted translation from natural-language requirements into executable design rules;
 - minimum-width support for non-Manhattan polygons;
 - sweep-line optimization for geometry-intensive rule checks;
-- Tcl-based DRC execution and automation commands beyond rule declaration;
+- richer Tcl result queries, filtering, and run-history support as concrete workflows require them;
 
 ## Project Goal
 
@@ -609,6 +700,7 @@ DRCheck is intended to demonstrate strong C++ design and EDA-oriented problem so
 - polymorphic rule execution;
 - centralized, validated rule construction;
 - JSON and Tcl rule-deck front ends sharing the same factory and engine;
+- reusable end-to-end DRC execution shared by direct CLI and Tcl automation;
 - reusable spatial acceleration;
 - structured violation reporting; and
 - performance claims backed by correctness-checked benchmarks.

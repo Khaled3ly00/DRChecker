@@ -1,0 +1,86 @@
+{
+    "violationCount": 5,
+    "violations": [
+        {
+            "type": "MinWidth",
+            "shapeIds": [
+                0
+            ],
+            "message": "Minimum width violation: required ",
+            "actual": 2.0,
+            "required": 3.0,
+            "marker": {
+                "firstPoint": {
+                    "x": 2.0,
+                    "y": 5.0
+                },
+                "secondPoint": {
+                    "x": 0.0,
+                    "y": 5.0
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 3
+            }
+        },
+        {
+            "type": "MinDensity",
+            "shapeIds": [],
+            "message": "Minimum density violation",
+            "actual": 0.2,
+            "required": 0.3,
+            "marker": {
+                "region": {
+                    "minX": 0.0,
+                    "minY": 5.0,
+                    "maxX": 10.0,
+                    "maxY": 10.0
+                }
+            }
+        },
+        {
+            "type": "MinDensity",
+            "shapeIds": [],
+            "message": "Minimum density violation",
+            "actual": 0.0,
+            "required": 0.3,
+            "marker": {
+                "region": {
+                    "minX": 5.0,
+                    "minY": 5.0,
+                    "maxX": 15.0,
+                    "maxY": 10.0
+                }
+            }
+        },
+        {
+            "type": "MinDensity",
+            "shapeIds": [],
+            "message": "Minimum density violation",
+            "actual": 0.0,
+            "required": 0.3,
+            "marker": {
+                "region": {
+                    "minX": 10.0,
+                    "minY": 5.0,
+                    "maxX": 20.0,
+                    "maxY": 10.0
+                }
+            }
+        },
+        {
+            "type": "MinDensity",
+            "shapeIds": [],
+            "message": "Minimum density violation",
+            "actual": 0.0,
+            "required": 0.3,
+            "marker": {
+                "region": {
+                    "minX": 15.0,
+                    "minY": 5.0,
+                    "maxX": 20.0,
+                    "maxY": 10.0
+                }
+            }
+        }
+    ]
+}
