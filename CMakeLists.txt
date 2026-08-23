@@ -17,7 +17,11 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(json)
 
-find_package(TCL REQUIRED)
+find_package(TCL QUIET)
+
+if(NOT TCL_FOUND)
+    message(FATAL_ERROR "Tcl development files not found")
+endif()
 
 # --------------------------------------------------
 # DRChecker library
