@@ -1,52 +1,253 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="440" height="240" viewBox="0 0 440 240">
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="90vh" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet">
+  <style>
+    .violation-label {
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .violation:hover .violation-label {
+      visibility: visible;
+    }
+    .violation {
+      cursor: pointer;
+    }
+    .legend-item.disabled .legend-label {
+      fill: darkgray;
+    }
+    .legend-item.disabled rect {
+      opacity: 0.35;
+    }
+  </style>
   <g id="layout">
-  <polygon points="20,220 60,220 60,20 20,20 " fill="turquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="1" />
-  <polygon points="100,220 220,220 220,120 100,120 " fill="turquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="1" />
-  <polygon points="120,180 140,180 140,160 120,160 " fill="yellow" fill-opacity="0.35" stroke="khaki" stroke-width="1" />
-  <polygon points="260,220 420,220 420,120 260,120 " fill="turquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="1" />
+  <g class="shape layer-M1">
+    <title>Shape ID: 1&#10;Layer: M1</title>
+  <polygon points="40,637.5 135,637.5 135,162.5 40,162.5 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
   </g>
-  <g id="shape-labels">
-  <text x="22" y="30" font-size="4" fill="black">0</text>
-  <text x="102" y="130" font-size="4" fill="black">1</text>
-  <text x="122" y="170" font-size="4" fill="black">2</text>
-  <text x="262" y="130" font-size="4" fill="black">3</text>
+  <g class="shape layer-M1">
+    <title>Shape ID: 2&#10;Layer: M1</title>
+  <polygon points="230,637.5 515,637.5 515,400 230,400 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
+  <g class="shape layer-VIA1">
+    <title>Shape ID: 3&#10;Layer: VIA1</title>
+  <polygon points="277.5,542.5 325,542.5 325,495 277.5,495 " fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
+  </g>
+  <g class="shape layer-M1">
+    <title>Shape ID: 4&#10;Layer: M1</title>
+  <polygon points="610,637.5 990,637.5 990,400 610,400 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
   </g>
   <g id="violations">
-    <line class="violation-edge" x1="60" y1="220" x2="60" y2="20" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <line class="violation-edge" x1="20" y1="20" x2="20" y2="220" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <g class="violation" data-layers="layer-M1">
+    <line class="violation-edge" x1="135" y1="637.5" x2="135" y2="162.5" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="40" y1="162.5" x2="40" y2="637.5" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="60" y1="120" x2="20" y2="120" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="60" cy="120" r="2.5" fill="red" />
-    <circle class="violation-point" cx="20" cy="120" r="2.5" fill="red" />
-    <text class="violation-label" x="40" y="119" font-size="6" text-anchor="middle" fill="red">MinWidth 2/3</text>
+    <line class="violation-marker" x1="135" y1="400" x2="40" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="135" cy="400" r="4" fill="red" />
+    <circle class="violation-point" cx="40" cy="400" r="4" fill="red" />
+    <text class="violation-label" x="87.5" y="393" font-size="14" text-anchor="middle" fill="red">MinWidth 2/3</text>
   </g>
-    <line class="violation-edge" x1="60" y1="220" x2="60" y2="20" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <line class="violation-edge" x1="100" y1="120" x2="100" y2="220" stroke="red" stroke-width="2" stroke-linecap="round" />
+    </g>
+    <g class="violation" data-layers="layer-M1">
+    <line class="violation-edge" x1="135" y1="637.5" x2="135" y2="162.5" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="230" y1="400" x2="230" y2="637.5" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="60" y1="120" x2="100" y2="120" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="60" cy="120" r="2.5" fill="red" />
-    <circle class="violation-point" cx="100" cy="120" r="2.5" fill="red" />
-    <text class="violation-label" x="80" y="119" font-size="6" text-anchor="middle" fill="red">MinSpacing 2/3</text>
+    <line class="violation-marker" x1="135" y1="400" x2="230" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="135" cy="400" r="4" fill="red" />
+    <circle class="violation-point" cx="230" cy="400" r="4" fill="red" />
+    <text class="violation-label" x="182.5" y="393" font-size="14" text-anchor="middle" fill="red">MinSpacing 2/3</text>
   </g>
-    <line class="violation-edge" x1="220" y1="220" x2="220" y2="120" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <line class="violation-edge" x1="260" y1="120" x2="260" y2="220" stroke="red" stroke-width="2" stroke-linecap="round" />
+    </g>
+    <g class="violation" data-layers="layer-M1">
+    <line class="violation-edge" x1="515" y1="637.5" x2="515" y2="400" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="610" y1="400" x2="610" y2="637.5" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="220" y1="120" x2="260" y2="120" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="220" cy="120" r="2.5" fill="red" />
-    <circle class="violation-point" cx="260" cy="120" r="2.5" fill="red" />
-    <text class="violation-label" x="240" y="119" font-size="6" text-anchor="middle" fill="red">MinSpacing 2/3</text>
+    <line class="violation-marker" x1="515" y1="400" x2="610" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="515" cy="400" r="4" fill="red" />
+    <circle class="violation-point" cx="610" cy="400" r="4" fill="red" />
+    <text class="violation-label" x="562.5" y="393" font-size="14" text-anchor="middle" fill="red">MinSpacing 2/3</text>
   </g>
-    <line class="violation-edge" x1="120" y1="160" x2="120" y2="180" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <line class="violation-edge" x1="100" y1="120" x2="100" y2="220" stroke="red" stroke-width="2" stroke-linecap="round" />
+    </g>
+    <g class="violation" data-layers="layer-VIA1 layer-M1">
+    <line class="violation-edge" x1="277.5" y1="495" x2="277.5" y2="542.5" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="230" y1="400" x2="230" y2="637.5" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="120" y1="160" x2="100" y2="160" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="120" cy="160" r="2.5" fill="red" />
-    <circle class="violation-point" cx="100" cy="160" r="2.5" fill="red" />
-    <text class="violation-label" x="110" y="159" font-size="6" text-anchor="middle" fill="red">Enclosure 1/2</text>
+    <line class="violation-marker" x1="277.5" y1="495" x2="230" y2="495" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="277.5" cy="495" r="4" fill="red" />
+    <circle class="violation-point" cx="230" cy="495" r="4" fill="red" />
+    <text class="violation-label" x="253.75" y="488" font-size="14" text-anchor="middle" fill="red">Enclosure 1/2</text>
   </g>
+    </g>
+    <g class="violation" data-layers="">
   <g>
-    <rect class="violation-region" x="220" y="20" width="200" height="200" fill="red" fill-opacity="0.08" stroke="red" stroke-width="2" />
-    <text class="violation-label" x="320" y="28" font-size="6" text-anchor="middle" fill="red">MinDensity 0.4/0.5</text>
+    <rect class="violation-region" x="515" y="162.5" width="475" height="475" fill="red" fill-opacity="0.08" stroke="red" stroke-width="2" />
+    <text class="violation-label" x="752.5" y="180.5" font-size="14" text-anchor="middle" fill="red">MinDensity 0.4/0.5</text>
   </g>
+    </g>
   </g>
+  <g id="layer-legend">
+    <text x="1050" y="40" font-size="20" font-weight="bold" fill="black">Violations: 5</text>
+    <text x="1050" y="65" font-size="18" font-weight="bold" fill="black">Layers</text>
+    <text id="toggle-all-layers" x="1115" y="65" font-size="13" fill="#555555" text-decoration="underline" style="cursor: pointer;" onclick="toggleAllLayers()">Hide All</text>
+    <g class="legend-item" data-layer="layer-M1" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1050" y="90" width="18" height="18" fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+      <text class="legend-label" x="1078" y="105" font-size="14" fill="black">M1</text>
+    </g>
+    <g class="legend-item" data-layer="layer-VIA1" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1050" y="120" width="18" height="18" fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
+      <text class="legend-label" x="1078" y="135" font-size="14" fill="black">VIA1</text>
+    </g>
+  </g>
+  <script><![CDATA[
+    function updateLayerVisibility() {
+      const hiddenLayers = new Set();
+
+      document.querySelectorAll('.legend-item.disabled').forEach(function(item) {
+        hiddenLayers.add(item.dataset.layer);
+      });
+
+      document.querySelectorAll('.shape').forEach(function(shape) {
+        let hideShape = false;
+
+        shape.classList.forEach(function(className) {
+          if (className.startsWith('layer-') && hiddenLayers.has(className)) {
+            hideShape = true;
+          }
+        });
+
+        shape.style.display = hideShape ? 'none' : '';
+      });
+
+      document.querySelectorAll('.violation').forEach(function(violation) {
+        const layersText = violation.dataset.layers || '';
+        const layers = layersText === '' ? [] : layersText.split(' ');
+
+        let hideViolation = false;
+
+        layers.forEach(function(layer) {
+          if (hiddenLayers.has(layer)) {
+            hideViolation = true;
+          }
+        });
+
+        violation.style.display = hideViolation ? 'none' : '';
+      });
+    }
+
+    function updateToggleAllText() {
+      const legendItems = document.querySelectorAll('.legend-item');
+      const toggleText = document.getElementById('toggle-all-layers');
+
+      if (!toggleText || legendItems.length === 0) {
+        return;
+      }
+
+      const allHidden = Array.from(legendItems).every(function(item) {
+        return item.classList.contains('disabled');
+      });
+
+      toggleText.textContent = allHidden ? 'Show All' : 'Hide All';
+    }
+
+    function toggleAllLayers() {
+      const legendItems = document.querySelectorAll('.legend-item');
+
+      const allHidden = Array.from(legendItems).every(function(item) {
+        return item.classList.contains('disabled');
+      });
+
+      legendItems.forEach(function(item) {
+        if (allHidden) {
+          item.classList.remove('disabled');
+        }
+        else {
+          item.classList.add('disabled');
+        }
+      });
+
+      updateLayerVisibility();
+      updateToggleAllText();
+    }
+
+    function toggleLayer(legendItem) {
+      legendItem.classList.toggle('disabled');
+      updateLayerVisibility();
+      updateToggleAllText();
+    }
+
+    const svg = document.documentElement;
+
+    const originalWidth = 1200;
+    const originalHeight = 800;
+
+    let viewX = 0;
+    let viewY = 0;
+    let viewWidth = originalWidth;
+    let viewHeight = originalHeight;
+
+    const MIN_ZOOM_FACTOR = 0.1;
+
+    svg.addEventListener('wheel', function(event) {
+      event.preventDefault();
+
+      const rect = svg.getBoundingClientRect();
+
+      const mouseX = viewX +
+        ((event.clientX - rect.left) / rect.width) * viewWidth;
+
+      const mouseY = viewY +
+        ((event.clientY - rect.top) / rect.height) * viewHeight;
+
+      let zoomFactor = event.deltaY < 0 ? 0.9 : 1.1;
+
+      let newWidth = viewWidth * zoomFactor;
+
+      const minWidth = originalWidth * MIN_ZOOM_FACTOR;
+
+      if (newWidth < minWidth) {
+        newWidth = minWidth;
+      }
+
+      if (newWidth > originalWidth) {
+        newWidth = originalWidth;
+      }
+
+      zoomFactor = newWidth / viewWidth;
+
+      const newHeight = viewHeight * zoomFactor;
+
+      viewX = mouseX - (mouseX - viewX) * zoomFactor;
+      viewY = mouseY - (mouseY - viewY) * zoomFactor;
+
+      viewWidth = newWidth;
+      viewHeight = newHeight;
+
+      if (viewWidth == originalWidth) {
+        viewX = 0;
+        viewY = 0;
+        viewHeight = originalHeight;
+      }
+
+      svg.setAttribute(
+        'viewBox',
+        viewX + ' ' + viewY + ' ' + viewWidth + ' ' + viewHeight
+      );
+    }, { passive: false });
+
+    function resetView() {
+      viewX = 0;
+      viewY = 0;
+      viewWidth = originalWidth;
+      viewHeight = originalHeight;
+
+      svg.setAttribute(
+        'viewBox',
+        '0 0 ' + originalWidth + ' ' + originalHeight
+      );
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'f' || event.key === 'F') {
+        resetView();
+      }
+    });
+  ]]></script>
 </svg>

@@ -1,0 +1,731 @@
+{
+    "violationCount": 33,
+    "violations": [
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                8,
+                33
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.04,
+                    "y": 2.125
+                },
+                "secondPoint": {
+                    "x": -0.04,
+                    "y": 2.125
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                8,
+                27
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.04,
+                    "y": 2.125
+                },
+                "secondPoint": {
+                    "x": -0.04,
+                    "y": 2.125
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                8,
+                28
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.04000000000000001,
+                    "y": 2.125
+                },
+                "secondPoint": {
+                    "x": -0.04,
+                    "y": 2.08
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 1
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                8,
+                25
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.78,
+                    "y": 2.125
+                },
+                "secondPoint": {
+                    "x": 0.78,
+                    "y": 2.125
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                8,
+                26
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.78,
+                    "y": 2.125
+                },
+                "secondPoint": {
+                    "x": 0.78,
+                    "y": 2.08
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 1
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                17,
+                35
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.04,
+                    "y": 0.095
+                },
+                "secondPoint": {
+                    "x": -0.04,
+                    "y": 0.095
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                17,
+                31
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.039999999999999994,
+                    "y": 0.095
+                },
+                "secondPoint": {
+                    "x": -0.039999999999999994,
+                    "y": 0.095
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                17,
+                38
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.78,
+                    "y": 0.095
+                },
+                "secondPoint": {
+                    "x": 0.78,
+                    "y": 0.095
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                22,
+                68
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.465,
+                    "y": 1.5
+                },
+                "secondPoint": {
+                    "x": 0.465,
+                    "y": 1.5
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 1
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                22,
+                81
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.375,
+                    "y": 0.53
+                },
+                "secondPoint": {
+                    "x": 0.375,
+                    "y": 0.53
+                },
+                "firstEdgeIndex": 3,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                25,
+                33
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.78,
+                    "y": 2.125
+                },
+                "secondPoint": {
+                    "x": 0.78,
+                    "y": 2.125
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 1
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                25,
+                26
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.78,
+                    "y": 1.98
+                },
+                "secondPoint": {
+                    "x": 0.78,
+                    "y": 1.98
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                25,
+                62
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.785,
+                    "y": 1.33
+                },
+                "secondPoint": {
+                    "x": 0.785,
+                    "y": 1.33
+                },
+                "firstEdgeIndex": 3,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                26,
+                33
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.87,
+                    "y": 2.08
+                },
+                "secondPoint": {
+                    "x": 0.88,
+                    "y": 2.08
+                },
+                "firstEdgeIndex": 2,
+                "secondEdgeIndex": 2
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                27,
+                33
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.04,
+                    "y": 2.125
+                },
+                "secondPoint": {
+                    "x": -0.04,
+                    "y": 2.125
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                27,
+                28
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.04,
+                    "y": 1.98
+                },
+                "secondPoint": {
+                    "x": -0.04,
+                    "y": 1.98
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                27,
+                59
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.035,
+                    "y": 1.33
+                },
+                "secondPoint": {
+                    "x": -0.035,
+                    "y": 1.33
+                },
+                "firstEdgeIndex": 3,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                28,
+                33
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.04,
+                    "y": 1.98
+                },
+                "secondPoint": {
+                    "x": -0.04,
+                    "y": 1.98
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                29,
+                30
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.78,
+                    "y": 0.705
+                },
+                "secondPoint": {
+                    "x": 0.78,
+                    "y": 0.705
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                29,
+                37
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.78,
+                    "y": 0.505
+                },
+                "secondPoint": {
+                    "x": 0.78,
+                    "y": 0.505
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 1
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                29,
+                38
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.78,
+                    "y": 0.325
+                },
+                "secondPoint": {
+                    "x": 0.78,
+                    "y": 0.325
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                29,
+                78
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.78,
+                    "y": 0.7
+                },
+                "secondPoint": {
+                    "x": 0.785,
+                    "y": 0.7
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 3
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                30,
+                78
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.87,
+                    "y": 0.7
+                },
+                "secondPoint": {
+                    "x": 0.87,
+                    "y": 0.7
+                },
+                "firstEdgeIndex": 2,
+                "secondEdgeIndex": 2
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                31,
+                35
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.04,
+                    "y": -0.045
+                },
+                "secondPoint": {
+                    "x": -0.04,
+                    "y": -0.045
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                31,
+                32
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.04,
+                    "y": 0.705
+                },
+                "secondPoint": {
+                    "x": -0.04,
+                    "y": 0.705
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                31,
+                44
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": -0.04,
+                    "y": 0.7
+                },
+                "secondPoint": {
+                    "x": -0.035,
+                    "y": 0.7
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 3
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                32,
+                44
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.05,
+                    "y": 0.7
+                },
+                "secondPoint": {
+                    "x": 0.05,
+                    "y": 0.7
+                },
+                "firstEdgeIndex": 2,
+                "secondEdgeIndex": 2
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                35,
+                38
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.7799999999999999,
+                    "y": 0.095
+                },
+                "secondPoint": {
+                    "x": 0.7799999999999999,
+                    "y": 0.095
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                37,
+                38
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.0,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.78,
+                    "y": 0.505
+                },
+                "secondPoint": {
+                    "x": 0.78,
+                    "y": 0.505
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                37,
+                78
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.025000000000000022,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.785,
+                    "y": 0.505
+                },
+                "secondPoint": {
+                    "x": 0.785,
+                    "y": 0.53
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                38,
+                78
+            ],
+            "message": "Minimum spacing violation",
+            "actual": 0.025000000000000022,
+            "required": 0.09,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.785,
+                    "y": 0.505
+                },
+                "secondPoint": {
+                    "x": 0.785,
+                    "y": 0.53
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "Enclosure",
+            "shapeIds": [
+                92,
+                19
+            ],
+            "message": "Enclosure violation",
+            "actual": 0.0,
+            "required": 0.1,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.575,
+                    "y": 0.965
+                },
+                "secondPoint": {
+                    "x": 0.575,
+                    "y": 0.965
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 0
+            }
+        },
+        {
+            "type": "Enclosure",
+            "shapeIds": [
+                93,
+                18
+            ],
+            "message": "Enclosure violation",
+            "actual": 0.0,
+            "required": 0.1,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.165,
+                    "y": 0.965
+                },
+                "secondPoint": {
+                    "x": 0.165,
+                    "y": 0.965
+                },
+                "firstEdgeIndex": 0,
+                "secondEdgeIndex": 0
+            }
+        }
+    ]
+}

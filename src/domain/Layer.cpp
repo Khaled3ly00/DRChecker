@@ -5,28 +5,78 @@
 namespace drcheck::domain {
 Layer layerFromString(const std::string& layerName)
 {
-    if (layerName == "Metal1") {
-        return Layer::Metal1;
+    if (layerName == "NW") {
+        return Layer::NW;
     }
 
-    if (layerName == "Metal2") {
-        return Layer::Metal2;
+    if (layerName == "NP") {
+        return Layer::NP;
     }
 
-    if (layerName == "Poly") {
-        return Layer::Poly;
+    if (layerName == "PP") {
+        return Layer::PP;
     }
 
-    if (layerName == "Diffusion") {
-        return Layer::Diffusion;
+    if (layerName == "M1") {
+        return Layer::M1;
     }
 
-    if (layerName == "Via12") {
-        return Layer::Via12;
+    if (layerName == "M1_PIN") {
+        return Layer::M1_PIN;
+    }
+
+    if (layerName == "M2") {
+        return Layer::M2;
+    }
+
+    if (layerName == "M2_PIN") {
+        return Layer::M2_PIN;
+    }
+
+    if (layerName == "PO") {
+        return Layer::PO;
+    }
+
+    if (layerName == "OD") {
+        return Layer::OD;
+    }
+
+    if (layerName == "CO") {
+        return Layer::CO;
+    }
+
+    if (layerName == "VIA1") {
+        return Layer::VIA1;
+    }
+
+    if (layerName == "PDK") {
+        return Layer::PDK;
+    }
+
+    if (layerName == "VTL_N") {
+        return Layer::VTL_N;
+    }
+
+    if (layerName == "VTL_P") {
+        return Layer::VTL_P;
     }
 
     throw std::invalid_argument(
         "Unknown layer: " + layerName
+    );
+}
+
+Purpose purposeFromString(const std::string& purposeName) {
+    if (purposeName == "drawing") {
+        return Purpose::Drawing;
+    }
+
+    if (purposeName == "pin") {
+        return Purpose::Pin;
+    }
+
+    throw std::invalid_argument(
+        "Unknown purpose: " + purposeName
     );
 }
 }

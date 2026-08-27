@@ -4,9 +4,11 @@
 
 DRCheck is a C++ Design Rule Checker for simplified IC layouts. The project focuses on modern C++, computational geometry, IC verification concepts, unit testing, spatial indexing, and evidence-based performance optimization.
 
-The current end-to-end application can:
+The current end-to-end application and integration tooling can:
 
-- load layout geometry from JSON and rule definitions from JSON or Tcl;
+- load purpose-tagged layout geometry from JSON and rule definitions from JSON or Tcl;
+- preserve source shape IDs and distinguish supported drawing and pin geometry;
+- export supported Cadence Virtuoso layout geometry to DRCheck JSON with optional hierarchy flattening;
 - translate parsed rule parameters into validated polymorphic rules through a central factory;
 - run the complete DRC/report workflow directly or from Tcl automation scripts;
 - run minimum-width, minimum-spacing, minimum-enclosure, and per-layer minimum/maximum density rules;
@@ -14,11 +16,12 @@ The current end-to-end application can:
 - report actual and required rule values;
 - attach optional point/edge or region-based witness geometry to violations;
 - write machine-readable JSON reports; and
-- render SVG layouts with highlighted violation geometry, including density regions.
+- render fitted SVG layouts with highlighted violation geometry, including density regions; and
+- provide interactive SVG layer visibility, violation filtering, hover details, and cursor-centered zoom.
 
 ## Current Status
 
-The geometry core, domain model, rule framework, centralized `RuleFactory`, JSON and Tcl rule-deck input paths, reusable `DRCRunner`, Tcl automation runner and commands, dual-mode CLI, SVG visualization, violation metadata, QuadTree optimization, reusable spatial-index architecture, density-rule pipeline, and cross-platform CI workflow are implemented and covered by tests.
+The geometry core, purpose-carrying shape model, expanded layer set, rule framework, centralized `RuleFactory`, JSON and Tcl rule-deck input paths, reusable `DRCRunner`, Tcl automation runner and commands, dual-mode CLI, interactive SVG visualization, violation metadata, QuadTree optimization, reusable spatial-index architecture, density-rule pipeline, and cross-platform CI workflow are implemented. The C++ behavior is covered by unit, integration, and end-to-end tests. A Cadence SKILL utility now provides the upstream Virtuoso-to-JSON bridge.
 
 `DRCEngine` builds one `LayerSpatialIndex` from the current shape collection and passes it to every rule. `MinSpacingRule`, `MinEnclosureRule`, and `DensityRule` reuse that index for layer-specific candidate discovery instead of building rule-local trees or scanning every possible shape.
 
@@ -31,40 +34,44 @@ Detailed benchmark methodology, results, and QuadTree tuning data have moved to 
 ## Architecture
 
 ```text
-layout.json                    rules.json / rules.tcl
-     |                                  |
-     v                                  v
-JSONLayoutParser         JSONRuleParser / TclRuleParser
-     |                                  |
-     |                           RuleParameters
-     |                                  |
-     |                                  v
-     |                            RuleFactory
-     |                                  |
-     +-----------> DRCEngine <-----------+
-                    |
-                    | builds once per run
-                    v
-           LayerSpatialIndex
-         one QuadTree per populated layer
-                    |
-                    | shared read-only access
-          +---------+----------+---------+
-          |         |          |         |
-          v         v          v         v
+Virtuoso layout
+     |
+     | scripts/virtuoso/layout_export.il
+     v
+layout.json                         rules.json / rules.tcl
+     |                                         |
+     v                                         v
+JSONLayoutParser                JSONRuleParser / TclRuleParser
+     |                                         |
+     |                                  RuleParameters
+     |                                         |
+     |                                         v
+     |                                   RuleFactory
+     |                                         |
+     +----------------> DRCEngine <-------------+
+                       |
+                       | builds once per run
+                       v
+               LayerSpatialIndex
+               one QuadTree per populated layer
+                       |
+                       | shared read-only access
+      +----------------+------------+-------------+
+      |                |            |             |
+      v                v            v             v
  MinWidthRule MinSpacingRule MinEnclosureRule DensityRule
-          |         |          |         |
-          +---------+----------+---------+
-                    |
+      |                |            |             |
+      +----------------+------------+-------------+
+                       |
           exact geometry and density checks
-                    |
-                    v
-          vector<Violation>
-                    |
-          +---------+---------+
-          |                   |
-          v                   v
-  JSONReportWriter      SVG visualization
+                       |
+                       v
+              vector<Violation>
+                       |
+             +---------+---------+
+             |                   |
+             v                   v
+     JSONReportWriter      SVG visualization
 ```
 
 The design keeps responsibilities separated:
@@ -72,11 +79,79 @@ The design keeps responsibilities separated:
 | Module | Responsibility |
 |---|---|
 | `geometry/` | Geometry primitives, predicates, measurements, and witness results |
-| `domain/` | Layers, shapes, violations, and violation markers |
+| `domain/` | Layers, purposes, shapes, violations, and violation markers |
 | `spatial/` | QuadTree storage and layer-aware candidate queries |
 | `rules/` | Rule-specific DRC semantics and centralized rule construction |
 | `engine/` | Shared-index construction, rule orchestration, and reusable end-to-end DRC execution |
-| `io/` | JSON layout parsing, JSON/Tcl rule-deck parsing, Tcl automation, parameter conversion, and report serialization |
+| `io/` | JSON layout parsing, JSON/Tcl rule-deck parsing, Tcl automation, parameter conversion, JSON reporting, and interactive SVG generation |
+| `scripts/virtuoso/` | Cadence SKILL integration for exporting layout geometry to DRCheck JSON |
+
+## Layout JSON, Layers, and Purposes
+
+`JSONLayoutParser` accepts layouts in micrometers and requires a top-level `units` field set to `"um"` plus a `shapes` array. Every shape must provide an integer `id`, a supported `layer`, a supported `purpose`, and polygon `vertices`:
+
+```json
+{
+  "units": "um",
+  "shapes": [
+    {
+      "id": 42,
+      "sourceType": "rect",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [0.0, 0.0],
+        [10.0, 0.0],
+        [10.0, 5.0],
+        [0.0, 5.0]
+      ]
+    }
+  ]
+}
+```
+
+The parser preserves each supplied ID instead of generating a replacement. Extra exporter metadata such as `source`, `library`, `cell`, `view`, `hierarchyDepth`, and per-shape `sourceType` can remain in the document; the checker consumes only the fields needed by its geometry model.
+
+The accepted layer strings are:
+
+| Category | Layers |
+|---|---|
+| Wells, implants, and threshold layers | `NW`, `NP`, `PP`, `PDK`, `VTL_N`, `VTL_P` |
+| Active, poly, and contact | `OD`, `PO`, `CO` |
+| Routing, pin routing, and via | `M1`, `M1_PIN`, `M2`, `M2_PIN`, `VIA1` |
+
+The accepted purposes are exactly `drawing` and `pin`, mapped to `Purpose::Drawing` and `Purpose::Pin`. `Shape` stores its ID, `Layer`, `Purpose`, and `Polygon`, so imported LPP information is not discarded. Pin routing can also remain independently addressable by rules through the explicit `M1_PIN` and `M2_PIN` layer values. Purpose itself is currently preserved domain metadata rather than a separate rule-deck filter.
+
+Unknown layer or purpose names, missing required shape fields, non-numeric vertices, unsupported units, and invalid polygons are rejected with exceptions rather than silently normalized.
+
+## Cadence Virtuoso Layout Export
+
+The repository includes `scripts/virtuoso/layout_export.il`, a SKILL utility that exports the active Virtuoso layout cellview into the JSON schema consumed by `JSONLayoutParser`.
+
+Load it inside Virtuoso and call `exportLayoutJson()` with an output path and hierarchy depth:
+
+```lisp
+load("/path/to/DRChecker/scripts/virtuoso/layout_export.il")
+
+; Top-level geometry only
+exportLayoutJson("/path/to/layout_top.json" 0)
+
+; Copy instances into a scratch cellview and flatten up to depth 32
+exportLayoutJson("/path/to/layout_flat.json" 32)
+```
+
+The exporter:
+
+- reads the currently edited layout cellview;
+- copies geometry into a temporary scratch cellview so the source layout is not flattened in place;
+- exports rectangles and polygons directly;
+- converts `path` and `pathSeg` objects to polygon vertices;
+- converts supported `1 x 1` standard vias into cut-layer rectangles;
+- skips text and label annotation objects;
+- assigns stable sequential IDs within the exported file; and
+- records the Virtuoso source, library, cell, view, requested hierarchy depth, micrometer units, source object type, layer, purpose, and vertices.
+
+A flatten depth of `0` exports only top-level shapes and vias. A positive depth copies and flattens instances to the requested level and warns when instances remain. The checked-in inverter material under `examples/inverter_example/` demonstrates top-level and flattened exports, Tcl rules, JSON reports, and interactive SVG output.
 
 ## Rule Construction and JSON Parsing
 
@@ -137,11 +212,11 @@ The factory rejects missing required parameters and unknown factory keys with `s
 The supported Tcl declarations mirror the four JSON rule families:
 
 ```tcl
-rule min_width -layer Metal1 -value 0.20
-rule min_spacing -layer Metal1 -value 0.25
-rule min_enclosure -inner Via12 -outer Metal1 -value 0.10
-rule density -layer Metal1 -limit minimum -value 0.30 -window_size 10 -window_step 5
-rule density -layer Metal2 -limit maximum -value 0.70 -window_size 20 -window_step 10 -region {0 0 100 100}
+rule min_width -layer M1 -value 0.20
+rule min_spacing -layer M1 -value 0.25
+rule min_enclosure -inner VIA1 -outer M1 -value 0.10
+rule density -layer M1 -limit minimum -value 0.30 -window_size 10 -window_step 5
+rule density -layer M2 -limit maximum -value 0.70 -window_size 20 -window_step 10 -region {0 0 100 100}
 ```
 
 Rule options are parsed as `-option value` pairs and stored by name, so their order does not affect the result. The parser rejects malformed pairs, duplicate options, missing required options, unexpected rule-specific options, unsupported rule types, invalid numeric values, and density limits other than `minimum` or `maximum`.
@@ -242,9 +317,9 @@ Tcl command exceptions are returned through the interpreter as command errors. I
 
 ```text
 LayerSpatialIndex
-├── Metal1 -> QuadTree
-├── Metal2 -> QuadTree
-└── Via12  -> QuadTree
+├── M1 -> QuadTree
+├── M2 -> QuadTree
+└── VIA1  -> QuadTree
 ```
 
 Construction follows two stages:
@@ -319,7 +394,7 @@ Detailed measurements preserve the geometry that produced them. `DistanceResult`
 
 ## Domain Model and Violation Reporting
 
-`Layer` identifies the IC layer associated with a shape. `Shape` combines a unique ID, a layer, and a polygon.
+`Layer` identifies the supported IC layer associated with a shape, while `Purpose` preserves whether the imported geometry is `Drawing` or `Pin`. `Shape` combines a unique ID, a layer, a purpose, and a polygon.
 
 A `Violation` records:
 
@@ -333,6 +408,40 @@ A `Violation` records:
 `ViolationMarker` supports two forms of violation geometry. Distance- and width-based rules can preserve two witness points and their polygon-edge indices, while window-based rules can preserve a region. `DensityRule` uses the region form to identify the exact window that violated its threshold.
 
 `JSONReportWriter` serializes marker data only when it is present. Point/edge markers retain their witness fields, and region markers emit the region bounds needed by downstream consumers. The SVG output highlights these regions directly on the rendered layout.
+
+## Interactive SVG Visualization
+
+`SVGReportWriter` renders the complete layout and any region-only violations into a fixed logical `1200 x 800` viewport. `SvgTransform` fits and centers the report while reserving space for its legend, preserves aspect ratio, and flips the layout Y axis into SVG coordinates. Report bounds include both shape geometry and region markers, so a density window outside the merged shape bounds is still visible.
+
+The renderer assigns a consistent fill and outline color to every supported layer:
+
+| Layers | Color |
+|---|---|
+| `NW` | cream |
+| `NP`, `VTL_P` | gray |
+| `PP` | magenta |
+| `M1`, `M1_PIN` | cyan |
+| `M2`, `M2_PIN` | gold |
+| `VIA1` | yellow |
+| `PO`, `VTL_N` | blue |
+| `OD` | red |
+| `CO` | green |
+| `PDK` | purple |
+
+`M1_PIN` and `M2_PIN` remain separate SVG layer and legend identities even though each currently shares its parent metal color. The renderer is layer-keyed: the stored `Purpose` value is not currently printed in the shape tooltip or exposed as a separate visibility control.
+
+Only layers that exist in the current layout appear in the legend. The legend also displays the total violation count and provides clickable per-layer controls plus `Hide All`/`Show All`. Hiding a layer hides its shapes and any shape-referenced violation associated with that layer, avoiding detached measurement markers when their geometry is not visible.
+
+Violation witness edges, measurement lines, witness points, and density regions remain highlighted in red. Their type and `actual/required` label is hidden until the user hovers over the violation, reducing clutter on dense layouts. Shapes provide an SVG tooltip with their source ID and layer.
+
+The generated SVG contains its own JavaScript and remains a standalone file:
+
+- mouse-wheel input zooms the internal `viewBox` around the cursor;
+- zoom is bounded between the full report and approximately `10x` magnification;
+- zooming back to the full extent restores the original view; and
+- pressing `F` resets the report immediately to its fitted full view.
+
+No server or external JavaScript dependency is required to use these interactions in an SVG-capable browser.
 
 ## Implemented Rules
 
@@ -370,7 +479,7 @@ For every inner-layer shape, the rule:
 3. measures boundary-to-boundary enclosure with `distanceTo(..., false)`; and
 4. reports insufficient enclosure or a missing containing outer shape.
 
-The current rule setup checks `Via12` enclosure against `Metal1` and `Metal2` independently through separate rule instances. Spatial filtering reduces candidate discovery work, while `contains()` remains necessary because a bounding-box match alone cannot prove polygon containment.
+The current rule setup checks `VIA1` enclosure against `M1` and `M2` independently through separate rule instances. Spatial filtering reduces candidate discovery work, while `contains()` remains necessary because a bounding-box match alone cannot prove polygon containment.
 
 ### `DensityRule`
 
@@ -455,6 +564,9 @@ drcheck/
 │   └── spatial/
 │       ├── LayerSpatialIndex.h
 │       └── QuadTree.h
+├── scripts/
+│   └── virtuoso/
+│       └── layout_export.il
 ├── src/
 │   ├── domain/
 │   │   ├── Layer.cpp
@@ -520,6 +632,7 @@ drcheck/
 │       └── QuadTreeTest.cpp
 ├── BENCHMARKS.md
 ├── CMakeLists.txt
+├── CMakePresets.json
 └── README.md
 ```
 
@@ -553,6 +666,8 @@ cmake -S . -B build
 cmake --build build --config Release
 ```
 
+`CMakePresets.json` also provides Ninja-based `x64-debug`, `x64-release`, `x86-debug`, `x86-release`, `linux-debug`, and `macos-debug` configure presets for supported host environments. The required compiler and Tcl development dependency must still be available to the selected preset.
+
 Configure without tests when required:
 
 ```bash
@@ -567,7 +682,7 @@ Run the full suite through CTest:
 ctest --test-dir build --output-on-failure
 ```
 
-The test suite covers geometry invariants and algorithms, JSON and Tcl parser validation, factory construction and validation, rule behavior, report serialization, SVG output, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end rule-deck processing. `RuleFactoryTest` verifies construction of every supported rule type, representative missing-parameter rejection, and unknown-type rejection. `JSONRuleParserTest` verifies the JSON parser-to-factory path for width, spacing, enclosure, minimum/maximum density, and density with an explicit analysis window. Density coverage also includes target-layer filtering, inferred analysis bounds, empty-layout behavior, partial edge windows, region markers, report integration, SVG highlighting, and execution through `DRCEngine` alongside existing rules.
+The test suite covers geometry invariants and algorithms, JSON and Tcl parser validation, factory construction and validation, rule behavior, report serialization, SVG output, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end rule-deck processing. Domain coverage now includes `Purpose` storage on `Shape`, while layout-parser coverage verifies caller-supplied shape IDs and the current layer vocabulary used by example layouts. The same layer and purpose migration is exercised throughout the engine, rule, spatial, report, benchmark-fixture, and end-to-end inputs. `RuleFactoryTest` verifies construction of every supported rule type, representative missing-parameter rejection, and unknown-type rejection. `JSONRuleParserTest` verifies the JSON parser-to-factory path for width, spacing, enclosure, minimum/maximum density, and density with an explicit analysis window. Density coverage also includes target-layer filtering, inferred analysis bounds, empty-layout behavior, partial edge windows, region markers, report integration, SVG highlighting, and execution through `DRCEngine` alongside existing rules.
 
 `TclRuleParserTest` covers all supported Tcl rule families, option-order independence, minimum and maximum density, optional density regions, and invalid-deck rejection. The end-to-end suite loads equivalent JSON and Tcl decks, runs each through `DRCEngine`, and compares rule counts, violation counts, violation types, participating shape IDs, and actual/required values.
 
@@ -678,6 +793,12 @@ The current implementation intentionally favors a clear, well-tested architectur
 - Spatial-index performance depends on geometry distribution and can degrade toward brute-force behavior in unfavorable layouts.
 - `DensityRule` uses a fixed, axis-aligned grid with one `windowSize` and `windowStep`; adaptive or multiscale density analysis is not implemented.
 - Automatic density analysis bounds require at least one layout shape; an explicit analysis region is required for an empty layout.
+- Layout JSON currently accepts only micrometer units, the enumerated layer names, and the exact `drawing` or `pin` purpose strings.
+- Rules and the spatial index select geometry by `Layer`; `Purpose` is preserved on `Shape` but is not yet an independent rule-deck selector. Pin geometry that must be checked separately therefore relies on explicit layer identities such as `M1_PIN` and `M2_PIN`.
+- The Virtuoso exporter supports `rect`, `polygon`, `path`, `pathSeg`, and `1 x 1` `stdVia` geometry. Other figure types and via arrays are skipped, and hierarchy remaining beyond the requested flatten depth is not serialized.
+- The Virtuoso exporter preserves the source PDK's layer and purpose strings. Exported names outside DRCheck's current layer/purpose vocabulary must be mapped or added before the JSON can be loaded.
+- The SVG viewer supports wheel zoom and full-view reset but does not yet provide click-drag panning.
+- SVG layer filtering associates violations through participating shape IDs. Region-only density violations do not carry shape IDs, so their highlighted regions are not currently tied to a layer toggle.
 - The CLI selects rule-deck parsers by the exact `.json` or `.tcl` extension; other extensions are rejected.
 - Tcl rule decks expose `rule`, while automation scripts expose only `drc_run` and `drc_error_count` as DRCheck-specific commands.
 - `drc_run` always writes its JSON report immediately and optionally writes SVG; deferred export is not implemented.
@@ -701,6 +822,9 @@ DRCheck is intended to demonstrate strong C++ design and EDA-oriented problem so
 - centralized, validated rule construction;
 - JSON and Tcl rule-deck front ends sharing the same factory and engine;
 - reusable end-to-end DRC execution shared by direct CLI and Tcl automation;
+- explicit layer/purpose preservation for EDA-originated geometry;
+- a practical Cadence Virtuoso-to-JSON integration path;
 - reusable spatial acceleration;
-- structured violation reporting; and
+- structured violation reporting;
+- interactive, standalone SVG inspection; and
 - performance claims backed by correctness-checked benchmarks.

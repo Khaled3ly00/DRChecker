@@ -1,0 +1,538 @@
+{
+  "source": "Cadence Virtuoso",
+  "library": "lab03",
+  "cell": "Div_1x_inverter",
+  "view": "layout",
+  "hierarchyDepth": 0,
+  "units": "um",
+  "shapes": [
+    {
+      "id": 1,
+      "sourceType": "path",
+      "layer": "OD",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.12, 1.945 ],
+        [ -0.12, 2.115 ],
+        [ 0.96, 2.115 ],
+        [ 0.96, 1.945 ]
+      ]
+    },
+    {
+      "id": 2,
+      "sourceType": "rect",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.785, 1.985 ],
+        [ 0.875, 1.985 ],
+        [ 0.875, 2.075 ],
+        [ 0.785, 2.075 ]
+      ]
+    },
+    {
+      "id": 3,
+      "sourceType": "rect",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.58, 1.985 ],
+        [ 0.67, 1.985 ],
+        [ 0.67, 2.075 ],
+        [ 0.58, 2.075 ]
+      ]
+    },
+    {
+      "id": 4,
+      "sourceType": "rect",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.375, 1.985 ],
+        [ 0.465, 1.985 ],
+        [ 0.465, 2.075 ],
+        [ 0.375, 2.075 ]
+      ]
+    },
+    {
+      "id": 5,
+      "sourceType": "rect",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.17, 1.985 ],
+        [ 0.26, 1.985 ],
+        [ 0.26, 2.075 ],
+        [ 0.17, 2.075 ]
+      ]
+    },
+    {
+      "id": 6,
+      "sourceType": "rect",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.035, 1.985 ],
+        [ 0.055, 1.985 ],
+        [ 0.055, 2.075 ],
+        [ -0.035, 2.075 ]
+      ]
+    },
+    {
+      "id": 7,
+      "sourceType": "path",
+      "layer": "NW",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.42, 1.645 ],
+        [ -0.42, 2.415 ],
+        [ 1.26, 2.415 ],
+        [ 1.26, 1.645 ]
+      ]
+    },
+    {
+      "id": 8,
+      "sourceType": "path",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.13, 1.935 ],
+        [ -0.13, 2.125 ],
+        [ 0.97, 2.125 ],
+        [ 0.97, 1.935 ]
+      ]
+    },
+    {
+      "id": 9,
+      "sourceType": "path",
+      "layer": "NP",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.25, 1.815 ],
+        [ -0.25, 2.245 ],
+        [ 1.09, 2.245 ],
+        [ 1.09, 1.815 ]
+      ]
+    },
+    {
+      "id": 10,
+      "sourceType": "path",
+      "layer": "OD",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.12, -0.085 ],
+        [ -0.12, 0.085 ],
+        [ 0.96, 0.085 ],
+        [ 0.96, -0.085 ]
+      ]
+    },
+    {
+      "id": 11,
+      "sourceType": "path",
+      "layer": "PP",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.25, -0.215 ],
+        [ -0.25, 0.215 ],
+        [ 1.09, 0.215 ],
+        [ 1.09, -0.215 ]
+      ]
+    },
+    {
+      "id": 12,
+      "sourceType": "rect",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.785, -0.045 ],
+        [ 0.875, -0.045 ],
+        [ 0.875, 0.045 ],
+        [ 0.785, 0.045 ]
+      ]
+    },
+    {
+      "id": 13,
+      "sourceType": "rect",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.58, -0.045 ],
+        [ 0.67, -0.045 ],
+        [ 0.67, 0.045 ],
+        [ 0.58, 0.045 ]
+      ]
+    },
+    {
+      "id": 14,
+      "sourceType": "rect",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.375, -0.045 ],
+        [ 0.465, -0.045 ],
+        [ 0.465, 0.045 ],
+        [ 0.375, 0.045 ]
+      ]
+    },
+    {
+      "id": 15,
+      "sourceType": "rect",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.17, -0.045 ],
+        [ 0.26, -0.045 ],
+        [ 0.26, 0.045 ],
+        [ 0.17, 0.045 ]
+      ]
+    },
+    {
+      "id": 16,
+      "sourceType": "rect",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.035, -0.045 ],
+        [ 0.055, -0.045 ],
+        [ 0.055, 0.045 ],
+        [ -0.035, 0.045 ]
+      ]
+    },
+    {
+      "id": 17,
+      "sourceType": "path",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.13, -0.095 ],
+        [ -0.13, 0.095 ],
+        [ 0.97, 0.095 ],
+        [ 0.97, -0.095 ]
+      ]
+    },
+    {
+      "id": 18,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.165, 0.725 ],
+        [ 0.165, 1.305 ],
+        [ 0.265, 1.305 ],
+        [ 0.265, 0.725 ]
+      ]
+    },
+    {
+      "id": 19,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.575, 0.925 ],
+        [ 0.575, 1.305 ],
+        [ 0.675, 1.305 ],
+        [ 0.675, 0.925 ]
+      ]
+    },
+    {
+      "id": 20,
+      "sourceType": "pathSeg",
+      "layer": "M2",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.125, 0.965 ],
+        [ 0.125, 1.065 ],
+        [ 0.715, 1.065 ],
+        [ 0.715, 0.965 ]
+      ]
+    },
+    {
+      "id": 21,
+      "sourceType": "pathSeg",
+      "layer": "PO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.185, 0.755 ],
+        [ 0.185, 0.815 ],
+        [ 0.245, 0.815 ],
+        [ 0.245, 0.755 ]
+      ]
+    },
+    {
+      "id": 22,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.37, 0.53 ],
+        [ 0.37, 1.5 ],
+        [ 0.47, 1.5 ],
+        [ 0.47, 0.53 ]
+      ]
+    },
+    {
+      "id": 23,
+      "sourceType": "rect",
+      "layer": "M1_PIN",
+      "purpose": "pin",
+      "vertices": [
+        [ 0.37, 0.965 ],
+        [ 0.47, 0.965 ],
+        [ 0.47, 1.065 ],
+        [ 0.37, 1.065 ]
+      ]
+    },
+    {
+      "id": 24,
+      "sourceType": "rect",
+      "layer": "M2_PIN",
+      "purpose": "pin",
+      "vertices": [
+        [ 0.125, 0.965 ],
+        [ 0.225, 0.965 ],
+        [ 0.225, 1.065 ],
+        [ 0.125, 1.065 ]
+      ]
+    },
+    {
+      "id": 25,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.78, 1.33 ],
+        [ 0.78, 2.125 ],
+        [ 0.88, 2.125 ],
+        [ 0.88, 1.33 ]
+      ]
+    },
+    {
+      "id": 26,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.78, 1.98 ],
+        [ 0.78, 2.08 ],
+        [ 0.87, 2.08 ],
+        [ 0.87, 1.98 ]
+      ]
+    },
+    {
+      "id": 27,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.04, 1.33 ],
+        [ -0.04, 2.125 ],
+        [ 0.06, 2.125 ],
+        [ 0.06, 1.33 ]
+      ]
+    },
+    {
+      "id": 28,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.04, 1.98 ],
+        [ -0.04, 2.08 ],
+        [ 0.05, 2.08 ],
+        [ 0.05, 1.98 ]
+      ]
+    },
+    {
+      "id": 29,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.78, 0.325 ],
+        [ 0.78, 0.705 ],
+        [ 0.88, 0.705 ],
+        [ 0.88, 0.325 ]
+      ]
+    },
+    {
+      "id": 30,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.78, 0.605 ],
+        [ 0.78, 0.705 ],
+        [ 0.87, 0.705 ],
+        [ 0.87, 0.605 ]
+      ]
+    },
+    {
+      "id": 31,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.04, -0.045 ],
+        [ -0.04, 0.705 ],
+        [ 0.06, 0.705 ],
+        [ 0.06, -0.045 ]
+      ]
+    },
+    {
+      "id": 32,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.04, 0.605 ],
+        [ -0.04, 0.705 ],
+        [ 0.05, 0.705 ],
+        [ 0.05, 0.605 ]
+      ]
+    },
+    {
+      "id": 33,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.04, 1.935 ],
+        [ -0.04, 2.125 ],
+        [ 0.88, 2.125 ],
+        [ 0.88, 1.935 ]
+      ]
+    },
+    {
+      "id": 34,
+      "sourceType": "rect",
+      "layer": "M1_PIN",
+      "purpose": "pin",
+      "vertices": [
+        [ -0.04, 1.935 ],
+        [ 0.15, 1.935 ],
+        [ 0.15, 2.125 ],
+        [ -0.04, 2.125 ]
+      ]
+    },
+    {
+      "id": 35,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ -0.04, -0.095 ],
+        [ -0.04, 0.095 ],
+        [ 0.88, 0.095 ],
+        [ 0.88, -0.095 ]
+      ]
+    },
+    {
+      "id": 36,
+      "sourceType": "rect",
+      "layer": "M1_PIN",
+      "purpose": "pin",
+      "vertices": [
+        [ -0.04, -0.095 ],
+        [ 0.15, -0.095 ],
+        [ 0.15, 0.095 ],
+        [ -0.04, 0.095 ]
+      ]
+    },
+    {
+      "id": 37,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.57, 0.325 ],
+        [ 0.57, 0.505 ],
+        [ 0.88, 0.505 ],
+        [ 0.88, 0.325 ]
+      ]
+    },
+    {
+      "id": 38,
+      "sourceType": "pathSeg",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.78, -0.045 ],
+        [ 0.78, 0.505 ],
+        [ 0.88, 0.505 ],
+        [ 0.88, -0.045 ]
+      ]
+    },
+    {
+      "id": 39,
+      "sourceType": "stdVia",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.17, 1.17 ],
+        [ 0.26, 1.17 ],
+        [ 0.26, 1.26 ],
+        [ 0.17, 1.26 ]
+      ]
+    },
+    {
+      "id": 40,
+      "sourceType": "stdVia",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.58, 1.17 ],
+        [ 0.67, 1.17 ],
+        [ 0.67, 1.26 ],
+        [ 0.58, 1.26 ]
+      ]
+    },
+    {
+      "id": 41,
+      "sourceType": "stdVia",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.17, 0.77 ],
+        [ 0.26, 0.77 ],
+        [ 0.26, 0.86 ],
+        [ 0.17, 0.86 ]
+      ]
+    },
+    {
+      "id": 42,
+      "sourceType": "stdVia",
+      "layer": "CO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.58, 0.37 ],
+        [ 0.67, 0.37 ],
+        [ 0.67, 0.46 ],
+        [ 0.58, 0.46 ]
+      ]
+    },
+    {
+      "id": 43,
+      "sourceType": "stdVia",
+      "layer": "VIA1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.575, 0.965 ],
+        [ 0.675, 0.965 ],
+        [ 0.675, 1.065 ],
+        [ 0.575, 1.065 ]
+      ]
+    },
+    {
+      "id": 44,
+      "sourceType": "stdVia",
+      "layer": "VIA1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.165, 0.965 ],
+        [ 0.265, 0.965 ],
+        [ 0.265, 1.065 ],
+        [ 0.165, 1.065 ]
+      ]
+    }
+  ]
+}

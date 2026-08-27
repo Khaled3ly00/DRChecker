@@ -13,6 +13,7 @@ using drcheck::domain::Violation;
 using drcheck::domain::ViolationType;
 using drcheck::domain::ViolationMarker;
 using drcheck::domain::Shape;
+using drcheck::domain::Purpose;
 using drcheck::domain::Layer;
 using drcheck::geometry::Point;
 using drcheck::geometry::Polygon;
@@ -29,7 +30,7 @@ TEST(SVGReportWriterTest, WritesPolygonToSVG)
         Point(0, 5)
         });
 
-    Shape shape(1, Layer::Metal1, std::move(polygon));
+    Shape shape(1, Layer::M1, Purpose::Drawing, std::move(polygon));
 
     const std::vector<Shape> shapes{shape};
     const std::vector<Violation> violations;
@@ -47,8 +48,8 @@ TEST(SVGReportWriterTest, WritesPolygonToSVG)
     EXPECT_NE(content.find("<svg"), std::string::npos);
     EXPECT_NE(content.find("<polygon"), std::string::npos);
     EXPECT_NE(content.find("</svg>"), std::string::npos);
-    EXPECT_NE(content.find("fill=\"turquoise\""), std::string::npos);
-    EXPECT_NE(content.find("stroke=\"darkturquoise\""), std::string::npos);
+    EXPECT_NE(content.find("fill=\"cyan\""), std::string::npos);
+    EXPECT_NE(content.find("stroke=\"cyan\""), std::string::npos);
     EXPECT_NE(content.find("fill-opacity=\"0.35\""), std::string::npos);
     // Check for shape ID
     EXPECT_NE(content.find("<text"), std::string::npos);
@@ -67,7 +68,7 @@ TEST(SVGReportWriterTest, WritesViolationToSVG)
     Point(0, 5)
         });
 
-    Shape shape(1, Layer::Metal1, std::move(polygon));
+    Shape shape(1, Layer::M1, Purpose::Drawing, std::move(polygon));
     ViolationMarker marker{Point(4, 2), Point(7, 2), 1, 3};
     Violation violation(ViolationType::MinSpacing,{ 1, 2 }, "Minimum spacing violation", 3.0, 4.0, marker);
 

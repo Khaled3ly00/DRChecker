@@ -1,7 +1,10 @@
 {
+  "units": "um",
   "shapes": [
     {
-      "layer": "Metal1",
+      "id": 1,
+      "layer": "M1",
+      "purpose": "drawing",
       "vertices": [
         [ 0, 0 ],
         [ 10, 0 ],
@@ -10,7 +13,9 @@
       ]
     },
     {
-      "layer": "Metal2",
+      "id": 2,
+      "layer": "M2",
+      "purpose": "drawing",
       "vertices": [
         [ 0, 0 ],
         [ 10, 0 ],
@@ -19,7 +24,9 @@
       ]
     },
     {
-      "layer": "Poly",
+      "id": 3,
+      "layer": "PO",
+      "purpose": "drawing",
       "vertices": [
         [ 0, 0 ],
         [ 10, 0 ],
@@ -28,7 +35,9 @@
       ]
     },
     {
-      "layer": "Diffusion",
+      "id": 4,
+      "layer": "OD",
+      "purpose": "drawing",
       "vertices": [
         [ 0, 0 ],
         [ 10, 0 ],
@@ -37,7 +46,9 @@
       ]
     },
     {
-      "layer": "Via12",
+      "id": 5,
+      "layer": "VIA1",
+      "purpose": "drawing",
       "vertices": [
         [ 0, 0 ],
         [ 10, 0 ],

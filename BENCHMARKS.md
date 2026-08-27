@@ -182,11 +182,11 @@ The primary metric is the number of calls to `Polygon::contains()`, because cont
 
 ### Synthetic layout
 
-Each grid cell contains one `Via12` polygon and one surrounding `Metal1` polygon:
+Each grid cell contains one `VIA1` polygon and one surrounding `M1` polygon:
 
 ```text
-Metal1: 8 x 8
-Via12:  4 x 4
+M1: 8 x 8
+VIA1:  4 x 4
 Actual enclosure: 2
 Required enclosure: 3
 Cell gap: 10
@@ -197,7 +197,7 @@ Every via is therefore contained by one metal polygon but violates the minimum-e
 Shapes are generated in interleaved order:
 
 ```text
-Metal0, Via0, Metal1, Via1, ...
+Metal0, Via0, M1, Via1, ...
 ```
 
 That ordering explains the brute-force containment counts. The first via finds its metal after one outer-layer check, the second after two, and so on:
@@ -210,16 +210,16 @@ That ordering explains the brute-force containment counts. The first via finds i
 
 ```text
 Brute force
-for each Via12
-    scan Metal1 shapes in order
+for each VIA1
+    scan M1 shapes in order
     call Polygon::contains()
     on the containing metal:
         call distanceTo(..., false)
 
 Spatial
 build LayerSpatialIndex once
-for each Via12
-    query Metal1 with the via bounding box
+for each VIA1
+    query M1 with the via bounding box
     call Polygon::contains() on returned candidates
     on the containing metal:
         call distanceTo(..., false)

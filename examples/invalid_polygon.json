@@ -1,7 +1,10 @@
 {
+  "units": "um",
   "shapes": [
     {
-      "layer": "Metal1",
+      "id": 1,
+      "layer": "M1",
+      "purpose": "drawing",
       "vertices": [
         [ 0, 0 ],
         [ 10, 10 ],

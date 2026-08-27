@@ -4,7 +4,7 @@
         {
             "type": "MinWidth",
             "shapeIds": [
-                0
+                1
             ],
             "message": "Minimum width violation: required ",
             "actual": 2.0,

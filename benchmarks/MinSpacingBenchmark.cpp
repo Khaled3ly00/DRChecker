@@ -26,6 +26,7 @@ struct BenchmarkResult
 std::vector<drcheck::domain::Shape> generateGrid(std::size_t count, double width, double height, double gap)
 {
     using drcheck::domain::Layer;
+    using drcheck::domain::Purpose;
     using drcheck::domain::Shape;
     using drcheck::geometry::Point;
     using drcheck::geometry::Polygon;
@@ -53,7 +54,7 @@ std::vector<drcheck::domain::Shape> generateGrid(std::size_t count, double width
             Point(x, y + height)
             });
 
-        shapes.emplace_back(i, Layer::Metal1, std::move(polygon));
+        shapes.emplace_back(i, Layer::M1, Purpose::Drawing, std::move(polygon));
     }
 
     return shapes;
@@ -69,14 +70,14 @@ BenchmarkResult runBruteForce(const std::vector<drcheck::domain::Shape>& shapes,
 
     for (std::size_t i = 0; i < shapes.size(); ++i)
     {
-        if (shapes[i].getLayer() != domain::Layer::Metal1)
+        if (shapes[i].getLayer() != domain::Layer::M1)
         {
             continue;
         }
 
         for (std::size_t j = i + 1; j < shapes.size(); ++j)
         {
-            if (shapes[j].getLayer() != domain::Layer::Metal1)
+            if (shapes[j].getLayer() != domain::Layer::M1)
             {
                 continue;
             }
@@ -111,7 +112,7 @@ BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, d
 
     for (const domain::Shape& shape : shapes)
     {
-        if (shape.getLayer() == domain::Layer::Metal1)
+        if (shape.getLayer() == domain::Layer::M1)
         {
             firstShape = &shape;
             break;
@@ -126,7 +127,7 @@ BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, d
 
     for (const domain::Shape& shape : shapes)
     {
-        if (shape.getLayer() != domain::Layer::Metal1)
+        if (shape.getLayer() != domain::Layer::M1)
         {
             continue;
         }
@@ -138,7 +139,7 @@ BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, d
 
     for (const domain::Shape& shape : shapes)
     {
-        if (shape.getLayer() == domain::Layer::Metal1)
+        if (shape.getLayer() == domain::Layer::M1)
         {
             tree.insert(shape);
         }
@@ -146,7 +147,7 @@ BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, d
 
     for (const domain::Shape& shape : shapes)
     {
-        if (shape.getLayer() != domain::Layer::Metal1)
+        if (shape.getLayer() != domain::Layer::M1)
         {
             continue;
         }

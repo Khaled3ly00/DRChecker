@@ -7,66 +7,121 @@
 #include <nlohmann/json.hpp>
 
 namespace drcheck::io {
-std::vector<domain::Shape> JSONLayoutParser::load(const std::string& filePath) {
-    std::ifstream input(filePath);
 
-    if (!input) {
-        throw std::runtime_error("Unable to open layout file: " + filePath);
-    }
-
-    nlohmann::json json;
-    input >> json;
-
-    // Array shapes must exist in JSON File
-    if (!json.contains("shapes") || !json["shapes"].is_array())
+    std::vector<domain::Shape> JSONLayoutParser::load(const std::string& filePath)
     {
-        throw std::invalid_argument("Layout must contain a shapes array");
-    }
+        std::ifstream input(filePath);
 
-    std::vector<domain::Shape> shapes;
-    shapes.reserve(json["shapes"].size());
-
-    // Create unique ID for each imported shape
-    std::size_t id = 0;
-
-    // For loop to extract each shape from JSON File
-    for (const auto& shapeJson : json["shapes"])
-    {
-        if (!shapeJson.is_object()) {
-            throw std::invalid_argument("Each shape must be a JSON object");
-        }
-        // Extracting Layer as string then calling parseLayer
-        const domain::Layer layer = domain::layerFromString(shapeJson.at("layer").get<std::string>());
-
-        // Extracting Vertices
-        std::vector<geometry::Point> vertices;
-        const auto& verticesJson = shapeJson.at("vertices");
-        vertices.reserve(verticesJson.size());
-
-        // Is the extracted data an array?
-        if (!verticesJson.is_array()) {
-            throw std::invalid_argument("vertices must be an array");
-        }
-        // Loop through vertices array
-        for (const auto& vertexJson : verticesJson)
+        if (!input)
         {
-            // Each element of vertices must be an array with size = 2 (x, y)
-            if (!vertexJson.is_array() || vertexJson.size() != 2)
-            {
-                throw std::invalid_argument(
-                    "Vertex must be [x, y]"
-                );
-            }
-            vertices.emplace_back(vertexJson[0].get<double>(), vertexJson[1].get<double>());
+            throw std::runtime_error("Unable to open layout file: " + filePath);
         }
-        
-        // Create Polygon using Extracted Vertices
-        geometry::Polygon polygon(std::move(vertices));
 
-        // Create Shape
-        shapes.emplace_back(id, layer, std::move(polygon));
-        ++id;
+        nlohmann::json json;
+        input >> json;
+
+        if (!json.contains("units"))
+        {
+            throw std::invalid_argument("Layout must contain a units field");
+        }
+
+        if (!json["units"].is_string())
+        {
+            throw std::invalid_argument("Layout units must be a string");
+        }
+
+        if (json["units"].get<std::string>() != "um")
+        {
+            throw std::invalid_argument("Unsupported layout units. Expected \"um\"");
+        }
+
+        if (!json.contains("shapes") || !json["shapes"].is_array())
+        {
+            throw std::invalid_argument("Layout must contain a shapes array");
+        }
+
+        std::vector<domain::Shape> shapes;
+        shapes.reserve(json["shapes"].size());
+
+        for (const auto& shapeJson : json["shapes"])
+        {
+            if (!shapeJson.is_object())
+            {
+                throw std::invalid_argument("Each shape must be a JSON object");
+            }
+
+            if (!shapeJson.contains("id"))
+            {
+                throw std::invalid_argument("Shape is missing required field: id");
+            }
+
+            if (!shapeJson.contains("layer"))
+            {
+                throw std::invalid_argument("Shape is missing required field: layer");
+            }
+
+            if (!shapeJson.contains("purpose"))
+            {
+                throw std::invalid_argument("Shape is missing required field: purpose");
+            }
+
+            if (!shapeJson.contains("vertices"))
+            {
+                throw std::invalid_argument("Shape is missing required field: vertices");
+            }
+
+            if (!shapeJson["id"].is_number_unsigned() && !shapeJson["id"].is_number_integer())
+            {
+                throw std::invalid_argument("Shape id must be an integer");
+            }
+
+            const std::size_t id = shapeJson["id"].get<std::size_t>();
+
+            if (!shapeJson["layer"].is_string())
+            {
+                throw std::invalid_argument("Shape layer must be a string");
+            }
+
+            if (!shapeJson["purpose"].is_string())
+            {
+                throw std::invalid_argument("Shape purpose must be a string");
+            }
+
+            const domain::Layer layer = domain::layerFromString(shapeJson["layer"].get<std::string>());
+
+            const domain::Purpose purpose = domain::purposeFromString(shapeJson["purpose"].get<std::string>());
+
+            const auto& verticesJson = shapeJson["vertices"];
+
+            if (!verticesJson.is_array())
+            {
+                throw std::invalid_argument("vertices must be an array");
+            }
+
+            std::vector<geometry::Point> vertices;
+            vertices.reserve(verticesJson.size());
+
+            for (const auto& vertexJson : verticesJson)
+            {
+                if (!vertexJson.is_array() || vertexJson.size() != 2)
+                {
+                    throw std::invalid_argument("Vertex must be [x, y]");
+                }
+
+                if (!vertexJson[0].is_number() || !vertexJson[1].is_number())
+                {
+                    throw std::invalid_argument("Vertex coordinates must be numbers");
+                }
+
+                vertices.emplace_back(vertexJson[0].get<double>(), vertexJson[1].get<double>());
+            }
+
+            geometry::Polygon polygon(std::move(vertices));
+
+            shapes.emplace_back(id, layer, purpose, std::move(polygon));
+        }
+
+        return shapes;
     }
-    return shapes;
-}
+
 }

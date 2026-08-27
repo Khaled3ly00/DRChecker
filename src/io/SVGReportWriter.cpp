@@ -3,20 +3,123 @@
 #include <fstream>
 #include <stdexcept>
 #include <optional>
+#include <algorithm>
 
 namespace drcheck::io {
     namespace {
 
-        constexpr double SVG_SCALE = 20.0;
-        constexpr double SVG_PADDING = 20.0;
+        constexpr double SVG_WIDTH = 1200.0;
+        constexpr double SVG_HEIGHT = 800.0;
+        constexpr double SVG_PADDING = 40.0;
 
-        constexpr double SHAPE_STROKE_WIDTH = 1.0;
-        constexpr double VIOLATION_EDGE_WIDTH = 2.0;
+        constexpr double SHAPE_STROKE_WIDTH = 2.0;
+        constexpr double VIOLATION_EDGE_WIDTH = 3.0;
         constexpr double VIOLATION_MARKER_WIDTH = 2.0;
-        constexpr double VIOLATION_POINT_RADIUS = 2.5;
+        constexpr double VIOLATION_POINT_RADIUS = 4.0;
 
-        constexpr double SHAPE_ID_FONT_SIZE = 4.0;
-        constexpr double VIOLATION_LABEL_FONT_SIZE = 6.0;
+        constexpr double VIOLATION_LABEL_FONT_SIZE = 14.0;
+
+        constexpr double LEGEND_WIDTH = 170.0;
+        constexpr double LEGEND_ITEM_HEIGHT = 30.0;
+        constexpr double LEGEND_COLOR_SIZE = 18.0;
+        constexpr double LEGEND_FONT_SIZE = 14.0;
+
+        // Converts layout coordinates to SVG coordinates while fitting the
+        // complete report inside a fixed SVG viewport.
+        class SvgTransform
+        {
+        public:
+            explicit SvgTransform(const geometry::BoundingBox& bounds)
+                : bounds(bounds)
+            {
+                const double layoutWidth = bounds.getMaxX() - bounds.getMinX();
+                const double layoutHeight = bounds.getMaxY() - bounds.getMinY();
+                const double availableWidth = SVG_WIDTH - 2.0 * SVG_PADDING - LEGEND_WIDTH;
+                const double availableHeight = SVG_HEIGHT - 2.0 * SVG_PADDING;
+                scale = std::min(availableWidth / layoutWidth, availableHeight / layoutHeight);
+
+                const double scaledWidth = layoutWidth * scale;
+                const double scaledHeight = layoutHeight * scale;
+
+                // Center the layout inside the viewport.
+                offsetX = SVG_PADDING + (availableWidth - scaledWidth) / 2.0;
+                offsetY = SVG_PADDING + (availableHeight - scaledHeight) / 2.0;
+            }
+
+            double toSvgX(double layoutX) const
+            {
+                return (layoutX - bounds.getMinX()) * scale + offsetX;
+            }
+
+            double toSvgY(double layoutY) const
+            {
+                // SVG Y increases downward, so the layout Y axis is flipped.
+                return (bounds.getMaxY() - layoutY) * scale + offsetY;
+            }
+
+            double scaleLength(double length) const
+            {
+                return length * scale;
+            }
+
+        private:
+            geometry::BoundingBox bounds;
+
+            double scale;
+            double offsetX;
+            double offsetY;
+        };
+
+        std::string layerToString(domain::Layer layer)
+        {
+            switch (layer)
+            {
+            case domain::Layer::NW:
+                return "NW";
+
+            case domain::Layer::NP:
+                return "NP";
+
+            case domain::Layer::PP:
+                return "PP";
+
+            case domain::Layer::M1:
+                return "M1";
+
+            case domain::Layer::M1_PIN:
+                return "M1_PIN";
+
+            case domain::Layer::M2:
+                return "M2";
+
+            case domain::Layer::M2_PIN:
+                return "M2_PIN";
+
+            case domain::Layer::VIA1:
+                return "VIA1";
+
+            case domain::Layer::PO:
+                return "PO";
+
+            case domain::Layer::OD:
+                return "OD";
+
+            case domain::Layer::CO:
+                return "CO";
+
+            case domain::Layer::PDK:
+                return "PDK";
+
+            case domain::Layer::VTL_N:
+                return "VTL_N";
+
+            case domain::Layer::VTL_P:
+                return "VTL_P";
+            }
+
+
+            return "Unknown";
+        }
 
         // Return bounding box that contains both layout shapes and violation regions.
         std::optional<geometry::BoundingBox> calculateReportBounds(const std::vector<domain::Shape>& shapes, const std::vector<domain::Violation>& violations)
@@ -64,36 +167,51 @@ namespace drcheck::io {
             return bounds;
         }
 
-        // Converts Layout X coordinate to SVG X coordinate.
-        double toSvgX(double layoutX, const geometry::BoundingBox& bounds)
-        {
-            return (layoutX - bounds.getMinX()) * SVG_SCALE + SVG_PADDING;
-        }
-
-        // Converts Layout Y coordinate to SVG Y coordinate.
-        double toSvgY(double layoutY, const geometry::BoundingBox& bounds)
-        {
-            return (bounds.getMaxY() - layoutY) * SVG_SCALE + SVG_PADDING;
-        }
-
         std::string layerFillColor(domain::Layer layer)
         {
             switch (layer)
             {
-            case domain::Layer::Metal1:
-                return "turquoise";
+            case domain::Layer::NW:
+                return "cream";
 
-            case domain::Layer::Metal2:
+            case domain::Layer::NP:
+                return "gray";
+
+            case domain::Layer::PP:
+                return "magenta";
+
+            case domain::Layer::M1:
+                return "cyan";
+
+            case domain::Layer::M1_PIN:
+                return "cyan";
+
+            case domain::Layer::M2:
                 return "gold";
 
-            case domain::Layer::Via12:
+            case domain::Layer::M2_PIN:
+                return "gold";
+
+            case domain::Layer::VIA1:
                 return "yellow";
 
-            case domain::Layer::Poly:
+            case domain::Layer::PO:
                 return "blue";
 
-            case domain::Layer::Diffusion:
-                return "crimson";
+            case domain::Layer::OD:
+                return "red";
+
+            case domain::Layer::CO:
+                return "green";
+
+            case domain::Layer::PDK:
+                return "purple";
+
+            case domain::Layer::VTL_N:
+                return "blue";
+
+            case domain::Layer::VTL_P:
+                return "gray";
             }
 
             return "lightgray";
@@ -103,31 +221,65 @@ namespace drcheck::io {
         {
             switch (layer)
             {
-            case domain::Layer::Metal1:
-                return "darkturquoise";
+            case domain::Layer::NW:
+                return "cream";
 
-            case domain::Layer::Metal2:
-                return "goldenrod";
+            case domain::Layer::NP:
+                return "gray";
 
-            case domain::Layer::Via12:
-                return "khaki";
+            case domain::Layer::PP:
+                return "magenta";
 
-            case domain::Layer::Poly:
-                return "navy";
+            case domain::Layer::M1:
+                return "cyan";
 
-            case domain::Layer::Diffusion:
+            case domain::Layer::M1_PIN:
+                return "cyan";
+
+            case domain::Layer::M2:
+                return "gold";
+
+            case domain::Layer::M2_PIN:
+                return "gold";
+
+            case domain::Layer::VIA1:
+                return "yellow";
+
+            case domain::Layer::PO:
+                return "blue";
+
+            case domain::Layer::OD:
                 return "red";
+
+            case domain::Layer::CO:
+                return "green";
+
+            case domain::Layer::PDK:
+                return "purple";
+
+            case domain::Layer::VTL_N:
+                return "blue";
+
+            case domain::Layer::VTL_P:
+                return "gray";
             }
 
             return "black";
         }
 
-        void writeHighlightedEdge(std::ofstream& output, const geometry::Segment& edge, const geometry::BoundingBox& bounds)
+        void writeHighlightedEdge(std::ofstream& output, const geometry::Segment& edge, const SvgTransform& transform)
         {
-            const double x1 = toSvgX(edge.getStart().getX(), bounds);
-            const double y1 = toSvgY(edge.getStart().getY(), bounds);
-            const double x2 = toSvgX(edge.getEnd().getX(), bounds);
-            const double y2 = toSvgY(edge.getEnd().getY(), bounds);
+            const double x1 =
+                transform.toSvgX(edge.getStart().getX());
+
+            const double y1 =
+                transform.toSvgY(edge.getStart().getY());
+
+            const double x2 =
+                transform.toSvgX(edge.getEnd().getX());
+
+            const double y2 =
+                transform.toSvgY(edge.getEnd().getY());
 
             output
                 << "    <line "
@@ -157,7 +309,54 @@ namespace drcheck::io {
             return nullptr;
         }
 
-        void writeViolationEdges(std::ofstream& output, const domain::Violation& violation, const std::vector<domain::Shape>& shapes, const geometry::BoundingBox& bounds)
+        std::string getViolationLayerClasses(const domain::Violation& violation, const std::vector<domain::Shape>& shapes)
+        {
+            std::vector<std::string> classes;
+
+            for (std::size_t shapeId : violation.getShapeIds())
+            {
+                const domain::Shape* shape = findShapeById(shapes, shapeId);
+
+                if (shape == nullptr)
+                {
+                    continue;
+                }
+
+                const std::string className = "layer-" + layerToString(shape->getLayer());
+
+                bool alreadyExists = false;
+
+                for (const auto& existingClass : classes)
+                {
+                    if (existingClass == className)
+                    {
+                        alreadyExists = true;
+                        break;
+                    }
+                }
+
+                if (!alreadyExists)
+                {
+                    classes.push_back(className);
+                }
+            }
+
+            std::string result;
+
+            for (std::size_t i = 0; i < classes.size(); ++i)
+            {
+                if (i > 0)
+                {
+                    result += " ";
+                }
+
+                result += classes[i];
+            }
+
+            return result;
+        }
+
+        void writeViolationEdges(std::ofstream& output, const domain::Violation& violation, const std::vector<domain::Shape>& shapes, const SvgTransform& transform)
         {
             if (!violation.getMarker().has_value())
             {
@@ -187,7 +386,8 @@ namespace drcheck::io {
 
                 if (edgeIndex < firstShapeEdges.size())
                 {
-                    writeHighlightedEdge(output, firstShapeEdges[edgeIndex], bounds);
+                    writeHighlightedEdge(output, firstShapeEdges[edgeIndex], transform
+                    );
                 }
             }
 
@@ -201,7 +401,7 @@ namespace drcheck::io {
 
                     if (edgeIndex < firstShapeEdges.size())
                     {
-                        writeHighlightedEdge(output, firstShapeEdges[edgeIndex], bounds);
+                        writeHighlightedEdge(output, firstShapeEdges[edgeIndex], transform);
                     }
                 }
 
@@ -224,18 +424,33 @@ namespace drcheck::io {
 
                 if (edgeIndex < secondShapeEdges.size())
                 {
-                    writeHighlightedEdge(output, secondShapeEdges[edgeIndex], bounds);
+                    writeHighlightedEdge(output, secondShapeEdges[edgeIndex], transform);
                 }
             }
         }
 
-        void writePolygon(std::ofstream& output, const domain::Shape& shape, const geometry::BoundingBox& bounds)
+        void writePolygon(std::ofstream& output, const domain::Shape& shape, const SvgTransform& transform)
         {
+            output
+                << "  <g class=\"shape layer-"
+                << layerToString(shape.getLayer())
+                << "\">\n";
+
+            output
+                << "    <title>"
+                << "Shape ID: " << shape.getId()
+                << "&#10;Layer: " << layerToString(shape.getLayer())
+                << "</title>\n";
+
             output << "  <polygon points=\"";
 
             for (const auto& point : shape.getPolygon().getVertices())
             {
-                output << toSvgX(point.getX(), bounds) << "," << toSvgY(point.getY(), bounds) << " ";
+                output
+                    << transform.toSvgX(point.getX())
+                    << ","
+                    << transform.toSvgY(point.getY())
+                    << " ";
             }
 
             output
@@ -251,28 +466,11 @@ namespace drcheck::io {
                 << SHAPE_STROKE_WIDTH
                 << "\""
                 << " />\n";
+
+            output << "  </g>\n";
         }
 
-        void writeShapeId(std::ofstream& output, const domain::Shape& shape, const geometry::BoundingBox& bounds)
-        {
-            const auto shapeBounds = shape.getPolygon().getBoundingBox();
-
-            const double x = toSvgX(shapeBounds.getMinX(), bounds) + 2.0;
-            const double y = toSvgY(shapeBounds.getMaxY(), bounds) + 10.0;
-
-            output
-                << "  <text "
-                << "x=\"" << x << "\" "
-                << "y=\"" << y << "\" "
-                << "font-size=\""
-                << SHAPE_ID_FONT_SIZE
-                << "\" "
-                << "fill=\"black\">"
-                << shape.getId()
-                << "</text>\n";
-        }
-
-        void writeViolationMarker(std::ofstream& output, const domain::Violation& violation, const geometry::BoundingBox& bounds)
+        void writeViolationMarker(std::ofstream& output, const domain::Violation& violation, const SvgTransform& transform)
         {
             if (!violation.getMarker().has_value())
             {
@@ -289,10 +487,10 @@ namespace drcheck::io {
             const geometry::Point& firstPoint = marker.firstPoint.value();
             const geometry::Point& secondPoint = marker.secondPoint.value();
 
-            const double x1 = toSvgX(firstPoint.getX(), bounds);
-            const double y1 = toSvgY(firstPoint.getY(), bounds);
-            const double x2 = toSvgX(secondPoint.getX(), bounds);
-            const double y2 = toSvgY(secondPoint.getY(), bounds);
+            const double x1 = transform.toSvgX(firstPoint.getX());
+            const double y1 = transform.toSvgY(firstPoint.getY());
+            const double x2 = transform.toSvgX(secondPoint.getX());
+            const double y2 = transform.toSvgY(secondPoint.getY());
 
             output << "  <g>\n";
 
@@ -341,7 +539,9 @@ namespace drcheck::io {
                 << "    <text "
                 << "class=\"violation-label\" "
                 << "x=\"" << midpointX << "\" "
-                << "y=\"" << midpointY - 1.0 << "\" "
+                << "y=\""
+                << midpointY - VIOLATION_LABEL_FONT_SIZE / 2.0
+                << "\" "
                 << "font-size=\""
                 << VIOLATION_LABEL_FONT_SIZE
                 << "\" "
@@ -357,7 +557,10 @@ namespace drcheck::io {
             output << "  </g>\n";
         }
 
-        void writeViolationRegion(std::ofstream& output, const domain::Violation& violation, const geometry::BoundingBox& bounds)
+        void writeViolationRegion(
+            std::ofstream& output,
+            const domain::Violation& violation,
+            const SvgTransform& transform)
         {
             if (!violation.getMarker().has_value())
             {
@@ -372,11 +575,11 @@ namespace drcheck::io {
             }
 
             const auto& region = marker.region.value();
-
-            const double x = toSvgX(region.getMinX(), bounds);
-            const double y = toSvgY(region.getMaxY(), bounds);
-            const double width = (region.getMaxX() - region.getMinX()) * SVG_SCALE;
-            const double height = (region.getMaxY() - region.getMinY()) * SVG_SCALE;
+            const double x = transform.toSvgX(region.getMinX());
+            const double y = transform.toSvgY(region.getMaxY());
+            const double width = transform.scaleLength(region.getMaxX() - region.getMinX());
+            const double height = transform.scaleLength(region.getMaxY() - region.getMinY()
+                );
 
             output << "  <g>\n";
 
@@ -396,7 +599,8 @@ namespace drcheck::io {
                 << "/>\n";
 
             const double labelX = x + width / 2.0;
-            const double labelY = y + VIOLATION_LABEL_FONT_SIZE + 2.0;
+
+            const double labelY = y + VIOLATION_LABEL_FONT_SIZE + 4.0;
 
             output
                 << "    <text "
@@ -419,6 +623,116 @@ namespace drcheck::io {
         }
 
     }
+    void writeLegendItem(std::ofstream& output, domain::Layer layer, double x, double y)
+    {
+        const std::string className = "layer-" + layerToString(layer);
+
+        output
+            << "    <g "
+            << "class=\"legend-item\" "
+            << "data-layer=\"" << className << "\" "
+            << "onclick=\"toggleLayer(this)\" "
+            << "style=\"cursor: pointer;\">\n";
+
+        output
+            << "    <rect "
+            << "x=\"" << x << "\" "
+            << "y=\"" << y << "\" "
+            << "width=\"" << LEGEND_COLOR_SIZE << "\" "
+            << "height=\"" << LEGEND_COLOR_SIZE << "\" "
+            << "fill=\"" << layerFillColor(layer) << "\" "
+            << "fill-opacity=\"0.35\" "
+            << "stroke=\"" << layerStrokeColor(layer) << "\" "
+            << "stroke-width=\"2\""
+            << " />\n";
+
+output
+    << "      <text "
+    << "class=\"legend-label\" "
+    << "x=\"" << x + LEGEND_COLOR_SIZE + 10.0 << "\" "
+    << "y=\"" << y + LEGEND_COLOR_SIZE - 3.0 << "\" "
+    << "font-size=\"" << LEGEND_FONT_SIZE << "\" "
+    << "fill=\"black\">"
+    << layerToString(layer)
+    << "</text>\n";
+
+        output << "    </g>\n";
+    }
+
+    std::vector<domain::Layer> getExistingLayers(const std::vector<domain::Shape>& shapes)
+    {
+        std::vector<domain::Layer> layers;
+
+        for (const auto& shape : shapes)
+        {
+            const domain::Layer layer = shape.getLayer();
+
+            if (std::find(layers.begin(), layers.end(), layer) == layers.end())
+            {
+                layers.push_back(layer);
+            }
+        }
+
+        return layers;
+    }
+
+    void writeLegend(std::ofstream& output, const std::vector<domain::Layer>& layers, std::size_t violationCount)
+    {
+        if (layers.empty())
+        {
+            return;
+        }
+
+        const double x = SVG_WIDTH - LEGEND_WIDTH + 20.0;
+        const double y = SVG_PADDING;
+
+        output << "  <g id=\"layer-legend\">\n";
+
+        output
+            << "    <text "
+            << "x=\"" << x << "\" "
+            << "y=\"" << y << "\" "
+            << "font-size=\"20\" "
+            << "font-weight=\"bold\" "
+            << "fill=\"black\">"
+            << "Violations: "
+            << violationCount
+            << "</text>\n";
+
+        output
+            << "    <text "
+            << "x=\"" << x << "\" "
+            << "y=\"" << y + 25.0 << "\" "
+            << "font-size=\"18\" "
+            << "font-weight=\"bold\" "
+            << "fill=\"black\">"
+            << "Layers"
+            << "</text>\n" 
+
+            << "    <text "
+            << "id=\"toggle-all-layers\" "
+            << "x=\"" << x + 65.0 << "\" "
+            << "y=\"" << y + 25.0 << "\" "
+            << "font-size=\"13\" "
+            << "fill=\"#555555\" "
+            << "text-decoration=\"underline\" "
+            << "style=\"cursor: pointer;\" "
+            << "onclick=\"toggleAllLayers()\">"
+            << "Hide All"
+            << "</text>\n";
+
+
+
+        double itemY = y + 50.0;
+
+        for (const domain::Layer layer : layers)
+        {
+            writeLegendItem(output, layer, x, itemY);
+            itemY += LEGEND_ITEM_HEIGHT;
+        }
+
+        output << "  </g>\n";
+    }
 
     void SVGReportWriter::write(const std::vector<domain::Shape>& shapes, const std::vector<domain::Violation>& violations, const std::string& filePath)
     {
@@ -436,43 +750,55 @@ namespace drcheck::io {
             output
                 << "<svg "
                 << "xmlns=\"http://www.w3.org/2000/svg\" "
-                << "width=\"100\" "
-                << "height=\"100\" "
-                << "viewBox=\"0 0 100 100\">\n";
-
-            output << "</svg>\n";
-
+                << "width=\"100%\" "
+                << "height=\"90vh\" "
+                << "viewBox=\"0 0 "
+                << SVG_WIDTH << " "
+                << SVG_HEIGHT << "\" "
+                << "preserveAspectRatio=\"xMidYMid meet\">\n"
+                << "</svg>\n";
             return;
         }
 
         const geometry::BoundingBox& bounds = reportBounds.value();
 
-        const double svgWidth = (bounds.getMaxX() - bounds.getMinX()) * SVG_SCALE + 2.0 * SVG_PADDING;
-        const double svgHeight = (bounds.getMaxY() - bounds.getMinY()) * SVG_SCALE + 2.0 * SVG_PADDING;
+        const SvgTransform transform(bounds);
 
         output
             << "<svg "
             << "xmlns=\"http://www.w3.org/2000/svg\" "
-            << "width=\"" << svgWidth << "\" "
-            << "height=\"" << svgHeight << "\" "
+            << "width=\"100%\" "
+            << "height=\"90vh\" "
             << "viewBox=\"0 0 "
-            << svgWidth << " "
-            << svgHeight << "\">\n";
+            << SVG_WIDTH << " "
+            << SVG_HEIGHT << "\" "
+            << "preserveAspectRatio=\"xMidYMid meet\">\n";
+
+        output
+            << "  <style>\n"
+            << "    .violation-label {\n"
+            << "      visibility: hidden;\n"
+            << "      pointer-events: none;\n"
+            << "    }\n"
+            << "    .violation:hover .violation-label {\n"
+            << "      visibility: visible;\n"
+            << "    }\n"
+            << "    .violation {\n"
+            << "      cursor: pointer;\n"
+            << "    }\n"
+            << "    .legend-item.disabled .legend-label {\n"
+            << "      fill: darkgray;\n"
+            << "    }\n"
+            << "    .legend-item.disabled rect {\n"
+            << "      opacity: 0.35;\n"
+            << "    }\n"
+            << "  </style>\n";
 
         output << "  <g id=\"layout\">\n";
 
         for (const auto& shape : shapes)
         {
-            writePolygon(output, shape, bounds);
-        }
-
-        output << "  </g>\n";
-
-        output << "  <g id=\"shape-labels\">\n";
-
-        for (const auto& shape : shapes)
-        {
-            writeShapeId(output, shape, bounds);
+            writePolygon(output, shape, transform);
         }
 
         output << "  </g>\n";
@@ -481,12 +807,179 @@ namespace drcheck::io {
 
         for (const auto& violation : violations)
         {
-            writeViolationEdges(output, violation, shapes, bounds);
-            writeViolationMarker(output, violation, bounds);
-            writeViolationRegion(output, violation, bounds);
+            output
+                << "    <g class=\"violation\" "
+                << "data-layers=\""
+                << getViolationLayerClasses(violation, shapes)
+                << "\">\n";
+
+            writeViolationEdges(output, violation, shapes, transform);
+            writeViolationMarker(output, violation, transform);
+            writeViolationRegion(output, violation, transform);
+
+            output << "    </g>\n";
         }
 
         output << "  </g>\n";
+
+        const auto existingLayers = getExistingLayers(shapes);
+        writeLegend(output, existingLayers, violations.size());
+
+        output
+            << "  <script><![CDATA[\n"
+            << "    function updateLayerVisibility() {\n"
+            << "      const hiddenLayers = new Set();\n"
+            << "\n"
+            << "      document.querySelectorAll('.legend-item.disabled').forEach(function(item) {\n"
+            << "        hiddenLayers.add(item.dataset.layer);\n"
+            << "      });\n"
+            << "\n"
+            << "      document.querySelectorAll('.shape').forEach(function(shape) {\n"
+            << "        let hideShape = false;\n"
+            << "\n"
+            << "        shape.classList.forEach(function(className) {\n"
+            << "          if (className.startsWith('layer-') && hiddenLayers.has(className)) {\n"
+            << "            hideShape = true;\n"
+            << "          }\n"
+            << "        });\n"
+            << "\n"
+            << "        shape.style.display = hideShape ? 'none' : '';\n"
+            << "      });\n"
+            << "\n"
+            << "      document.querySelectorAll('.violation').forEach(function(violation) {\n"
+            << "        const layersText = violation.dataset.layers || '';\n"
+            << "        const layers = layersText === '' ? [] : layersText.split(' ');\n"
+            << "\n"
+            << "        let hideViolation = false;\n"
+            << "\n"
+            << "        layers.forEach(function(layer) {\n"
+            << "          if (hiddenLayers.has(layer)) {\n"
+            << "            hideViolation = true;\n"
+            << "          }\n"
+            << "        });\n"
+            << "\n"
+            << "        violation.style.display = hideViolation ? 'none' : '';\n"
+            << "      });\n"
+            << "    }\n"
+            << "\n"
+            << "    function updateToggleAllText() {\n"
+            << "      const legendItems = document.querySelectorAll('.legend-item');\n"
+            << "      const toggleText = document.getElementById('toggle-all-layers');\n"
+            << "\n"
+            << "      if (!toggleText || legendItems.length === 0) {\n"
+            << "        return;\n"
+            << "      }\n"
+            << "\n"
+            << "      const allHidden = Array.from(legendItems).every(function(item) {\n"
+            << "        return item.classList.contains('disabled');\n"
+            << "      });\n"
+            << "\n"
+            << "      toggleText.textContent = allHidden ? 'Show All' : 'Hide All';\n"
+            << "    }\n"
+            << "\n"
+            << "    function toggleAllLayers() {\n"
+            << "      const legendItems = document.querySelectorAll('.legend-item');\n"
+            << "\n"
+            << "      const allHidden = Array.from(legendItems).every(function(item) {\n"
+            << "        return item.classList.contains('disabled');\n"
+            << "      });\n"
+            << "\n"
+            << "      legendItems.forEach(function(item) {\n"
+            << "        if (allHidden) {\n"
+            << "          item.classList.remove('disabled');\n"
+            << "        }\n"
+            << "        else {\n"
+            << "          item.classList.add('disabled');\n"
+            << "        }\n"
+            << "      });\n"
+            << "\n"
+            << "      updateLayerVisibility();\n"
+            << "      updateToggleAllText();\n"
+            << "    }\n"
+            << "\n"
+            << "    function toggleLayer(legendItem) {\n"
+            << "      legendItem.classList.toggle('disabled');\n"
+            << "      updateLayerVisibility();\n"
+            << "      updateToggleAllText();\n"
+            << "    }\n"
+            << "\n"
+            << "    const svg = document.documentElement;\n"
+            << "\n"
+            << "    const originalWidth = " << SVG_WIDTH << ";\n"
+            << "    const originalHeight = " << SVG_HEIGHT << ";\n"
+            << "\n"
+            << "    let viewX = 0;\n"
+            << "    let viewY = 0;\n"
+            << "    let viewWidth = originalWidth;\n"
+            << "    let viewHeight = originalHeight;\n"
+            << "\n"
+            << "    const MIN_ZOOM_FACTOR = 0.1;\n"
+            << "\n"
+            << "    svg.addEventListener('wheel', function(event) {\n"
+            << "      event.preventDefault();\n"
+            << "\n"
+            << "      const rect = svg.getBoundingClientRect();\n"
+            << "\n"
+            << "      const mouseX = viewX +\n"
+            << "        ((event.clientX - rect.left) / rect.width) * viewWidth;\n"
+            << "\n"
+            << "      const mouseY = viewY +\n"
+            << "        ((event.clientY - rect.top) / rect.height) * viewHeight;\n"
+            << "\n"
+            << "      let zoomFactor = event.deltaY < 0 ? 0.9 : 1.1;\n"
+            << "\n"
+            << "      let newWidth = viewWidth * zoomFactor;\n"
+            << "\n"
+            << "      const minWidth = originalWidth * MIN_ZOOM_FACTOR;\n"
+            << "\n"
+            << "      if (newWidth < minWidth) {\n"
+            << "        newWidth = minWidth;\n"
+            << "      }\n"
+            << "\n"
+            << "      if (newWidth > originalWidth) {\n"
+            << "        newWidth = originalWidth;\n"
+            << "      }\n"
+            << "\n"
+            << "      zoomFactor = newWidth / viewWidth;\n"
+            << "\n"
+            << "      const newHeight = viewHeight * zoomFactor;\n"
+            << "\n"
+            << "      viewX = mouseX - (mouseX - viewX) * zoomFactor;\n"
+            << "      viewY = mouseY - (mouseY - viewY) * zoomFactor;\n"
+            << "\n"
+            << "      viewWidth = newWidth;\n"
+            << "      viewHeight = newHeight;\n"
+            << "\n"
+            << "      if (viewWidth == originalWidth) {\n"
+            << "        viewX = 0;\n"
+            << "        viewY = 0;\n"
+            << "        viewHeight = originalHeight;\n"
+            << "      }\n"
+            << "\n"
+            << "      svg.setAttribute(\n"
+            << "        'viewBox',\n"
+            << "        viewX + ' ' + viewY + ' ' + viewWidth + ' ' + viewHeight\n"
+            << "      );\n"
+            << "    }, { passive: false });\n"
+            << "\n"
+            << "    function resetView() {\n"
+            << "      viewX = 0;\n"
+            << "      viewY = 0;\n"
+            << "      viewWidth = originalWidth;\n"
+            << "      viewHeight = originalHeight;\n"
+            << "\n"
+            << "      svg.setAttribute(\n"
+            << "        'viewBox',\n"
+            << "        '0 0 ' + originalWidth + ' ' + originalHeight\n"
+            << "      );\n"
+            << "    }\n"
+            << "\n"
+            << "    document.addEventListener('keydown', function(event) {\n"
+            << "      if (event.key === 'f' || event.key === 'F') {\n"
+            << "        resetView();\n"
+            << "      }\n"
+            << "    });\n"
+            << "  ]]></script>\n";
 
         output << "</svg>\n";
     }

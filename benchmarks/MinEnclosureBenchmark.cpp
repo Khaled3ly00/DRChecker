@@ -15,6 +15,7 @@
 #include "drcheck/spatial/LayerSpatialIndex.h"
 
 using drcheck::domain::Layer;
+using drcheck::domain::Purpose;
 using drcheck::domain::Shape;
 
 using drcheck::geometry::BoundingBox;
@@ -63,8 +64,8 @@ std::vector<Shape> generateEnclosureGrid(std::size_t count, double viaSize, doub
             Point(x + enclosure, y + enclosure + viaSize)
             });
 
-        shapes.emplace_back(2 * i, Layer::Metal1, std::move(metalPolygon));
-        shapes.emplace_back(2 * i + 1, Layer::Via12, std::move(viaPolygon));
+        shapes.emplace_back(2 * i, Layer::M1, Purpose::Drawing, std::move(metalPolygon));
+        shapes.emplace_back(2 * i + 1, Layer::VIA1, Purpose::Drawing, std::move(viaPolygon));
     }
 
     return shapes;
@@ -79,7 +80,7 @@ EnclosureBenchmarkResult runBruteForce(const std::vector<Shape>& shapes, double 
 
     for (const Shape& innerShape : shapes)
     {
-        if (innerShape.getLayer() != Layer::Via12)
+        if (innerShape.getLayer() != Layer::VIA1)
         {
             continue;
         }
@@ -88,7 +89,7 @@ EnclosureBenchmarkResult runBruteForce(const std::vector<Shape>& shapes, double 
 
         for (const Shape& outerShape : shapes)
         {
-            if (outerShape.getLayer() != Layer::Metal1)
+            if (outerShape.getLayer() != Layer::M1)
             {
                 continue;
             }
@@ -136,7 +137,7 @@ EnclosureBenchmarkResult runSpatial(const std::vector<Shape>& shapes, const Laye
 
     for (const Shape& innerShape : shapes)
     {
-        if (innerShape.getLayer() != Layer::Via12)
+        if (innerShape.getLayer() != Layer::VIA1)
         {
             continue;
         }
@@ -145,7 +146,7 @@ EnclosureBenchmarkResult runSpatial(const std::vector<Shape>& shapes, const Laye
 
         const BoundingBox innerBox = innerShape.getPolygon().getBoundingBox();
 
-        const auto candidates = spatialIndex.query(Layer::Metal1,innerBox);
+        const auto candidates = spatialIndex.query(Layer::M1,innerBox);
 
         for (const Shape* outerShape : candidates)
         {

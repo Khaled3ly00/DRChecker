@@ -29,9 +29,9 @@ TEST(MinEnclosureRuleTest, AcceptsExactMinEnclosure)
         Point(8,2)
         });
 
-    Shape first(1, Layer::Metal1, std::move(firstPolygon));
-    Shape second(2, Layer::Via12, std::move(secondPolygon));
-    MinEnclosureRule rule(Layer::Via12, Layer::Metal1, 2.0);
+    Shape first(1, Layer::M1, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::VIA1, Purpose::Drawing, std::move(secondPolygon));
+    MinEnclosureRule rule(Layer::VIA1, Layer::M1, 2.0);
     const std::vector<Shape> shapes{first, second};
     // Creates QuadTree
     LayerSpatialIndex spatialIndex(shapes);
@@ -55,9 +55,9 @@ TEST(MinEnclosureRuleTest, AcceptsMoreThanMinEnclosure)
         Point(12,5)
         });
 
-    Shape first(1, Layer::Metal1, std::move(firstPolygon));
-    Shape second(2, Layer::Via12, std::move(secondPolygon));
-    MinEnclosureRule rule(Layer::Via12, Layer::Metal1, 2.0);
+    Shape first(1, Layer::M1, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::VIA1, Purpose::Drawing, std::move(secondPolygon));
+    MinEnclosureRule rule(Layer::VIA1, Layer::M1, 2.0);
     const std::vector<Shape> shapes{ first, second };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -80,9 +80,9 @@ TEST(MinEnclosureRuleTest, RejectsLessThanMinEnclosure)
         Point(8,2)
         });
 
-    Shape first(1, Layer::Metal1, std::move(firstPolygon));
-    Shape second(2, Layer::Via12, std::move(secondPolygon));
-    MinEnclosureRule rule(Layer::Via12, Layer::Metal1, 3.0);
+    Shape first(1, Layer::M1, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::VIA1, Purpose::Drawing, std::move(secondPolygon));
+    MinEnclosureRule rule(Layer::VIA1, Layer::M1, 3.0);
     const std::vector<Shape> shapes{first, second};
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -128,9 +128,9 @@ TEST(MinEnclosureRuleTest, IntersectingPolygonsMinEnclosure) // Intersecting pol
         Point(4.0, 8.0)
         });
 
-    Shape first(1, Layer::Via12, std::move(firstPolygon));
-    Shape second(2, Layer::Metal1, std::move(secondPolygon));
-    MinEnclosureRule rule(Layer::Via12, Layer::Metal1, 1.0);
+    Shape first(1, Layer::VIA1, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::M1, Purpose::Drawing, std::move(secondPolygon));
+    MinEnclosureRule rule(Layer::VIA1, Layer::M1, 1.0);
     const std::vector<Shape> shapes{first, second};
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -157,9 +157,9 @@ TEST(MinEnclosureRuleTest, TouchingInternallyPolygonsMinEnclosure) // Touching I
         Point(4.0, 6.0)
         });
 
-    Shape first(1, Layer::Metal1, std::move(firstPolygon));
-    Shape second(2, Layer::Via12, std::move(secondPolygon));
-    MinEnclosureRule rule(Layer::Via12, Layer::Metal1, 1.0);
+    Shape first(1, Layer::M1, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::VIA1, Purpose::Drawing, std::move(secondPolygon));
+    MinEnclosureRule rule(Layer::VIA1, Layer::M1, 1.0);
     const std::vector<Shape> shapes{ first, second };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -182,9 +182,9 @@ TEST(MinEnclosureRuleTest, InnerCompletelyOutsideMinEnclosure) {
         Point(8.0, 12.0)
         });
 
-    Shape first(1, Layer::Via12, std::move(firstPolygon));
-    Shape second(2, Layer::Metal1, std::move(secondPolygon));
-    MinEnclosureRule rule(Layer::Via12, Layer::Metal1, 2.0);
+    Shape first(1, Layer::VIA1, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::M1, Purpose::Drawing, std::move(secondPolygon));
+    MinEnclosureRule rule(Layer::VIA1, Layer::M1, 2.0);
     const std::vector<Shape> shapes{ first, second };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -212,9 +212,9 @@ TEST(MinEnclosureRuleTest, InnerCompletelyInsideConcavePolygonMinEnclosure) {
         Point(0.0, 8.0)
         });
 
-    Shape first(1, Layer::Via12, std::move(firstPolygon));
-    Shape second(2, Layer::Metal1, std::move(secondPolygon));
-    MinEnclosureRule rule(Layer::Via12, Layer::Metal1, 2.0);
+    Shape first(1, Layer::VIA1, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::M1, Purpose::Drawing, std::move(secondPolygon));
+    MinEnclosureRule rule(Layer::VIA1, Layer::M1, 2.0);
     const std::vector<Shape> shapes{ first, second };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -241,9 +241,9 @@ TEST(MinEnclosureRuleTest, InnerIntersectsOuterConcavePolygonMinEnclosure) {
         Point(0.0, 8.0)
         });
 
-    Shape first(1, Layer::Via12, std::move(firstPolygon));
-    Shape second(2, Layer::Metal1, std::move(secondPolygon));
-    MinEnclosureRule rule(Layer::Via12, Layer::Metal1, 3.0);
+    Shape first(1, Layer::VIA1, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::M1, Purpose::Drawing, std::move(secondPolygon));
+    MinEnclosureRule rule(Layer::VIA1, Layer::M1, 3.0);
     const std::vector<Shape> shapes{ first, second };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -252,7 +252,7 @@ TEST(MinEnclosureRuleTest, InnerIntersectsOuterConcavePolygonMinEnclosure) {
 }
 // If the rule checks for via12 enclosure within Metal 1
 // But there's only 2 shapes: metal 2 and via12
-// Then if rule is checked a violation appears as there's no via12 enclosed within Metal1
+// Then if rule is checked a violation appears as there's no via12 enclosed within M1
 TEST(MinEnclosureRuleTest,NoMatchingOuterLayerMinEnclosure)
 {
     Polygon firstPolygon({
@@ -268,9 +268,9 @@ TEST(MinEnclosureRuleTest,NoMatchingOuterLayerMinEnclosure)
         Point(8,2)
         });
 
-    Shape first(1, Layer::Metal2, std::move(firstPolygon));
-    Shape second(2, Layer::Via12, std::move(secondPolygon));
-    MinEnclosureRule rule(Layer::Via12, Layer::Metal1, 2.0);
+    Shape first(1, Layer::M2, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::VIA1, Purpose::Drawing, std::move(secondPolygon));
+    MinEnclosureRule rule(Layer::VIA1, Layer::M1, 2.0);
     const std::vector<Shape> shapes{ first, second };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -278,8 +278,8 @@ TEST(MinEnclosureRuleTest,NoMatchingOuterLayerMinEnclosure)
     EXPECT_EQ(violations.size(), 1);
     EXPECT_FALSE(violations[0].getMarker().has_value());
 }
-// Multiple outer candidates, one valid. Have two Metal1 shapes:
-// one does not contain the Via12, while another provides sufficient enclosure.
+// Multiple outer candidates, one valid. Have two M1 shapes:
+// one does not contain the VIA1, while another provides sufficient enclosure.
 TEST(MinEnclosureRuleTest, MultipleOuterLayerPolygonsMinEnclosure)
 {
     Polygon firstPolygon({
@@ -301,10 +301,10 @@ TEST(MinEnclosureRuleTest, MultipleOuterLayerPolygonsMinEnclosure)
         Point(3,2)
         });
 
-    Shape first(1, Layer::Metal1, std::move(firstPolygon));
-    Shape second(2, Layer::Metal1, std::move(secondPolygon));
-    Shape third(3, Layer::Via12, std::move(thirdPolygon));
-    MinEnclosureRule rule(Layer::Via12, Layer::Metal1, 2.0);
+    Shape first(1, Layer::M1, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::M1, Purpose::Drawing, std::move(secondPolygon));
+    Shape third(3, Layer::VIA1, Purpose::Drawing, std::move(thirdPolygon));
+    MinEnclosureRule rule(Layer::VIA1, Layer::M1, 2.0);
     const std::vector<Shape> shapes{first, second, third};
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -312,7 +312,7 @@ TEST(MinEnclosureRuleTest, MultipleOuterLayerPolygonsMinEnclosure)
     EXPECT_TRUE(violations.empty());
 }
 // Multiple inner shapes. For example, 
-// one Via12 correctly enclosed and another Via12 insufficiently enclosed. 
+// one VIA1 correctly enclosed and another VIA1 insufficiently enclosed. 
 // Expected result: exactly one violation
 TEST(MinEnclosureRuleTest, MultipleInnerLayerPolygonsMinEnclosure)
 {
@@ -334,10 +334,10 @@ TEST(MinEnclosureRuleTest, MultipleInnerLayerPolygonsMinEnclosure)
         Point(10,10),
         Point(10,9)
         });
-    Shape first(1, Layer::Metal1, std::move(firstPolygon));
-    Shape second(2, Layer::Via12, std::move(secondPolygon));
-    Shape third(3, Layer::Via12, std::move(thirdPolygon));
-    MinEnclosureRule rule(Layer::Via12, Layer::Metal1, 2.0);
+    Shape first(1, Layer::M1, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::VIA1, Purpose::Drawing, std::move(secondPolygon));
+    Shape third(3, Layer::VIA1, Purpose::Drawing, std::move(thirdPolygon));
+    MinEnclosureRule rule(Layer::VIA1, Layer::M1, 2.0);
     const std::vector<Shape> shapes{ first, second, third };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -348,19 +348,19 @@ TEST(MinEnclosureRuleTest, MultipleInnerLayerPolygonsMinEnclosure)
 
 TEST(MinEnclosureRuleTest, ThrowsOnNonPositiveMinimumEnclosure)
 {
-    EXPECT_THROW(MinEnclosureRule(Layer::Via12, Layer::Metal1, 0.0), std::invalid_argument);
-    EXPECT_THROW(MinEnclosureRule(Layer::Via12, Layer::Metal1, -1.0), std::invalid_argument);
+    EXPECT_THROW(MinEnclosureRule(Layer::VIA1, Layer::M1, 0.0), std::invalid_argument);
+    EXPECT_THROW(MinEnclosureRule(Layer::VIA1, Layer::M1, -1.0), std::invalid_argument);
 }
 
 TEST(MinEnclosureRuleTest, ThrowsOnSameLayerMinimumEnclosure)
 {
-    EXPECT_THROW(MinEnclosureRule(Layer::Metal1, Layer::Metal1, 0.0), std::invalid_argument);
+    EXPECT_THROW(MinEnclosureRule(Layer::M1, Layer::M1, 0.0), std::invalid_argument);
 }
 
 TEST(MinEnclosureRuleTest, WorksThroughRuleInterface)
 {
     // Pointer to a Rule object, but actually holds a MinEnclosureRule
-    std::unique_ptr<Rule> rule = std::make_unique<MinEnclosureRule>(Layer::Via12, Layer::Metal1, 4.0);
+    std::unique_ptr<Rule> rule = std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M1, 4.0);
     Polygon firstPolygon({
         Point(0,0),
         Point(10,0),
@@ -374,8 +374,8 @@ TEST(MinEnclosureRuleTest, WorksThroughRuleInterface)
         Point(8,2)
         });
 
-    Shape first(1, Layer::Metal1, std::move(firstPolygon));
-    Shape second(2, Layer::Via12, std::move(secondPolygon));
+    Shape first(1, Layer::M1, Purpose::Drawing, std::move(firstPolygon));
+    Shape second(2, Layer::VIA1, Purpose::Drawing, std::move(secondPolygon));
     const std::vector<Shape> shapes{first, second};
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule->check(shapes, spatialIndex);

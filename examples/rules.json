@@ -2,33 +2,33 @@
   "rules": [
     {
       "type": "MinWidth",
-      "layer": "Metal1",
+      "layer": "M1",
       "value": 3
     },
     {
       "type": "MinWidth",
-      "layer": "Metal2",
+      "layer": "M2",
       "value": 4
     },
     {
       "type": "MinWidth",
-      "layer": "Via12",
+      "layer": "VIA1",
       "value": 1
     },
     {
       "type": "MinSpacing",
-      "layer": "Metal1",
+      "layer": "M1",
       "value": 2
     },
     {
       "type": "MinEnclosure",
-      "innerLayer": "Via12",
-      "outerLayer": "Metal1",
+      "innerLayer": "VIA1",
+      "outerLayer": "M1",
       "value": 2
     },
     {
       "type": "Density",
-      "layer": "Metal1",
+      "layer": "M1",
       "limit": "Minimum",
       "value": 0.30,
       "windowSize": 10.0,
@@ -36,7 +36,7 @@
     },
     {
       "type": "Density",
-      "layer": "Metal2",
+      "layer": "M2",
       "limit": "Maximum",
       "value": 0.70,
       "windowSize": 20.0,
@@ -44,7 +44,7 @@
     },
     {
       "type": "Density",
-      "layer": "Metal1",
+      "layer": "M1",
       "limit": "Minimum",
       "value": 0.40,
       "windowSize": 10.0,

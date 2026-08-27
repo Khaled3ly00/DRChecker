@@ -26,7 +26,7 @@ TEST(TclRuleParserTest, ParsesMinSpacingRule)
 
     ASSERT_NE(minSpacingRule, nullptr);
 
-    EXPECT_EQ(minSpacingRule->getLayer(), Layer::Metal1);
+    EXPECT_EQ(minSpacingRule->getLayer(), Layer::M1);
     EXPECT_NEAR(minSpacingRule->getMinimumSpacing(), 0.25, EPSILON);
 }
 
@@ -40,7 +40,7 @@ TEST(TclRuleParserTest, ParsesMinSpacingOptionsInAnyOrder)
 
     ASSERT_NE(minSpacingRule, nullptr);
 
-    EXPECT_EQ(minSpacingRule->getLayer(), Layer::Metal2);
+    EXPECT_EQ(minSpacingRule->getLayer(), Layer::M2);
     EXPECT_NEAR(minSpacingRule->getMinimumSpacing(), 0.25, EPSILON);
 }
 
@@ -59,7 +59,7 @@ TEST(TclRuleParserTest, ParsesMinWidthRule)
 
     ASSERT_NE(minWidthRule, nullptr);
 
-    EXPECT_EQ(minWidthRule->getLayer(), Layer::Metal1);
+    EXPECT_EQ(minWidthRule->getLayer(), Layer::M1);
     EXPECT_NEAR(minWidthRule->getMinimumWidth(), 0.20, EPSILON);
 }
 
@@ -72,8 +72,8 @@ TEST(TclRuleParserTest, ParsesMinEnclosureRule)
 
     ASSERT_NE(minEnclosureRule, nullptr);
 
-    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::Via12);
-    EXPECT_EQ(minEnclosureRule->getOuterLayer(), Layer::Metal1);
+    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::VIA1);
+    EXPECT_EQ(minEnclosureRule->getOuterLayer(), Layer::M1);
     EXPECT_NEAR(minEnclosureRule->getMinimumEnclosure(), 0.10, EPSILON);
 }
 
@@ -86,7 +86,7 @@ TEST(TclRuleParserTest, ParsesMinimumDensityRule)
 
     ASSERT_NE(densityRule, nullptr);
 
-    EXPECT_EQ(densityRule->getLayer(), Layer::Metal1);
+    EXPECT_EQ(densityRule->getLayer(), Layer::M1);
     EXPECT_EQ(densityRule->getLimit(), DensityLimit::Minimum);
     EXPECT_NEAR(densityRule->getRequiredDensity(), 0.30, EPSILON);
     EXPECT_NEAR(densityRule->getWindowSize(), 10.0, EPSILON);
@@ -103,7 +103,7 @@ TEST(TclRuleParserTest, ParsesMaximumDensityRule)
 
     ASSERT_NE(densityRule, nullptr);
 
-    EXPECT_EQ(densityRule->getLayer(), Layer::Metal2);
+    EXPECT_EQ(densityRule->getLayer(), Layer::M2);
     EXPECT_EQ(densityRule->getLimit(), DensityLimit::Maximum);
     EXPECT_NEAR(densityRule->getRequiredDensity(), 0.70, EPSILON);
     EXPECT_NEAR(densityRule->getWindowSize(), 20.0, EPSILON);
@@ -120,7 +120,7 @@ TEST(TclRuleParserTest, ParsesDensityRuleWithAnalysisRegion)
 
     ASSERT_NE(densityRule, nullptr);
 
-    EXPECT_EQ(densityRule->getLayer(), Layer::Metal2);
+    EXPECT_EQ(densityRule->getLayer(), Layer::M2);
     EXPECT_EQ(densityRule->getLimit(), DensityLimit::Maximum);
     EXPECT_NEAR(densityRule->getRequiredDensity(), 0.70, EPSILON);
     EXPECT_NEAR(densityRule->getWindowSize(), 20.0, EPSILON);

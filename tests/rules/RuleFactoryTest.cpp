@@ -16,7 +16,7 @@ TEST(RuleFactoryTest, CreatesMinSpacingRule)
 {
     RuleParameters params;
 
-    params.layer = Layer::Metal1;
+    params.layer = Layer::M1;
     params.value = 0.25;
 
     auto rule = RuleFactory::create("min_spacing", params);
@@ -25,7 +25,7 @@ TEST(RuleFactoryTest, CreatesMinSpacingRule)
 
     ASSERT_NE(minSpacingRule, nullptr);
 
-    EXPECT_EQ(minSpacingRule->getLayer(), Layer::Metal1);
+    EXPECT_EQ(minSpacingRule->getLayer(), Layer::M1);
     EXPECT_NEAR(minSpacingRule->getMinimumSpacing(), 0.25, EPSILON);
 }
 
@@ -33,7 +33,7 @@ TEST(RuleFactoryTest, CreatesMinWidthRule)
 {
     RuleParameters params;
 
-    params.layer = Layer::Metal1;
+    params.layer = Layer::M1;
     params.value = 0.20;
 
     auto rule = RuleFactory::create("min_width", params);
@@ -42,7 +42,7 @@ TEST(RuleFactoryTest, CreatesMinWidthRule)
 
     ASSERT_NE(minWidthRule, nullptr);
 
-    EXPECT_EQ(minWidthRule->getLayer(), Layer::Metal1);
+    EXPECT_EQ(minWidthRule->getLayer(), Layer::M1);
     EXPECT_NEAR(minWidthRule->getMinimumWidth(), 0.20, EPSILON);
 }
 
@@ -50,8 +50,8 @@ TEST(RuleFactoryTest, CreatesMinEnclosureRule)
 {
     RuleParameters params;
 
-    params.innerLayer = Layer::Via12;
-    params.outerLayer = Layer::Metal1;
+    params.innerLayer = Layer::VIA1;
+    params.outerLayer = Layer::M1;
     params.value = 1.0;
 
     auto rule = RuleFactory::create("min_enclosure", params);
@@ -60,8 +60,8 @@ TEST(RuleFactoryTest, CreatesMinEnclosureRule)
 
     ASSERT_NE(minEnclosureRule, nullptr);
 
-    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::Via12);
-    EXPECT_EQ(minEnclosureRule->getOuterLayer(), Layer::Metal1);
+    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::VIA1);
+    EXPECT_EQ(minEnclosureRule->getOuterLayer(), Layer::M1);
     EXPECT_NEAR(minEnclosureRule->getMinimumEnclosure(), 1.0, EPSILON);
 }
 
@@ -69,7 +69,7 @@ TEST(RuleFactoryTest, CreatesDensityRule)
 {
     RuleParameters params;
 
-    params.layer = Layer::Metal1;
+    params.layer = Layer::M1;
     params.value = 0.30;
     params.densityLimit = DensityLimit::Minimum;
     params.windowSize = 10.0;
@@ -82,7 +82,7 @@ TEST(RuleFactoryTest, CreatesDensityRule)
 
     ASSERT_NE(densityRule, nullptr);
 
-    EXPECT_EQ(densityRule->getLayer(), Layer::Metal1);
+    EXPECT_EQ(densityRule->getLayer(), Layer::M1);
     EXPECT_EQ(densityRule->getLimit(), DensityLimit::Minimum);
     EXPECT_NEAR(densityRule->getRequiredDensity(), 0.30, EPSILON);
     EXPECT_NEAR(densityRule->getWindowSize(), 10.0, EPSILON);
@@ -98,7 +98,7 @@ TEST(RuleFactoryTest, RejectsMissingMinSpacingValue)
 {
     RuleParameters params;
 
-    params.layer = Layer::Metal1;
+    params.layer = Layer::M1;
 
     EXPECT_THROW(RuleFactory::create("min_spacing", params), std::invalid_argument);
 }
