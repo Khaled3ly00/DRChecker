@@ -7,6 +7,7 @@
 
 #include "drcheck/geometry/Point.h"
 #include "drcheck/geometry/BoundingBox.h"
+#include "drcheck/domain/Layer.h"
 
 namespace drcheck::domain {
 
@@ -22,7 +23,6 @@ struct ViolationMarker
     //
     // For region-based violations (Density):
     // region stores the violating sampling window.
-
     std::optional<geometry::Point> firstPoint;
     std::optional<geometry::Point> secondPoint;
 
@@ -30,6 +30,9 @@ struct ViolationMarker
     std::optional<std::size_t> secondEdgeIndex;
 
     std::optional<geometry::BoundingBox> region;
+
+    std::optional<domain::Layer> firstLayer;
+    std::optional<domain::Layer> secondLayer;
 };
 
 enum class ViolationType

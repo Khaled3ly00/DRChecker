@@ -5,7 +5,8 @@ Shape::Shape(std::size_t id, Layer layer, Purpose purpose, geometry::Polygon pol
 	: id(id), layer(layer), purpose(purpose), polygon(std::move(polygon)) {
 }
 
-std::size_t Shape::getId() const {
+std::size_t Shape::getId() const
+{
 	return id;
 }
 

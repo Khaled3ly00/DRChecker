@@ -93,7 +93,7 @@ namespace drcheck::geometry {
 		return BoundingBox(minX, minY, maxX, maxY);
 	}
 
-	bool Polygon::contains(const Point& point) const
+	bool Polygon::contains(const Point& point, bool includeBoundary) const
 	{
 		// Bounding box check (Broad-phase rejection).
 		if (!getBoundingBox().overlaps(
@@ -109,7 +109,7 @@ namespace drcheck::geometry {
 		// If the point is within the bounding box, check if it's on the polygon edge.
 		for (const Segment& edge : getEdges()) {
 			if (edge.contains(point)) {
-				return true;
+				return includeBoundary;
 			}
 		}
 		// Use the ray-casting algorithm to determine if the point is inside the polygon
@@ -183,6 +183,141 @@ namespace drcheck::geometry {
 		}
 		return false;
 	}
+
+	// Checks if both polygons have shared edge (shared vertex returns false)
+	bool Polygon::sharesBoundarySegment(const Polygon& other) const {
+		// Broad Phase Check
+		if (!getBoundingBox().overlaps(other.getBoundingBox(), EPSILON))
+		{
+			return false;
+		}
+
+		const auto thisEdges = getEdges();
+		const auto otherEdges = other.getEdges();
+
+		for (const Segment& firstEdge : thisEdges)
+		{
+			for (const Segment& secondEdge : otherEdges)
+			{
+				// Check if the two edges collinear
+				const bool collinear =
+					Point::getOrientation(firstEdge.getStart(), firstEdge.getEnd(), secondEdge.getStart()) == Orientation::Collinear &&
+					Point::getOrientation(firstEdge.getStart(), firstEdge.getEnd(), secondEdge.getEnd()) == Orientation::Collinear;
+
+				if (!collinear)
+				{
+					continue;
+				}
+
+				// If collinear, check for overlap distance
+				const double dx = std::abs(firstEdge.getEnd().getX() - firstEdge.getStart().getX());
+				const double dy = std::abs(firstEdge.getEnd().getY() - firstEdge.getStart().getY());
+				if (dx >= dy)
+				{
+					const auto overlap = positiveOverlapInterval(
+						std::min(firstEdge.getStart().getX(), firstEdge.getEnd().getX()),
+						std::max(firstEdge.getStart().getX(), firstEdge.getEnd().getX()),
+						std::min(secondEdge.getStart().getX(), secondEdge.getEnd().getX()),
+						std::max(secondEdge.getStart().getX(), secondEdge.getEnd().getX())
+					);
+
+					if (overlap)
+					{
+						return true;
+					}
+				}
+				else
+				{
+					const auto overlap = positiveOverlapInterval(
+						std::min(firstEdge.getStart().getY(), firstEdge.getEnd().getY()),
+						std::max(firstEdge.getStart().getY(), firstEdge.getEnd().getY()),
+						std::min(secondEdge.getStart().getY(), secondEdge.getEnd().getY()),
+						std::max(secondEdge.getStart().getY(), secondEdge.getEnd().getY())
+					);
+
+					if (overlap)
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	// Check if two polygons have shared area
+	bool Polygon::overlaps(const Polygon& other) const {
+		// Broad Phase Check
+		if (!getBoundingBox().overlaps(other.getBoundingBox(), EPSILON))
+		{
+			return false;
+		}
+		
+		const auto thisEdges = getEdges();
+		const auto otherEdges = other.getEdges();
+
+		// Check for edge intersection (false: don't include endpoints touching)
+		for (const Segment& firstEdge : thisEdges)
+		{
+			for (const Segment& secondEdge : otherEdges)
+			{
+				if (firstEdge.intersects(secondEdge, false))
+				{
+					return true;
+				}
+			}
+		}
+
+		// Check if one polygon completely contains other
+		if (contains(other) || other.contains(*this))
+		{
+			return true;
+		}
+
+		// Check for partial enclosure
+		for (const Point& vertex : vertices)
+		{
+			if (other.contains(vertex, false))
+			{
+				return true;
+			}
+		}
+
+		for (const Point& vertex : other.getVertices())
+		{
+			if (contains(vertex, false))
+			{
+				return true;
+			}
+		}
+
+		for (const Segment& edge : thisEdges)
+		{
+			const Point midpoint(
+				(edge.getStart().getX() + edge.getEnd().getX()) / 2.0,
+				(edge.getStart().getY() + edge.getEnd().getY()) / 2.0
+			);
+
+			if (other.contains(midpoint, false))
+			{
+				return true;
+			}
+		}
+
+		for (const Segment& edge : otherEdges)
+		{
+			const Point midpoint(
+				(edge.getStart().getX() + edge.getEnd().getX()) / 2.0,
+				(edge.getStart().getY() + edge.getEnd().getY()) / 2.0
+			);
+
+			if (contains(midpoint, false))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	// Calculate the minimum distance between two polygons by checking distances between edges
 	PolygonEdgePairResult Polygon::distanceTo(const Polygon& other, bool treatIntersectionAsZero) const
 	{	
@@ -385,10 +520,7 @@ namespace drcheck::geometry {
 			return std::nullopt;
 		}
 
-		return std::make_pair(
-			overlapMin,
-			overlapMax
-		);
+		return std::make_pair(overlapMin, overlapMax);
 	}
 	// Calculates a score that represents how much these pair of edges are perpendicular to connector 
 	// (0: perpendicular, 2: parallel)

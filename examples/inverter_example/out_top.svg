@@ -18,9 +18,41 @@
     }
   </style>
   <g id="layout">
+  <g class="shape layer-NW">
+    <title>Shape ID: 7&#10;Layer: NW</title>
+  <polygon points="285.038,250.798 285.038,40 744.962,40 744.962,250.798 " fill="cream" fill-opacity="0.35" stroke="cream" stroke-width="2" />
+  </g>
+  <g class="shape layer-PO">
+    <title>Shape ID: 21&#10;Layer: PO</title>
+  <polygon points="473.935,453.384 443.821,453.384 443.821,502.661 473.935,502.661 " fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
+  </g>
+  <g class="shape layer-PO">
+    <title>Shape ID: 28&#10;Layer: PO</title>
+  <polygon points="443.821,393.156 473.935,393.156 473.935,343.878 443.821,343.878 " fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
+  </g>
+  <g class="shape layer-PO">
+    <title>Shape ID: 30&#10;Layer: PO</title>
+  <polygon points="556.065,393.156 586.179,393.156 586.179,343.878 556.065,343.878 " fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
+  </g>
+  <g class="shape layer-PO">
+    <title>Shape ID: 33&#10;Layer: PO</title>
+  <polygon points="556.065,612.167 586.179,612.167 586.179,562.89 556.065,562.89 " fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
+  </g>
+  <g class="shape layer-NP">
+    <title>Shape ID: 9&#10;Layer: NP</title>
+  <polygon points="331.578,204.259 331.578,86.5399 698.422,86.5399 698.422,204.259 " fill="gray" fill-opacity="0.35" stroke="gray" stroke-width="2" />
+  </g>
+  <g class="shape layer-PP">
+    <title>Shape ID: 11&#10;Layer: PP</title>
+  <polygon points="331.578,760 331.578,642.281 698.422,642.281 698.422,760 " fill="magenta" fill-opacity="0.35" stroke="magenta" stroke-width="2" />
+  </g>
   <g class="shape layer-OD">
     <title>Shape ID: 1&#10;Layer: OD</title>
   <polygon points="367.167,168.669 367.167,122.129 662.833,122.129 662.833,168.669 " fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
+  </g>
+  <g class="shape layer-OD">
+    <title>Shape ID: 10&#10;Layer: OD</title>
+  <polygon points="367.167,724.411 367.167,677.871 662.833,677.871 662.833,724.411 " fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
   </g>
   <g class="shape layer-CO">
     <title>Shape ID: 2&#10;Layer: CO</title>
@@ -42,26 +74,6 @@
     <title>Shape ID: 6&#10;Layer: CO</title>
   <polygon points="390.437,157.719 415.076,157.719 415.076,133.08 390.437,133.08 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
   </g>
-  <g class="shape layer-NW">
-    <title>Shape ID: 7&#10;Layer: NW</title>
-  <polygon points="285.038,250.798 285.038,40 744.962,40 744.962,250.798 " fill="cream" fill-opacity="0.35" stroke="cream" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 8&#10;Layer: M1</title>
-  <polygon points="364.43,171.407 364.43,119.392 665.57,119.392 665.57,171.407 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-NP">
-    <title>Shape ID: 9&#10;Layer: NP</title>
-  <polygon points="331.578,204.259 331.578,86.5399 698.422,86.5399 698.422,204.259 " fill="gray" fill-opacity="0.35" stroke="gray" stroke-width="2" />
-  </g>
-  <g class="shape layer-OD">
-    <title>Shape ID: 10&#10;Layer: OD</title>
-  <polygon points="367.167,724.411 367.167,677.871 662.833,677.871 662.833,724.411 " fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
-  </g>
-  <g class="shape layer-PP">
-    <title>Shape ID: 11&#10;Layer: PP</title>
-  <polygon points="331.578,760 331.578,642.281 698.422,642.281 698.422,760 " fill="magenta" fill-opacity="0.35" stroke="magenta" stroke-width="2" />
-  </g>
   <g class="shape layer-CO">
     <title>Shape ID: 12&#10;Layer: CO</title>
   <polygon points="614.924,713.46 639.563,713.46 639.563,688.821 614.924,688.821 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
@@ -82,25 +94,37 @@
     <title>Shape ID: 16&#10;Layer: CO</title>
   <polygon points="390.437,713.46 415.076,713.46 415.076,688.821 390.437,688.821 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
   </g>
+  <g class="shape layer-CO">
+    <title>Shape ID: 27&#10;Layer: CO</title>
+  <polygon points="446.559,380.837 471.198,380.837 471.198,356.198 446.559,356.198 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  </g>
+  <g class="shape layer-CO">
+    <title>Shape ID: 29&#10;Layer: CO</title>
+  <polygon points="558.802,380.837 583.441,380.837 583.441,356.198 558.802,356.198 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  </g>
+  <g class="shape layer-CO">
+    <title>Shape ID: 31&#10;Layer: CO</title>
+  <polygon points="446.559,490.342 471.198,490.342 471.198,465.703 446.559,465.703 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  </g>
+  <g class="shape layer-CO">
+    <title>Shape ID: 32&#10;Layer: CO</title>
+  <polygon points="558.802,599.848 583.441,599.848 583.441,575.209 558.802,575.209 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  </g>
+  <g class="shape layer-M1">
+    <title>Shape ID: 8&#10;Layer: M1</title>
+  <polygon points="416.445,171.407 613.555,171.407 613.555,337.034 640.932,337.034 640.932,171.407 665.57,171.407 665.57,119.392 640.932,119.392 613.555,119.392 416.445,119.392 389.068,119.392 364.43,119.392 364.43,171.407 389.068,171.407 389.068,337.034 416.445,337.034 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
   <g class="shape layer-M1">
     <title>Shape ID: 17&#10;Layer: M1</title>
-  <polygon points="364.43,727.148 364.43,675.133 665.57,675.133 665.57,727.148 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  <polygon points="665.57,675.133 640.932,675.133 640.932,612.167 640.932,508.137 638.194,508.137 613.555,508.137 613.555,562.89 583.441,562.89 558.802,562.89 556.065,562.89 556.065,612.167 613.555,612.167 613.555,675.133 416.445,675.133 416.445,508.137 413.707,508.137 389.068,508.137 389.068,675.133 364.43,675.133 364.43,727.148 665.57,727.148 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
   </g>
   <g class="shape layer-M1">
     <title>Shape ID: 18&#10;Layer: M1</title>
-  <polygon points="445.19,502.662 445.19,343.878 472.567,343.878 472.567,502.662 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  <polygon points="472.567,343.878 471.198,343.878 446.559,343.878 445.19,343.878 445.19,502.661 472.567,502.661 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
   </g>
   <g class="shape layer-M1">
     <title>Shape ID: 19&#10;Layer: M1</title>
-  <polygon points="557.433,447.909 557.433,343.878 584.81,343.878 584.81,447.909 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M2">
-    <title>Shape ID: 20&#10;Layer: M2</title>
-  <polygon points="434.24,436.958 434.24,409.582 595.76,409.582 595.76,436.958 " fill="gold" fill-opacity="0.35" stroke="gold" stroke-width="2" />
-  </g>
-  <g class="shape layer-PO">
-    <title>Shape ID: 21&#10;Layer: PO</title>
-  <polygon points="450.665,494.449 450.665,478.023 467.091,478.023 467.091,494.449 " fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
+  <polygon points="584.81,343.878 583.441,343.878 558.802,343.878 557.433,343.878 557.433,447.909 584.81,447.909 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
   </g>
   <g class="shape layer-M1">
     <title>Shape ID: 22&#10;Layer: M1</title>
@@ -109,326 +133,198 @@
   <g class="shape layer-M1_PIN">
     <title>Shape ID: 23&#10;Layer: M1_PIN</title>
   <polygon points="501.312,436.958 528.688,436.958 528.688,409.582 501.312,409.582 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+      <line x1="501.312" y1="409.582" x2="528.688" y2="436.958" stroke="lightgray" stroke-width="1.5" />
+      <line x1="501.312" y1="436.958" x2="528.688" y2="409.582" stroke="lightgray" stroke-width="1.5" />
+  </g>
+  <g class="shape layer-M1_PIN">
+    <title>Shape ID: 25&#10;Layer: M1_PIN</title>
+  <polygon points="389.068,171.407 441.084,171.407 441.084,119.392 389.068,119.392 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+      <line x1="389.068" y1="119.392" x2="441.084" y2="171.407" stroke="lightgray" stroke-width="1.5" />
+      <line x1="389.068" y1="171.407" x2="441.084" y2="119.392" stroke="lightgray" stroke-width="1.5" />
+  </g>
+  <g class="shape layer-M1_PIN">
+    <title>Shape ID: 26&#10;Layer: M1_PIN</title>
+  <polygon points="389.068,727.148 441.084,727.148 441.084,675.133 389.068,675.133 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+      <line x1="389.068" y1="675.133" x2="441.084" y2="727.148" stroke="lightgray" stroke-width="1.5" />
+      <line x1="389.068" y1="727.148" x2="441.084" y2="675.133" stroke="lightgray" stroke-width="1.5" />
+  </g>
+  <g class="shape layer-VIA1">
+    <title>Shape ID: 34&#10;Layer: VIA1</title>
+  <polygon points="557.433,436.958 584.81,436.958 584.81,409.582 557.433,409.582 " fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
+  </g>
+  <g class="shape layer-VIA1">
+    <title>Shape ID: 35&#10;Layer: VIA1</title>
+  <polygon points="445.19,436.958 472.567,436.958 472.567,409.582 445.19,409.582 " fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
+  </g>
+  <g class="shape layer-M2">
+    <title>Shape ID: 20&#10;Layer: M2</title>
+  <polygon points="483.517,436.958 595.76,436.958 595.76,409.582 546.483,409.582 483.517,409.582 434.24,409.582 434.24,436.958 " fill="gold" fill-opacity="0.35" stroke="gold" stroke-width="2" />
   </g>
   <g class="shape layer-M2_PIN">
     <title>Shape ID: 24&#10;Layer: M2_PIN</title>
   <polygon points="434.24,436.958 461.616,436.958 461.616,409.582 434.24,409.582 " fill="gold" fill-opacity="0.35" stroke="gold" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 25&#10;Layer: M1</title>
-  <polygon points="613.555,337.034 613.555,119.392 640.932,119.392 640.932,337.034 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 26&#10;Layer: M1</title>
-  <polygon points="613.555,159.087 613.555,131.711 638.194,131.711 638.194,159.087 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 27&#10;Layer: M1</title>
-  <polygon points="389.068,337.034 389.068,119.392 416.445,119.392 416.445,337.034 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 28&#10;Layer: M1</title>
-  <polygon points="389.068,159.087 389.068,131.711 413.707,131.711 413.707,159.087 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 29&#10;Layer: M1</title>
-  <polygon points="613.555,612.167 613.555,508.137 640.932,508.137 640.932,612.167 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 30&#10;Layer: M1</title>
-  <polygon points="613.555,535.513 613.555,508.137 638.194,508.137 638.194,535.513 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 31&#10;Layer: M1</title>
-  <polygon points="389.068,713.46 389.068,508.137 416.445,508.137 416.445,713.46 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 32&#10;Layer: M1</title>
-  <polygon points="389.068,535.513 389.068,508.137 413.707,508.137 413.707,535.513 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 33&#10;Layer: M1</title>
-  <polygon points="389.068,171.407 389.068,119.392 640.932,119.392 640.932,171.407 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1_PIN">
-    <title>Shape ID: 34&#10;Layer: M1_PIN</title>
-  <polygon points="389.068,171.407 441.084,171.407 441.084,119.392 389.068,119.392 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 35&#10;Layer: M1</title>
-  <polygon points="389.068,727.148 389.068,675.133 640.932,675.133 640.932,727.148 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1_PIN">
-    <title>Shape ID: 36&#10;Layer: M1_PIN</title>
-  <polygon points="389.068,727.148 441.084,727.148 441.084,675.133 389.068,675.133 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 37&#10;Layer: M1</title>
-  <polygon points="556.065,612.167 556.065,562.89 640.932,562.89 640.932,612.167 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-M1">
-    <title>Shape ID: 38&#10;Layer: M1</title>
-  <polygon points="613.555,713.46 613.555,562.89 640.932,562.89 640.932,713.46 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-  </g>
-  <g class="shape layer-CO">
-    <title>Shape ID: 39&#10;Layer: CO</title>
-  <polygon points="446.559,380.837 471.198,380.837 471.198,356.198 446.559,356.198 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
-  </g>
-  <g class="shape layer-CO">
-    <title>Shape ID: 40&#10;Layer: CO</title>
-  <polygon points="558.802,380.837 583.441,380.837 583.441,356.198 558.802,356.198 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
-  </g>
-  <g class="shape layer-CO">
-    <title>Shape ID: 41&#10;Layer: CO</title>
-  <polygon points="446.559,490.342 471.198,490.342 471.198,465.703 446.559,465.703 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
-  </g>
-  <g class="shape layer-CO">
-    <title>Shape ID: 42&#10;Layer: CO</title>
-  <polygon points="558.802,599.848 583.441,599.848 583.441,575.209 558.802,575.209 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
-  </g>
-  <g class="shape layer-VIA1">
-    <title>Shape ID: 43&#10;Layer: VIA1</title>
-  <polygon points="557.433,436.958 584.81,436.958 584.81,409.582 557.433,409.582 " fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
-  </g>
-  <g class="shape layer-VIA1">
-    <title>Shape ID: 44&#10;Layer: VIA1</title>
-  <polygon points="445.19,436.958 472.567,436.958 472.567,409.582 445.19,409.582 " fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
+      <line x1="434.24" y1="409.582" x2="461.616" y2="436.958" stroke="lightgray" stroke-width="1.5" />
+      <line x1="434.24" y1="436.958" x2="461.616" y2="409.582" stroke="lightgray" stroke-width="1.5" />
   </g>
   </g>
   <g id="violations">
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="364.43" y1="119.392" x2="665.57" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="389.068" y1="171.407" x2="389.068" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g class="violation" data-layers="layer-PO">
+    <line class="violation-edge" x1="443.821" y1="453.384" x2="443.821" y2="502.661" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="473.935" y1="502.661" x2="473.935" y2="453.384" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="389.068" y1="119.392" x2="389.068" y2="119.392" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="389.068" cy="119.392" r="4" fill="red" />
-    <circle class="violation-point" cx="389.068" cy="119.392" r="4" fill="red" />
-    <text class="violation-label" x="389.068" y="112.392" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
+    <line class="violation-marker" x1="443.821" y1="478.023" x2="473.935" y2="478.023" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="443.821" cy="478.023" r="4" fill="red" />
+    <circle class="violation-point" cx="473.935" cy="478.023" r="4" fill="red" />
+    <text class="violation-label" x="458.878" y="471.023" font-size="14" text-anchor="middle" fill="red"><tspan x="458.878">MinWidth PO</tspan><tspan x="458.878" dy="16">0.11/0.12</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="364.43" y1="119.392" x2="665.57" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="389.068" y1="337.034" x2="389.068" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g class="violation" data-layers="layer-PO">
+    <line class="violation-edge" x1="473.935" y1="393.156" x2="473.935" y2="343.878" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="443.821" y1="343.878" x2="443.821" y2="393.156" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="389.068" y1="119.392" x2="389.068" y2="119.392" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="389.068" cy="119.392" r="4" fill="red" />
-    <circle class="violation-point" cx="389.068" cy="119.392" r="4" fill="red" />
-    <text class="violation-label" x="389.068" y="112.392" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
+    <line class="violation-marker" x1="473.935" y1="368.517" x2="443.821" y2="368.517" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="473.935" cy="368.517" r="4" fill="red" />
+    <circle class="violation-point" cx="443.821" cy="368.517" r="4" fill="red" />
+    <text class="violation-label" x="458.878" y="361.517" font-size="14" text-anchor="middle" fill="red"><tspan x="458.878">MinWidth PO</tspan><tspan x="458.878" dy="16">0.11/0.12</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="364.43" y1="119.392" x2="665.57" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="389.068" y1="131.711" x2="413.707" y2="131.711" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g class="violation" data-layers="layer-PO">
+    <line class="violation-edge" x1="586.179" y1="393.156" x2="586.179" y2="343.878" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="556.065" y1="343.878" x2="556.065" y2="393.156" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="389.068" y1="119.392" x2="389.068" y2="131.711" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="389.068" cy="119.392" r="4" fill="red" />
-    <circle class="violation-point" cx="389.068" cy="131.711" r="4" fill="red" />
-    <text class="violation-label" x="389.068" y="118.551" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
+    <line class="violation-marker" x1="586.179" y1="368.517" x2="556.065" y2="368.517" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="586.179" cy="368.517" r="4" fill="red" />
+    <circle class="violation-point" cx="556.065" cy="368.517" r="4" fill="red" />
+    <text class="violation-label" x="571.122" y="361.517" font-size="14" text-anchor="middle" fill="red"><tspan x="571.122">MinWidth PO</tspan><tspan x="571.122" dy="16">0.11/0.12</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="364.43" y1="119.392" x2="665.57" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="613.555" y1="337.034" x2="613.555" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g class="violation" data-layers="layer-PO">
+    <line class="violation-edge" x1="586.179" y1="612.167" x2="586.179" y2="562.89" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="556.065" y1="562.89" x2="556.065" y2="612.167" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="613.555" y1="119.392" x2="613.555" y2="119.392" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="613.555" cy="119.392" r="4" fill="red" />
-    <circle class="violation-point" cx="613.555" cy="119.392" r="4" fill="red" />
-    <text class="violation-label" x="613.555" y="112.392" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
+    <line class="violation-marker" x1="586.179" y1="587.529" x2="556.065" y2="587.529" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="586.179" cy="587.529" r="4" fill="red" />
+    <circle class="violation-point" cx="556.065" cy="587.529" r="4" fill="red" />
+    <text class="violation-label" x="571.122" y="580.529" font-size="14" text-anchor="middle" fill="red"><tspan x="571.122">MinWidth PO</tspan><tspan x="571.122" dy="16">0.11/0.12</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="364.43" y1="119.392" x2="665.57" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="613.555" y1="131.711" x2="638.194" y2="131.711" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g class="violation" data-layers="layer-PO">
+    </g>
+    <g class="violation" data-layers="layer-PO">
+    </g>
+    <g class="violation" data-layers="layer-PO">
+    </g>
+    <g class="violation" data-layers="layer-PO">
+    </g>
+    <g class="violation" data-layers="layer-PO">
+    </g>
+    <g class="violation" data-layers="layer-PO">
+    </g>
+    <g class="violation" data-layers="layer-PO">
+    </g>
+    <g class="violation" data-layers="layer-PO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO">
+    </g>
+    <g class="violation" data-layers="layer-CO layer-M1">
+    <line class="violation-edge" x1="446.559" y1="356.198" x2="446.559" y2="380.837" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="445.19" y1="343.878" x2="445.19" y2="502.661" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="613.555" y1="119.392" x2="613.555" y2="131.711" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="613.555" cy="119.392" r="4" fill="red" />
-    <circle class="violation-point" cx="613.555" cy="131.711" r="4" fill="red" />
-    <text class="violation-label" x="613.555" y="118.551" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
+    <line class="violation-marker" x1="446.559" y1="356.198" x2="445.19" y2="356.198" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="446.559" cy="356.198" r="4" fill="red" />
+    <circle class="violation-point" cx="445.19" cy="356.198" r="4" fill="red" />
+    <text class="violation-label" x="445.875" y="349.198" font-size="14" text-anchor="middle" fill="red"><tspan x="445.875">Enclosure CO With M1</tspan><tspan x="445.875" dy="16">0.005/0.025</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="364.43" y1="675.133" x2="665.57" y2="675.133" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="389.068" y1="727.148" x2="389.068" y2="675.133" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g class="violation" data-layers="layer-CO layer-M1">
+    <line class="violation-edge" x1="583.441" y1="380.837" x2="583.441" y2="356.198" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="584.81" y1="447.909" x2="584.81" y2="343.878" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="389.068" y1="675.133" x2="389.068" y2="675.133" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="389.068" cy="675.133" r="4" fill="red" />
-    <circle class="violation-point" cx="389.068" cy="675.133" r="4" fill="red" />
-    <text class="violation-label" x="389.068" y="668.133" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
+    <line class="violation-marker" x1="583.441" y1="380.837" x2="584.81" y2="380.837" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="583.441" cy="380.837" r="4" fill="red" />
+    <circle class="violation-point" cx="584.81" cy="380.837" r="4" fill="red" />
+    <text class="violation-label" x="584.126" y="373.837" font-size="14" text-anchor="middle" fill="red"><tspan x="584.126">Enclosure CO With M1</tspan><tspan x="584.126" dy="16">0.005/0.025</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="364.43" y1="675.133" x2="665.57" y2="675.133" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="389.068" y1="713.46" x2="389.068" y2="508.137" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g class="violation" data-layers="layer-CO layer-M1">
+    <line class="violation-edge" x1="446.559" y1="465.703" x2="446.559" y2="490.342" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="445.19" y1="343.878" x2="445.19" y2="502.661" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="389.068" y1="675.133" x2="389.068" y2="675.133" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="389.068" cy="675.133" r="4" fill="red" />
-    <circle class="violation-point" cx="389.068" cy="675.133" r="4" fill="red" />
-    <text class="violation-label" x="389.068" y="668.133" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
+    <line class="violation-marker" x1="446.559" y1="465.703" x2="445.19" y2="465.703" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="446.559" cy="465.703" r="4" fill="red" />
+    <circle class="violation-point" cx="445.19" cy="465.703" r="4" fill="red" />
+    <text class="violation-label" x="445.875" y="458.703" font-size="14" text-anchor="middle" fill="red"><tspan x="445.875">Enclosure CO With M1</tspan><tspan x="445.875" dy="16">0.005/0.025</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="364.43" y1="675.133" x2="665.57" y2="675.133" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="613.555" y1="713.46" x2="613.555" y2="562.89" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g class="violation" data-layers="layer-CO layer-M1">
+    <line class="violation-edge" x1="558.802" y1="575.209" x2="558.802" y2="599.848" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="556.065" y1="562.89" x2="556.065" y2="612.167" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="613.555" y1="675.133" x2="613.555" y2="675.133" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="613.555" cy="675.133" r="4" fill="red" />
-    <circle class="violation-point" cx="613.555" cy="675.133" r="4" fill="red" />
-    <text class="violation-label" x="613.555" y="668.133" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
+    <line class="violation-marker" x1="558.802" y1="575.209" x2="556.065" y2="575.209" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="558.802" cy="575.209" r="4" fill="red" />
+    <circle class="violation-point" cx="556.065" cy="575.209" r="4" fill="red" />
+    <text class="violation-label" x="557.433" y="568.209" font-size="14" text-anchor="middle" fill="red"><tspan x="557.433">Enclosure CO With M1</tspan><tspan x="557.433" dy="16">0.01/0.025</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="613.555" y1="337.034" x2="613.555" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="389.068" y1="119.392" x2="640.932" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g class="violation" data-layers="layer-M2">
+    <line class="violation-edge" x1="483.517" y1="436.958" x2="595.76" y2="436.958" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="595.76" y1="409.582" x2="546.483" y2="409.582" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="613.555" y1="119.392" x2="613.555" y2="119.392" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="613.555" cy="119.392" r="4" fill="red" />
-    <circle class="violation-point" cx="613.555" cy="119.392" r="4" fill="red" />
-    <text class="violation-label" x="613.555" y="112.392" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="613.555" y1="337.034" x2="613.555" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="613.555" y1="159.087" x2="613.555" y2="131.711" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="613.555" y1="159.087" x2="613.555" y2="159.087" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="613.555" cy="159.087" r="4" fill="red" />
-    <circle class="violation-point" cx="613.555" cy="159.087" r="4" fill="red" />
-    <text class="violation-label" x="613.555" y="152.087" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="638.194" y1="131.711" x2="638.194" y2="159.087" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="640.932" y1="119.392" x2="640.932" y2="171.407" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="638.194" y1="131.711" x2="640.932" y2="131.711" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="638.194" cy="131.711" r="4" fill="red" />
-    <circle class="violation-point" cx="640.932" cy="131.711" r="4" fill="red" />
-    <text class="violation-label" x="639.563" y="124.711" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="389.068" y1="337.034" x2="389.068" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="389.068" y1="171.407" x2="389.068" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="389.068" y1="119.392" x2="389.068" y2="119.392" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="389.068" cy="119.392" r="4" fill="red" />
-    <circle class="violation-point" cx="389.068" cy="119.392" r="4" fill="red" />
-    <text class="violation-label" x="389.068" y="112.392" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="389.068" y1="337.034" x2="389.068" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="389.068" y1="159.087" x2="389.068" y2="131.711" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="389.068" y1="159.087" x2="389.068" y2="159.087" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="389.068" cy="159.087" r="4" fill="red" />
-    <circle class="violation-point" cx="389.068" cy="159.087" r="4" fill="red" />
-    <text class="violation-label" x="389.068" y="152.087" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="389.068" y1="159.087" x2="389.068" y2="131.711" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="389.068" y1="171.407" x2="389.068" y2="119.392" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="389.068" y1="159.087" x2="389.068" y2="159.087" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="389.068" cy="159.087" r="4" fill="red" />
-    <circle class="violation-point" cx="389.068" cy="159.087" r="4" fill="red" />
-    <text class="violation-label" x="389.068" y="152.087" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="613.555" y1="612.167" x2="613.555" y2="508.137" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="613.555" y1="535.513" x2="613.555" y2="508.137" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="613.555" y1="508.137" x2="613.555" y2="508.137" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="613.555" cy="508.137" r="4" fill="red" />
-    <circle class="violation-point" cx="613.555" cy="508.137" r="4" fill="red" />
-    <text class="violation-label" x="613.555" y="501.137" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="613.555" y1="612.167" x2="613.555" y2="508.137" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="556.065" y1="562.89" x2="640.932" y2="562.89" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="613.555" y1="562.89" x2="613.555" y2="562.89" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="613.555" cy="562.89" r="4" fill="red" />
-    <circle class="violation-point" cx="613.555" cy="562.89" r="4" fill="red" />
-    <text class="violation-label" x="613.555" y="555.89" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="613.555" y1="612.167" x2="613.555" y2="508.137" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="613.555" y1="713.46" x2="613.555" y2="562.89" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="613.555" y1="612.167" x2="613.555" y2="612.167" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="613.555" cy="612.167" r="4" fill="red" />
-    <circle class="violation-point" cx="613.555" cy="612.167" r="4" fill="red" />
-    <text class="violation-label" x="613.555" y="605.167" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="389.068" y1="713.46" x2="389.068" y2="508.137" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="389.068" y1="727.148" x2="389.068" y2="675.133" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="389.068" y1="713.46" x2="389.068" y2="713.46" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="389.068" cy="713.46" r="4" fill="red" />
-    <circle class="violation-point" cx="389.068" cy="713.46" r="4" fill="red" />
-    <text class="violation-label" x="389.068" y="706.46" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="389.068" y1="713.46" x2="389.068" y2="508.137" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="389.068" y1="535.513" x2="389.068" y2="508.137" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="389.068" y1="508.137" x2="389.068" y2="508.137" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="389.068" cy="508.137" r="4" fill="red" />
-    <circle class="violation-point" cx="389.068" cy="508.137" r="4" fill="red" />
-    <text class="violation-label" x="389.068" y="501.137" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="389.068" y1="675.133" x2="640.932" y2="675.133" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="613.555" y1="713.46" x2="613.555" y2="562.89" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="613.555" y1="675.133" x2="613.555" y2="675.133" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="613.555" cy="675.133" r="4" fill="red" />
-    <circle class="violation-point" cx="613.555" cy="675.133" r="4" fill="red" />
-    <text class="violation-label" x="613.555" y="668.133" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
-  </g>
-    </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="556.065" y1="562.89" x2="640.932" y2="562.89" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="613.555" y1="713.46" x2="613.555" y2="562.89" stroke="red" stroke-width="3" stroke-linecap="round" />
-  <g>
-    <line class="violation-marker" x1="613.555" y1="562.89" x2="613.555" y2="562.89" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="613.555" cy="562.89" r="4" fill="red" />
-    <circle class="violation-point" cx="613.555" cy="562.89" r="4" fill="red" />
-    <text class="violation-label" x="613.555" y="555.89" font-size="14" text-anchor="middle" fill="red">MinSpacing 0/0.09</text>
+    <line class="violation-marker" x1="571.122" y1="436.958" x2="571.122" y2="409.582" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="571.122" cy="436.958" r="4" fill="red" />
+    <circle class="violation-point" cx="571.122" cy="409.582" r="4" fill="red" />
+    <text class="violation-label" x="571.122" y="416.27" font-size="14" text-anchor="middle" fill="red"><tspan x="571.122">MinWidth M2</tspan><tspan x="571.122" dy="16">0.1/0.1</tspan></text>
   </g>
     </g>
     <g class="violation" data-layers="layer-VIA1 layer-M1">
-    <line class="violation-edge" x1="557.433" y1="436.958" x2="584.81" y2="436.958" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="557.433" y1="447.909" x2="557.433" y2="343.878" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="584.81" y1="436.958" x2="584.81" y2="409.582" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="584.81" y1="447.909" x2="584.81" y2="343.878" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="557.433" y1="436.958" x2="557.433" y2="436.958" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="557.433" cy="436.958" r="4" fill="red" />
-    <circle class="violation-point" cx="557.433" cy="436.958" r="4" fill="red" />
-    <text class="violation-label" x="557.433" y="429.958" font-size="14" text-anchor="middle" fill="red">Enclosure 0/0.1</text>
+    <line class="violation-marker" x1="584.81" y1="436.958" x2="584.81" y2="436.958" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="584.81" cy="436.958" r="4" fill="red" />
+    <circle class="violation-point" cx="584.81" cy="436.958" r="4" fill="red" />
+    <text class="violation-label" x="584.81" y="429.958" font-size="14" text-anchor="middle" fill="red"><tspan x="584.81">Enclosure VIA1 With M1</tspan><tspan x="584.81" dy="16">0/0.03</tspan></text>
   </g>
     </g>
     <g class="violation" data-layers="layer-VIA1 layer-M1">
-    <line class="violation-edge" x1="445.19" y1="436.958" x2="472.567" y2="436.958" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="445.19" y1="502.662" x2="445.19" y2="343.878" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="445.19" y1="409.582" x2="445.19" y2="436.958" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="445.19" y1="343.878" x2="445.19" y2="502.661" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="445.19" y1="436.958" x2="445.19" y2="436.958" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="445.19" cy="436.958" r="4" fill="red" />
-    <circle class="violation-point" cx="445.19" cy="436.958" r="4" fill="red" />
-    <text class="violation-label" x="445.19" y="429.958" font-size="14" text-anchor="middle" fill="red">Enclosure 0/0.1</text>
+    <line class="violation-marker" x1="445.19" y1="409.582" x2="445.19" y2="409.582" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="445.19" cy="409.582" r="4" fill="red" />
+    <circle class="violation-point" cx="445.19" cy="409.582" r="4" fill="red" />
+    <text class="violation-label" x="445.19" y="402.582" font-size="14" text-anchor="middle" fill="red"><tspan x="445.19">Enclosure VIA1 With M1</tspan><tspan x="445.19" dy="16">0/0.03</tspan></text>
   </g>
     </g>
   </g>
   <g id="layer-legend">
-    <text x="1050" y="40" font-size="20" font-weight="bold" fill="black">Violations: 23</text>
+    <text x="1050" y="40" font-size="20" font-weight="bold" fill="black">Violations: 33</text>
     <text x="1050" y="65" font-size="18" font-weight="bold" fill="black">Layers</text>
     <text id="toggle-all-layers" x="1115" y="65" font-size="13" fill="#555555" text-decoration="underline" style="cursor: pointer;" onclick="toggleAllLayers()">Hide All</text>
     <g class="legend-item" data-layer="layer-OD" onclick="toggleLayer(this)" style="cursor: pointer;">

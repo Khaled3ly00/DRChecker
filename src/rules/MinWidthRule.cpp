@@ -28,10 +28,11 @@ std::vector<domain::Violation> MinWidthRule::check(const std::vector<domain::Sha
 		const geometry::PolygonEdgePairResult actualWidth = shape.getPolygon().minWidth();
 		if (actualWidth.distance + geometry::EPSILON < minimumWidth) {
 			domain::ViolationMarker marker{
-				actualWidth.firstPoint,
-				actualWidth.secondPoint,
-				actualWidth.firstEdgeIndex,
-				actualWidth.secondEdgeIndex
+				.firstPoint = actualWidth.firstPoint,
+				.secondPoint = actualWidth.secondPoint,
+				.firstEdgeIndex = actualWidth.firstEdgeIndex,
+				.secondEdgeIndex = actualWidth.secondEdgeIndex,
+				.firstLayer = getLayer()
 			};
 			std::string message = "Minimum width violation: required ";
 			// If the shape's width is less than the minimum width, create a violation (object) and add it to the violations vector

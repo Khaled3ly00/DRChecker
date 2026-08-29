@@ -48,10 +48,11 @@ std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::S
             if (actualSpacing.distance + geometry::EPSILON < minimumSpacing)
             {
                 domain::ViolationMarker marker{
-                    actualSpacing.firstPoint,
-                    actualSpacing.secondPoint,
-                    actualSpacing.firstEdgeIndex,
-                    actualSpacing.secondEdgeIndex
+                    .firstPoint = actualSpacing.firstPoint,
+                    .secondPoint = actualSpacing.secondPoint,
+                    .firstEdgeIndex = actualSpacing.firstEdgeIndex,
+                    .secondEdgeIndex = actualSpacing.secondEdgeIndex,
+                    .firstLayer = getLayer()
                 };
 
                 violations.emplace_back(domain::ViolationType::MinSpacing, std::vector<std::size_t>{firstShape.getId(), secondShape->getId()},

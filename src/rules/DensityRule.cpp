@@ -151,7 +151,8 @@ namespace drcheck::rules {
             // aggregate designated initializer used in c++20 to initialize members by member name
             // without needing to initialize all members
             const domain::ViolationMarker marker{
-                .region = window
+                .region = window,
+                .firstLayer = getLayer()
             };
 
             violations.emplace_back(violationType, std::vector<std::size_t>{}, message, actualDensity, requiredDensity, marker);

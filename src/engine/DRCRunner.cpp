@@ -5,6 +5,7 @@
 #include "drcheck/io/JSONReportWriter.h"
 #include "drcheck/io/SVGReportWriter.h"
 #include "drcheck/io/TclRuleParser.h"
+#include "drcheck/layout/LayoutNormalizer.h"
 
 #include <filesystem>
 
@@ -12,7 +13,9 @@ namespace drcheck::engine {
 
 std::vector<domain::Violation> DRCRunner::run(const DRCRunConfig& config)
 {
-    const auto shapes = io::JSONLayoutParser::load(config.layoutPath);
+    const auto rawShapes = io::JSONLayoutParser::load(config.layoutPath);
+
+    const auto shapes = layout::LayoutNormalizer::normalize(rawShapes);
 
     std::vector<std::unique_ptr<rules::Rule>> rules;
 

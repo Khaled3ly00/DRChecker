@@ -37,10 +37,14 @@ namespace drcheck::geometry {
 		Orientation getOrientation() const;
 		BoundingBox getBoundingBox() const;
 
-		bool contains(const Point& point) const;
+		bool contains(const Point& point, bool includeBoundary = true) const;
 		bool contains(const Polygon& other) const;
 
 		bool intersects(const Polygon& other) const;
+
+		bool sharesBoundarySegment(const Polygon& other) const;
+
+		bool overlaps(const Polygon& other) const;
 
 		PolygonEdgePairResult distanceTo(const Polygon& other, bool treatIntersectionAsZero = true) const;
 

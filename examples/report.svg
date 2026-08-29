@@ -26,13 +26,13 @@
     <title>Shape ID: 2&#10;Layer: M1</title>
   <polygon points="230,637.5 515,637.5 515,400 230,400 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
   </g>
-  <g class="shape layer-VIA1">
-    <title>Shape ID: 3&#10;Layer: VIA1</title>
-  <polygon points="277.5,542.5 325,542.5 325,495 277.5,495 " fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
-  </g>
   <g class="shape layer-M1">
     <title>Shape ID: 4&#10;Layer: M1</title>
   <polygon points="610,637.5 990,637.5 990,400 610,400 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
+  <g class="shape layer-VIA1">
+    <title>Shape ID: 3&#10;Layer: VIA1</title>
+  <polygon points="277.5,542.5 325,542.5 325,495 277.5,495 " fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
   </g>
   </g>
   <g id="violations">
@@ -43,7 +43,7 @@
     <line class="violation-marker" x1="135" y1="400" x2="40" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
     <circle class="violation-point" cx="135" cy="400" r="4" fill="red" />
     <circle class="violation-point" cx="40" cy="400" r="4" fill="red" />
-    <text class="violation-label" x="87.5" y="393" font-size="14" text-anchor="middle" fill="red">MinWidth 2/3</text>
+    <text class="violation-label" x="87.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="87.5">MinWidth M1</tspan><tspan x="87.5" dy="16">2/3</tspan></text>
   </g>
     </g>
     <g class="violation" data-layers="layer-M1">
@@ -53,7 +53,7 @@
     <line class="violation-marker" x1="135" y1="400" x2="230" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
     <circle class="violation-point" cx="135" cy="400" r="4" fill="red" />
     <circle class="violation-point" cx="230" cy="400" r="4" fill="red" />
-    <text class="violation-label" x="182.5" y="393" font-size="14" text-anchor="middle" fill="red">MinSpacing 2/3</text>
+    <text class="violation-label" x="182.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="182.5">MinSpacing M1</tspan><tspan x="182.5" dy="16">2/3</tspan></text>
   </g>
     </g>
     <g class="violation" data-layers="layer-M1">
@@ -63,7 +63,7 @@
     <line class="violation-marker" x1="515" y1="400" x2="610" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
     <circle class="violation-point" cx="515" cy="400" r="4" fill="red" />
     <circle class="violation-point" cx="610" cy="400" r="4" fill="red" />
-    <text class="violation-label" x="562.5" y="393" font-size="14" text-anchor="middle" fill="red">MinSpacing 2/3</text>
+    <text class="violation-label" x="562.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="562.5">MinSpacing M1</tspan><tspan x="562.5" dy="16">2/3</tspan></text>
   </g>
     </g>
     <g class="violation" data-layers="layer-VIA1 layer-M1">
@@ -73,7 +73,7 @@
     <line class="violation-marker" x1="277.5" y1="495" x2="230" y2="495" stroke="red" stroke-width="2" stroke-linecap="round" />
     <circle class="violation-point" cx="277.5" cy="495" r="4" fill="red" />
     <circle class="violation-point" cx="230" cy="495" r="4" fill="red" />
-    <text class="violation-label" x="253.75" y="488" font-size="14" text-anchor="middle" fill="red">Enclosure 1/2</text>
+    <text class="violation-label" x="253.75" y="488" font-size="14" text-anchor="middle" fill="red"><tspan x="253.75">Enclosure VIA1 With M1</tspan><tspan x="253.75" dy="16">1/2</tspan></text>
   </g>
     </g>
     <g class="violation" data-layers="">

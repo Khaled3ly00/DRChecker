@@ -1,11 +1,11 @@
 #pragma once
 
-#include <cstddef>
 
 #include "drcheck/geometry/Polygon.h"
-#include "Layer.h"
+#include "drcheck/domain/Layer.h"
 
 namespace drcheck::domain {
+
 class Shape
 {
 public:
@@ -22,7 +22,7 @@ public:
 private:
     std::size_t id;
     Layer layer;
-    geometry::Polygon polygon;
     Purpose purpose;
+    geometry::Polygon polygon;
 };
 }

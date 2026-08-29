@@ -1052,7 +1052,7 @@
     },
     {
       "id": 88,
-      "sourceType": "stdVia",
+      "sourceType": "stdViaCut",
       "layer": "CO",
       "purpose": "drawing",
       "vertices": [
@@ -1064,7 +1064,31 @@
     },
     {
       "id": 89,
-      "sourceType": "stdVia",
+      "sourceType": "stdViaEnclosure",
+      "layer": "PO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.16, 1.125 ],
+        [ 0.27, 1.125 ],
+        [ 0.27, 1.305 ],
+        [ 0.16, 1.305 ]
+      ]
+    },
+    {
+      "id": 90,
+      "sourceType": "stdViaEnclosure",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.17, 1.125 ],
+        [ 0.26, 1.125 ],
+        [ 0.26, 1.305 ],
+        [ 0.17, 1.305 ]
+      ]
+    },
+    {
+      "id": 91,
+      "sourceType": "stdViaCut",
       "layer": "CO",
       "purpose": "drawing",
       "vertices": [
@@ -1075,8 +1099,32 @@
       ]
     },
     {
-      "id": 90,
-      "sourceType": "stdVia",
+      "id": 92,
+      "sourceType": "stdViaEnclosure",
+      "layer": "PO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.57, 1.125 ],
+        [ 0.68, 1.125 ],
+        [ 0.68, 1.305 ],
+        [ 0.57, 1.305 ]
+      ]
+    },
+    {
+      "id": 93,
+      "sourceType": "stdViaEnclosure",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.58, 1.125 ],
+        [ 0.67, 1.125 ],
+        [ 0.67, 1.305 ],
+        [ 0.58, 1.305 ]
+      ]
+    },
+    {
+      "id": 94,
+      "sourceType": "stdViaCut",
       "layer": "CO",
       "purpose": "drawing",
       "vertices": [
@@ -1087,8 +1135,32 @@
       ]
     },
     {
-      "id": 91,
-      "sourceType": "stdVia",
+      "id": 95,
+      "sourceType": "stdViaEnclosure",
+      "layer": "PO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.16, 0.725 ],
+        [ 0.27, 0.725 ],
+        [ 0.27, 0.905 ],
+        [ 0.16, 0.905 ]
+      ]
+    },
+    {
+      "id": 96,
+      "sourceType": "stdViaEnclosure",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.17, 0.725 ],
+        [ 0.26, 0.725 ],
+        [ 0.26, 0.905 ],
+        [ 0.17, 0.905 ]
+      ]
+    },
+    {
+      "id": 97,
+      "sourceType": "stdViaCut",
       "layer": "CO",
       "purpose": "drawing",
       "vertices": [
@@ -1099,8 +1171,32 @@
       ]
     },
     {
-      "id": 92,
-      "sourceType": "stdVia",
+      "id": 98,
+      "sourceType": "stdViaEnclosure",
+      "layer": "PO",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.57, 0.325 ],
+        [ 0.68, 0.325 ],
+        [ 0.68, 0.505 ],
+        [ 0.57, 0.505 ]
+      ]
+    },
+    {
+      "id": 99,
+      "sourceType": "stdViaEnclosure",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.58, 0.325 ],
+        [ 0.67, 0.325 ],
+        [ 0.67, 0.505 ],
+        [ 0.58, 0.505 ]
+      ]
+    },
+    {
+      "id": 100,
+      "sourceType": "stdViaCut",
       "layer": "VIA1",
       "purpose": "drawing",
       "vertices": [
@@ -1111,8 +1207,32 @@
       ]
     },
     {
-      "id": 93,
-      "sourceType": "stdVia",
+      "id": 101,
+      "sourceType": "stdViaEnclosure",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.575, 0.925 ],
+        [ 0.675, 0.925 ],
+        [ 0.675, 1.105 ],
+        [ 0.575, 1.105 ]
+      ]
+    },
+    {
+      "id": 102,
+      "sourceType": "stdViaEnclosure",
+      "layer": "M2",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.535, 0.965 ],
+        [ 0.715, 0.965 ],
+        [ 0.715, 1.065 ],
+        [ 0.535, 1.065 ]
+      ]
+    },
+    {
+      "id": 103,
+      "sourceType": "stdViaCut",
       "layer": "VIA1",
       "purpose": "drawing",
       "vertices": [
@@ -1120,6 +1240,30 @@
         [ 0.265, 0.965 ],
         [ 0.265, 1.065 ],
         [ 0.165, 1.065 ]
+      ]
+    },
+    {
+      "id": 104,
+      "sourceType": "stdViaEnclosure",
+      "layer": "M1",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.165, 0.925 ],
+        [ 0.265, 0.925 ],
+        [ 0.265, 1.105 ],
+        [ 0.165, 1.105 ]
+      ]
+    },
+    {
+      "id": 105,
+      "sourceType": "stdViaEnclosure",
+      "layer": "M2",
+      "purpose": "drawing",
+      "vertices": [
+        [ 0.125, 0.965 ],
+        [ 0.305, 0.965 ],
+        [ 0.305, 1.065 ],
+        [ 0.125, 1.065 ]
       ]
     }
   ]

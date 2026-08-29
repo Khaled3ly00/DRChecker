@@ -53,10 +53,12 @@ std::vector<domain::Violation>MinEnclosureRule::check(const std::vector<domain::
             if (actualEnclosure.distance + geometry::EPSILON < minimumEnclosure)
             {
                 domain::ViolationMarker marker{
-                    actualEnclosure.firstPoint,
-                    actualEnclosure.secondPoint,
-                    actualEnclosure.firstEdgeIndex,
-                    actualEnclosure.secondEdgeIndex
+                    .firstPoint = actualEnclosure.firstPoint,
+                    .secondPoint = actualEnclosure.secondPoint,
+                    .firstEdgeIndex = actualEnclosure.firstEdgeIndex,
+                    .secondEdgeIndex = actualEnclosure.secondEdgeIndex,
+                    .firstLayer = getInnerLayer(),
+                    .secondLayer = getOuterLayer()
                 };
 
                 violations.emplace_back(

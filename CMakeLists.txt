@@ -17,11 +17,27 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(json)
 
+# tcl
 find_package(TCL QUIET)
 
 if(NOT TCL_FOUND)
     message(FATAL_ERROR "Tcl development files not found")
 endif()
+
+# clipper2
+set(CLIPPER2_UTILS OFF CACHE BOOL "" FORCE)
+set(CLIPPER2_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(CLIPPER2_TESTS OFF CACHE BOOL "" FORCE)
+set(CLIPPER2_USINGZ "OFF" CACHE STRING "" FORCE)
+
+FetchContent_Declare(
+    clipper2
+    GIT_REPOSITORY https://github.com/AngusJohnson/Clipper2.git
+    GIT_TAG Clipper2_2.0.1
+    SOURCE_SUBDIR CPP
+)
+
+FetchContent_MakeAvailable(clipper2)
 
 # --------------------------------------------------
 # DRChecker library
@@ -62,6 +78,9 @@ add_library(drchecker
     # Spatial
     src/spatial/QuadTree.cpp
     src/spatial/LayerSpatialIndex.cpp
+
+    # Layout
+    src/layout/LayoutNormalizer.cpp
 )
 
 target_include_directories(drchecker
@@ -77,6 +96,7 @@ target_link_libraries(drchecker
     PRIVATE
         nlohmann_json::nlohmann_json
         ${TCL_LIBRARY}
+        Clipper2
 )
 
 target_compile_features(drchecker PUBLIC cxx_std_20)
@@ -141,6 +161,9 @@ if(DRCHECK_BUILD_TESTS)
         # Spatial
         tests/spatial/QuadTreeTest.cpp
         tests/spatial/LayerSpatialIndexTest.cpp
+
+        # Layout
+        tests/layout/LayoutNormalizerTest.cpp
     )
 
     target_link_libraries(

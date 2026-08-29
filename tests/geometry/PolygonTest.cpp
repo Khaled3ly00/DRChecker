@@ -204,6 +204,7 @@ TEST(PolygonTest, ContainsPointOnEdge)
 		});
 	Point point(5.0, 0.0);
 	EXPECT_TRUE(polygon.contains(point));
+    EXPECT_FALSE(polygon.contains(point, false));
 }
 
 TEST(PolygonTest, ContainsPointWithinBoundaryTolerance)
@@ -264,6 +265,7 @@ TEST(PolygonTest, DetectsOverlappingPolygons)
         });
 
     EXPECT_TRUE(first.intersects(second));
+    EXPECT_TRUE(first.overlaps(second));
 }
 
 TEST(PolygonTest, SeparatedPolygonsDoNotIntersect)
@@ -283,6 +285,7 @@ TEST(PolygonTest, SeparatedPolygonsDoNotIntersect)
         });
 
     EXPECT_FALSE(first.intersects(second));
+    EXPECT_FALSE(first.overlaps(second));
 }
 
 TEST(PolygonTest, DetectsContainedPolygon)
@@ -302,6 +305,7 @@ TEST(PolygonTest, DetectsContainedPolygon)
         });
 
     EXPECT_TRUE(outer.intersects(inner));
+    EXPECT_TRUE(outer.overlaps(inner));
 }
 
 TEST(PolygonTest, DetectsContainedPolygonReverseCall)
@@ -321,6 +325,7 @@ TEST(PolygonTest, DetectsContainedPolygonReverseCall)
         });
 
     EXPECT_TRUE(inner.intersects(outer));
+    EXPECT_TRUE(inner.overlaps(outer));
 }
 
 TEST(PolygonTest, IntersectionIsSymmetric)
@@ -362,6 +367,7 @@ TEST(PolygonTest, TouchingEdgesCountAsIntersection)
         });
 
     EXPECT_TRUE(first.intersects(second));
+    EXPECT_FALSE(first.overlaps(second));
 }
 
 TEST(PolygonTest, TouchingVertexCountsAsIntersection)
@@ -381,6 +387,7 @@ TEST(PolygonTest, TouchingVertexCountsAsIntersection)
         });
 
     EXPECT_TRUE(first.intersects(second));
+    EXPECT_FALSE(first.overlaps(second));
 }
 TEST(PolygonTest, NearTouchingPolygonsIntersectSymmetrically)
 {
@@ -1002,4 +1009,135 @@ TEST(PolygonTest, AreaInsideReturnsPartialUShapedPolygonArea)
     BoundingBox window(0, 5, 10, 8);
 
     EXPECT_NEAR(polygon.areaInsideWindow(window), 18.0, EPSILON);
+}
+
+// Polygon::sharesBoundarySegment() Tests
+TEST(PolygonTest, SharingFullBoundaryPolygons)
+{
+    Polygon first({
+        Point(0, 0),
+        Point(4, 0),
+        Point(4, 4),
+        Point(0, 4)
+        });
+
+    Polygon second({
+        Point(4, 0),
+        Point(10, 0),
+        Point(10, 4),
+        Point(4, 4)
+        });
+
+
+    EXPECT_TRUE(first.sharesBoundarySegment(second));
+    EXPECT_FALSE(first.overlaps(second));
+}
+
+TEST(PolygonTest, SharingPartialBoundaryPolygons)
+{
+    Polygon first({
+        Point(0, 0),
+        Point(4, 0),
+        Point(4, 4),
+        Point(0, 4)
+        });
+
+    Polygon second({
+        Point(4, 0),
+        Point(10, 0),
+        Point(10, 2),
+        Point(4, 2)
+        });
+
+
+    EXPECT_TRUE(first.sharesBoundarySegment(second));
+    EXPECT_FALSE(first.overlaps(second));
+}
+
+TEST(PolygonTest, TouchingVerticesDoesntCountAsSharingBoundaryPolygons)
+{
+    Polygon first({
+        Point(0, 0),
+        Point(4, 0),
+        Point(4, 4),
+        Point(0, 4)
+        });
+
+    Polygon second({
+        Point(4, 4),
+        Point(10, 4),
+        Point(10, 8),
+        Point(4, 8)
+        });
+
+
+    EXPECT_FALSE(first.sharesBoundarySegment(second));
+    EXPECT_FALSE(first.overlaps(second));
+}
+
+TEST(PolygonTest, OverlappingDoesntCountAsSharingBoundaryPolygons)
+{
+    Polygon first({
+        Point(0, 0),
+        Point(4, 0),
+        Point(4, 4),
+        Point(0, 4)
+        });
+
+    Polygon second({
+        Point(2, 6),
+        Point(3, 6),
+        Point(3, 2),
+        Point(2, 2)
+        });
+
+
+    EXPECT_FALSE(first.sharesBoundarySegment(second));
+    EXPECT_TRUE(first.overlaps(second));
+}
+
+TEST(PolygonTest, OverlappingWithSharingBoundaryPolygons)
+{
+    Polygon first({
+        Point(0, 0),
+        Point(4, 0),
+        Point(4, 4),
+        Point(0, 4)
+        });
+
+    Polygon second({
+        Point(2, 2),
+        Point(2, 4),
+        Point(4, 4),
+        Point(4, 2)
+        });
+
+
+    EXPECT_TRUE(first.sharesBoundarySegment(second));
+    EXPECT_TRUE(first.overlaps(second));
+}
+
+// Polygon::overlaps() Tests
+TEST(PolygonTest, OverlappingPolgonsSpecialCase)
+{
+    Polygon first({
+        Point(0, 0),
+        Point(4, 0),
+        Point(4, 2),
+        Point(2, 2),
+        Point(2, 3),
+        Point(4, 3),
+        Point(4, 4),
+        Point(0, 4)
+        });
+
+    Polygon second({
+        Point(2, 0),
+        Point(6, 0),
+        Point(6, 4),
+        Point(2, 4)
+        });
+
+
+    EXPECT_TRUE(first.overlaps(second));
 }

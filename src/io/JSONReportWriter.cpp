@@ -5,6 +5,14 @@
 
 #include <nlohmann/json.hpp>
 
+namespace {
+    double roundForReport(double value)
+    {
+        constexpr double scale = 1'000'000.0;
+        return std::round(value * scale) / scale;
+    }
+}
+
 namespace drcheck::io {
 void JSONReportWriter::write(const std::vector<domain::Violation>& violations, const std::string& filePath)
 {
@@ -23,7 +31,7 @@ void JSONReportWriter::write(const std::vector<domain::Violation>& violations, c
         violationJson["type"] = violation.getTypeAsString();
         violationJson["shapeIds"] = violation.getShapeIds();
         violationJson["message"] = violation.getMessage();
-        violationJson["actual"] = violation.getActualValue();
+        violationJson["actual"] = roundForReport(violation.getActualValue());
         violationJson["required"] = violation.getRequiredValue();
 
         if (violation.getMarker().has_value())
@@ -32,16 +40,16 @@ void JSONReportWriter::write(const std::vector<domain::Violation>& violations, c
             if (marker.firstPoint.has_value())
             {
                 violationJson["marker"]["firstPoint"] = {
-                    {"x", marker.firstPoint->getX()},
-                    {"y", marker.firstPoint->getY()}
+                    {"x", roundForReport(marker.firstPoint->getX())},
+                    {"y", roundForReport(marker.firstPoint->getY())}
                 };
             }
 
             if (marker.secondPoint.has_value())
             {
                 violationJson["marker"]["secondPoint"] = {
-                    {"x", marker.secondPoint->getX()},
-                    {"y", marker.secondPoint->getY()}
+                    {"x", roundForReport(marker.secondPoint->getX())},
+                    {"y", roundForReport(marker.secondPoint->getY())}
                 };
             }
             if (marker.firstEdgeIndex.has_value())
@@ -58,19 +66,19 @@ void JSONReportWriter::write(const std::vector<domain::Violation>& violations, c
                 violationJson["marker"]["region"] = {
                     {
                         "minX",
-                        marker.region->getMinX()
+                        roundForReport(marker.region->getMinX())
                     },
                     {
                         "minY",
-                        marker.region->getMinY()
+                        roundForReport(marker.region->getMinY())
                     },
                     {
                         "maxX",
-                        marker.region->getMaxX()
+                        roundForReport(marker.region->getMaxX())
                     },
                     {
                         "maxY",
-                        marker.region->getMaxY()
+                        roundForReport(marker.region->getMaxY())
                     }
                 };
             }

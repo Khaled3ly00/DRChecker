@@ -70,6 +70,77 @@ namespace drcheck::io {
             double offsetY;
         };
 
+        double roundForReport(double value)
+        {
+            constexpr double scale = 1'000.0;
+            return std::round(value * scale) / scale;
+        }
+
+        int getLayerDrawPriority(domain::Layer layer)
+        {
+            switch (layer)
+            {
+            case domain::Layer::NW:
+                return 0;
+            
+            case domain::Layer::VTL_N:
+                return 1;
+
+            case domain::Layer::VTL_P:
+                return 2;
+
+            case domain::Layer::PDK:
+                return 3;
+
+            case domain::Layer::PO:
+                return 4;
+
+            case domain::Layer::NP:
+                return 5;
+
+            case domain::Layer::PP:
+                return 6;
+
+            case domain::Layer::OD:
+                return 7;
+
+            case domain::Layer::CO:
+                return 8;
+
+            case domain::Layer::M1:
+                return 9;
+
+            case domain::Layer::M1_PIN:
+                return 10;
+
+            case domain::Layer::VIA1:
+                return 11;
+
+            case domain::Layer::M2:
+                return 12;
+
+            case domain::Layer::M2_PIN:
+                return 13;
+            }
+
+            return 100;
+        }
+
+        std::vector<domain::Shape> getShapesInDrawOrder(const std::vector<domain::Shape>& shapes)
+        {
+            std::vector<domain::Shape> orderedShapes = shapes;
+
+            std::stable_sort(
+                orderedShapes.begin(),
+                orderedShapes.end(),
+                [](const domain::Shape& first, const domain::Shape& second)
+                {
+                    return getLayerDrawPriority(first.getLayer()) < getLayerDrawPriority(second.getLayer());
+                });
+
+            return orderedShapes;
+        }
+
         std::string layerToString(domain::Layer layer)
         {
             switch (layer)
@@ -467,6 +538,36 @@ namespace drcheck::io {
                 << "\""
                 << " />\n";
 
+            if (shape.getLayer() == domain::Layer::M1_PIN || shape.getLayer() == domain::Layer::M2_PIN) {
+
+                const auto bounds = shape.getPolygon().getBoundingBox();
+
+                const double minX = transform.toSvgX(bounds.getMinX());
+                const double maxX = transform.toSvgX(bounds.getMaxX());
+
+                const double topY = transform.toSvgY(bounds.getMaxY());
+                const double bottomY = transform.toSvgY(bounds.getMinY());
+
+                output
+                    << "      <line "
+                    << "x1=\"" << minX << "\" "
+                    << "y1=\"" << topY << "\" "
+                    << "x2=\"" << maxX << "\" "
+                    << "y2=\"" << bottomY << "\" "
+                    << "stroke=\"lightgray\" "
+                    << "stroke-width=\"1.5\""
+                    << " />\n"
+
+                    << "      <line "
+                    << "x1=\"" << minX << "\" "
+                    << "y1=\"" << bottomY << "\" "
+                    << "x2=\"" << maxX << "\" "
+                    << "y2=\"" << topY << "\" "
+                    << "stroke=\"lightgray\" "
+                    << "stroke-width=\"1.5\""
+                    << " />\n";
+
+            }
             output << "  </g>\n";
         }
 
@@ -491,6 +592,8 @@ namespace drcheck::io {
             const double y1 = transform.toSvgY(firstPoint.getY());
             const double x2 = transform.toSvgX(secondPoint.getX());
             const double y2 = transform.toSvgY(secondPoint.getY());
+
+
 
             output << "  <g>\n";
 
@@ -539,20 +642,42 @@ namespace drcheck::io {
                 << "    <text "
                 << "class=\"violation-label\" "
                 << "x=\"" << midpointX << "\" "
-                << "y=\""
-                << midpointY - VIOLATION_LABEL_FONT_SIZE / 2.0
-                << "\" "
-                << "font-size=\""
-                << VIOLATION_LABEL_FONT_SIZE
-                << "\" "
+                << "y=\"" << midpointY - VIOLATION_LABEL_FONT_SIZE / 2.0 << "\" "
+                << "font-size=\"" << VIOLATION_LABEL_FONT_SIZE << "\" "
                 << "text-anchor=\"middle\" "
-                << "fill=\"red\">"
-                << violation.getTypeAsString()
-                << " "
-                << violation.getActualValue()
+                << "fill=\"red\">";
+
+            output
+                << "<tspan x=\"" << midpointX << "\">"
+                << violation.getTypeAsString();
+
+            if (marker.firstLayer.has_value())
+            {
+                output
+                    << " "
+                    << layerToString(marker.firstLayer.value());
+
+                if (marker.secondLayer.has_value())
+                {
+                    output
+                        << " With "
+                        << layerToString(marker.secondLayer.value());
+                }
+            }
+
+            output
+                << "</tspan>";
+
+            output
+                << "<tspan "
+                << "x=\"" << midpointX << "\" "
+                << "dy=\"" << VIOLATION_LABEL_FONT_SIZE + 2.0 << "\">"
+                << roundForReport(violation.getActualValue())
                 << "/"
                 << violation.getRequiredValue()
-                << "</text>\n";
+                << "</tspan>";
+
+            output << "</text>\n";
 
             output << "  </g>\n";
         }
@@ -796,7 +921,9 @@ output
 
         output << "  <g id=\"layout\">\n";
 
-        for (const auto& shape : shapes)
+        const auto orderedShapes = getShapesInDrawOrder(shapes);
+
+        for (const auto& shape : orderedShapes)
         {
             writePolygon(output, shape, transform);
         }
