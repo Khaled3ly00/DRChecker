@@ -82,6 +82,12 @@ void JSONReportWriter::write(const std::vector<domain::Violation>& violations, c
                     }
                 };
             }
+            if (marker.firstLayer.has_value()) {
+                violationJson["marker"]["firstLayer"] = {"firstLayer", marker.firstLayer.value()};
+            }
+            if (marker.secondLayer.has_value()) {
+                violationJson["marker"]["secondLayer"] = { "firstLayer", marker.secondLayer.value() };
+            }
         }
         // Push violationJson to violations
         report["violations"].push_back(std::move(violationJson));

@@ -32,9 +32,18 @@ namespace drcheck::rules {
 
         if (type == "min_enclosure")
         {
-            if (!params.innerLayer.has_value() || !params.outerLayer.has_value() || !params.value.has_value())
+            if (!params.innerLayer.has_value())
             {
-                throw std::invalid_argument("min_enclosure requires inner layer, outer layer, and value");
+                throw std::invalid_argument("MinEnclosureRule requires innerLayer");
+            }
+
+            if (params.enclosureOptions.has_value())
+            {
+                return std::make_unique<MinEnclosureRule>(params.innerLayer.value(), params.enclosureOptions.value());
+            }
+            if (!params.outerLayer.has_value() || !params.value.has_value())
+            {
+                throw std::invalid_argument("MinEnclosureRule requires enclosure options or outerLayer and value");
             }
 
             return std::make_unique<MinEnclosureRule>(params.innerLayer.value(), params.outerLayer.value(), params.value.value());

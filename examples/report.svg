@@ -4,10 +4,10 @@
       visibility: hidden;
       pointer-events: none;
     }
-    .violation:hover .violation-label {
+    .violation-overlay:hover .violation-label {
       visibility: visible;
     }
-    .violation {
+    .violation-overlay {
       cursor: pointer;
     }
     .legend-item.disabled .legend-label {
@@ -16,93 +16,245 @@
     .legend-item.disabled rect {
       opacity: 0.35;
     }
+    .violation-list-item.active rect {
+      fill: #ffeaea;
+      stroke: #cc0000;
+    }
+    .violation-list-item.active text {
+      fill: #990000;
+    }
   </style>
   <g id="layout">
   <g class="shape layer-M1">
     <title>Shape ID: 1&#10;Layer: M1</title>
-  <polygon points="40,637.5 135,637.5 135,162.5 40,162.5 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  <polygon points="360,557.5 423,557.5 423,242.5 360,242.5 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
   </g>
   <g class="shape layer-M1">
     <title>Shape ID: 2&#10;Layer: M1</title>
-  <polygon points="230,637.5 515,637.5 515,400 230,400 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  <polygon points="486,557.5 675,557.5 675,400 486,400 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
   </g>
   <g class="shape layer-M1">
     <title>Shape ID: 4&#10;Layer: M1</title>
-  <polygon points="610,637.5 990,637.5 990,400 610,400 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  <polygon points="738,557.5 990,557.5 990,400 738,400 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
   </g>
   <g class="shape layer-VIA1">
     <title>Shape ID: 3&#10;Layer: VIA1</title>
-  <polygon points="277.5,542.5 325,542.5 325,495 277.5,495 " fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
+  <polygon points="517.5,494.5 549,494.5 549,463 517.5,463 " fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
   </g>
   </g>
   <g id="violations">
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="135" y1="637.5" x2="135" y2="162.5" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="40" y1="162.5" x2="40" y2="637.5" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g id="violation-0" class="violation-overlay" data-layers="layer-M1" style="display: none;">
+    <line class="violation-edge" x1="423" y1="557.5" x2="423" y2="242.5" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="360" y1="242.5" x2="360" y2="557.5" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="135" y1="400" x2="40" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="135" cy="400" r="4" fill="red" />
-    <circle class="violation-point" cx="40" cy="400" r="4" fill="red" />
-    <text class="violation-label" x="87.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="87.5">MinWidth M1</tspan><tspan x="87.5" dy="16">2/3</tspan></text>
+    <line class="violation-marker" x1="423" y1="400" x2="360" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="423" cy="400" r="4" fill="red" />
+    <circle class="violation-point" cx="360" cy="400" r="4" fill="red" />
+    <text class="violation-label" x="391.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="391.5">MinWidth M1</tspan><tspan x="391.5" dy="16">2/3</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="135" y1="637.5" x2="135" y2="162.5" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="230" y1="400" x2="230" y2="637.5" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g id="violation-1" class="violation-overlay" data-layers="layer-M1" style="display: none;">
+    <line class="violation-edge" x1="423" y1="557.5" x2="423" y2="242.5" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="486" y1="400" x2="486" y2="557.5" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="135" y1="400" x2="230" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="135" cy="400" r="4" fill="red" />
-    <circle class="violation-point" cx="230" cy="400" r="4" fill="red" />
-    <text class="violation-label" x="182.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="182.5">MinSpacing M1</tspan><tspan x="182.5" dy="16">2/3</tspan></text>
+    <line class="violation-marker" x1="423" y1="400" x2="486" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="423" cy="400" r="4" fill="red" />
+    <circle class="violation-point" cx="486" cy="400" r="4" fill="red" />
+    <text class="violation-label" x="454.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="454.5">MinSpacing M1</tspan><tspan x="454.5" dy="16">2/3</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="layer-M1">
-    <line class="violation-edge" x1="515" y1="637.5" x2="515" y2="400" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="610" y1="400" x2="610" y2="637.5" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g id="violation-2" class="violation-overlay" data-layers="layer-M1" style="display: none;">
+    <line class="violation-edge" x1="675" y1="557.5" x2="675" y2="400" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="738" y1="400" x2="738" y2="557.5" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="515" y1="400" x2="610" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="515" cy="400" r="4" fill="red" />
-    <circle class="violation-point" cx="610" cy="400" r="4" fill="red" />
-    <text class="violation-label" x="562.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="562.5">MinSpacing M1</tspan><tspan x="562.5" dy="16">2/3</tspan></text>
+    <line class="violation-marker" x1="675" y1="400" x2="738" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="675" cy="400" r="4" fill="red" />
+    <circle class="violation-point" cx="738" cy="400" r="4" fill="red" />
+    <text class="violation-label" x="706.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="706.5">MinSpacing M1</tspan><tspan x="706.5" dy="16">2/3</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="layer-VIA1 layer-M1">
-    <line class="violation-edge" x1="277.5" y1="495" x2="277.5" y2="542.5" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="230" y1="400" x2="230" y2="637.5" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <g id="violation-3" class="violation-overlay" data-layers="layer-VIA1 layer-M1" style="display: none;">
+    <line class="violation-edge" x1="517.5" y1="463" x2="517.5" y2="494.5" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="486" y1="400" x2="486" y2="557.5" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="277.5" y1="495" x2="230" y2="495" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="277.5" cy="495" r="4" fill="red" />
-    <circle class="violation-point" cx="230" cy="495" r="4" fill="red" />
-    <text class="violation-label" x="253.75" y="488" font-size="14" text-anchor="middle" fill="red"><tspan x="253.75">Enclosure VIA1 With M1</tspan><tspan x="253.75" dy="16">1/2</tspan></text>
+    <line class="violation-marker" x1="517.5" y1="463" x2="486" y2="463" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="517.5" cy="463" r="4" fill="red" />
+    <circle class="violation-point" cx="486" cy="463" r="4" fill="red" />
+    <text class="violation-label" x="501.75" y="456" font-size="14" text-anchor="middle" fill="red"><tspan x="501.75">Enclosure VIA1 With M1</tspan><tspan x="501.75" dy="16">1/2</tspan></text>
   </g>
     </g>
-    <g class="violation" data-layers="">
+    <g id="violation-4" class="violation-overlay" data-layers="" style="display: none;">
   <g>
-    <rect class="violation-region" x="515" y="162.5" width="475" height="475" fill="red" fill-opacity="0.08" stroke="red" stroke-width="2" />
-    <text class="violation-label" x="752.5" y="180.5" font-size="14" text-anchor="middle" fill="red">MinDensity 0.4/0.5</text>
+    <rect class="violation-region" x="675" y="242.5" width="315" height="315" fill="red" fill-opacity="0.08" stroke="red" stroke-width="2" />
+    <text class="violation-label" x="832.5" y="260.5" font-size="14" text-anchor="middle" fill="red">MinDensity 0.4/0.5</text>
   </g>
     </g>
+  </g>
+  <g id="violation-list">
+    <rect x="40" y="40" width="300" height="720" fill="#fafafa" stroke="#cccccc" stroke-width="1" />
+    <text x="50" y="60" font-size="20" font-weight="bold" fill="black">Violations: 5</text>
+    <g class="panel-button" onclick="showAllViolations()" style="cursor: pointer;">
+      <rect x="50" y="70" width="80" height="24" fill="#eeeeee" stroke="#999999" stroke-width="1" />
+      <text x="90" y="86" font-size="12" text-anchor="middle" fill="black">Show All</text>
+    </g>
+    <g class="panel-button" onclick="hideAllViolations()" style="cursor: pointer;">
+      <rect x="140" y="70" width="80" height="24" fill="#eeeeee" stroke="#999999" stroke-width="1" />
+      <text x="180" y="86" font-size="12" text-anchor="middle" fill="black">Hide All</text>
+    </g>
+    <g id="violation-item-0" class="violation-list-item" data-violation-id="violation-0" data-message="Minimum width violation on layer: M1should be 3.000000 actual2.000000" data-page="0" data-layers="layer-M1" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="96" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="114" font-size="12" fill="black">1. MinWidth M1 2/3</text>
+    </g>
+    <g id="violation-item-1" class="violation-list-item" data-violation-id="violation-1" data-message="Minimum spacing violation" data-page="0" data-layers="layer-M1" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="128" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="146" font-size="12" fill="black">2. MinSpacing M1 2/3</text>
+    </g>
+    <g id="violation-item-2" class="violation-list-item" data-violation-id="violation-2" data-message="Minimum spacing violation" data-page="0" data-layers="layer-M1" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="160" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="178" font-size="12" fill="black">3. MinSpacing M1 2/3</text>
+    </g>
+    <g id="violation-item-3" class="violation-list-item" data-violation-id="violation-3" data-message="Minimum Enclosure violation: VIA1 enclosed by M1should be 2.000000 actual1.000000" data-page="0" data-layers="layer-VIA1 layer-M1" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="192" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="210" font-size="12" fill="black">4. Enclosure VIA1-M1 1/2</text>
+    </g>
+    <g id="violation-item-4" class="violation-list-item" data-violation-id="violation-4" data-message="Minimum density violation on layer : M1should be 0.500000 actual0.400000" data-page="0" data-layers="" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="224" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="242" font-size="12" fill="black">5. MinDensity M1 0.4/0.5</text>
+    </g>
+    <text x="60" y="740" font-size="13" fill="#555555" style="cursor: pointer;" onclick="previousViolationPage()">Prev</text>
+    <text id="violation-page-indicator" x="190" y="740" font-size="13" text-anchor="middle" fill="black">1 / 1</text>
+    <text x="295" y="740" font-size="13" fill="#555555" style="cursor: pointer;" onclick="nextViolationPage()">Next</text>
+    <rect x="50" y="630" width="280" height="80" fill="#fafafa" stroke="#cccccc" stroke-width="1" rx="4" />
+    <text x="58" y="648" font-size="13" font-weight="bold" fill="black">Violation Details</text>
+    <text id="violation-details-text" x="58" y="670" font-size="11" fill="#555555">Select a violation</text>
   </g>
   <g id="layer-legend">
-    <text x="1050" y="40" font-size="20" font-weight="bold" fill="black">Violations: 5</text>
-    <text x="1050" y="65" font-size="18" font-weight="bold" fill="black">Layers</text>
-    <text id="toggle-all-layers" x="1115" y="65" font-size="13" fill="#555555" text-decoration="underline" style="cursor: pointer;" onclick="toggleAllLayers()">Hide All</text>
+    <text x="1050" y="40" font-size="20" font-weight="bold" fill="black">Layers</text>
+    <text id="toggle-all-layers" x="1115" y="40" font-size="15" fill="#555555" text-decoration="underline" style="cursor: pointer;" onclick="toggleAllLayers()">Hide All</text>
     <g class="legend-item" data-layer="layer-M1" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="90" width="18" height="18" fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-      <text class="legend-label" x="1078" y="105" font-size="14" fill="black">M1</text>
+    <rect x="1050" y="65" width="18" height="18" fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+      <text class="legend-label" x="1078" y="80" font-size="14" fill="black">M1</text>
     </g>
     <g class="legend-item" data-layer="layer-VIA1" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="120" width="18" height="18" fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
-      <text class="legend-label" x="1078" y="135" font-size="14" fill="black">VIA1</text>
+    <rect x="1050" y="95" width="18" height="18" fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
+      <text class="legend-label" x="1078" y="110" font-size="14" fill="black">VIA1</text>
     </g>
   </g>
   <script><![CDATA[
-    function updateLayerVisibility() {
+    let currentViolationPage = 0;
+    const totalViolationPages = 1;
+
+    function toggleViolation(item) {
+        const violationId = item.dataset.violationId;
+        const overlay = document.getElementById(violationId);
+        const details = document.getElementById('violation-details-text');
+
+        if (!overlay) {
+            return;
+        }
+
+        const isActive = item.classList.toggle('active');
+
+        overlay.style.display = isActive ? '' : 'none';
+
+        if (!details) {
+            return;
+        }
+
+        if (isActive) {
+            details.textContent = item.dataset.message;
+        }
+        else {
+            const activeItems =
+                document.querySelectorAll('.violation-list-item.active');
+
+            details.textContent =
+                activeItems.length === 0
+                    ? 'Select a violation'
+                    : 'Multiple violations selected';
+        }
+    }
+    function showAllViolations() {
+        document.querySelectorAll('.violation-list-item').forEach(function(item) {
+            item.classList.add('active');
+
+            const overlay =
+                document.getElementById(item.dataset.violationId);
+
+            if (overlay && item.style.display !== 'none') {
+                overlay.style.display = '';
+            }
+        });
+
+        const details =
+            document.getElementById('violation-details-text');
+
+        if (details) {
+            details.textContent = 'All violations are shown';
+        }
+    }
+
+    function hideAllViolations() {
+        document.querySelectorAll('.violation-list-item').forEach(function(item) {
+            item.classList.remove('active');
+
+            const overlay =
+                document.getElementById(item.dataset.violationId);
+
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        });
+
+        const details =
+            document.getElementById('violation-details-text');
+
+        if (details) {
+            details.textContent = 'Select a violation';
+        }
+    }
+    function getHiddenLayers() {
       const hiddenLayers = new Set();
 
       document.querySelectorAll('.legend-item.disabled').forEach(function(item) {
         hiddenLayers.add(item.dataset.layer);
       });
+
+      return hiddenLayers;
+    }
+
+    function itemUsesHiddenLayer(item, hiddenLayers) {
+      const layersText = item.dataset.layers || '';
+      const layers = layersText === '' ? [] : layersText.split(' ');
+
+      return layers.some(function(layer) {
+        return hiddenLayers.has(layer);
+      });
+    }
+
+    function updateViolationListVisibility(hiddenLayers) {
+      document.querySelectorAll('.violation-list-item').forEach(function(item) {
+        const hiddenByLayer = itemUsesHiddenLayer(item, hiddenLayers);
+        const onCurrentPage = Number(item.dataset.page) === currentViolationPage;
+
+        item.style.display = !hiddenByLayer && onCurrentPage ? '' : 'none';
+
+        if (hiddenByLayer) {
+          item.classList.remove('active');
+        }
+
+        // Pagination only changes the list; selected overlays stay visible
+        // across pages unless their layer is hidden.
+        const overlay = document.getElementById(item.dataset.violationId);
+        if (overlay) {
+          const showOverlay = !hiddenByLayer && item.classList.contains('active');
+          overlay.style.display = showOverlay ? '' : 'none';
+        }
+      });
+    }
+
+    function updateLayerVisibility() {
+      const hiddenLayers = getHiddenLayers();
 
       document.querySelectorAll('.shape').forEach(function(shape) {
         let hideShape = false;
@@ -116,20 +268,31 @@
         shape.style.display = hideShape ? 'none' : '';
       });
 
-      document.querySelectorAll('.violation').forEach(function(violation) {
-        const layersText = violation.dataset.layers || '';
-        const layers = layersText === '' ? [] : layersText.split(' ');
+      updateViolationListVisibility(hiddenLayers);
+    }
 
-        let hideViolation = false;
+    function updateViolationPage() {
+      updateViolationListVisibility(getHiddenLayers());
 
-        layers.forEach(function(layer) {
-          if (hiddenLayers.has(layer)) {
-            hideViolation = true;
-          }
-        });
+      const indicator = document.getElementById('violation-page-indicator');
+      if (indicator) {
+        indicator.textContent =
+          (currentViolationPage + 1) + ' / ' + totalViolationPages;
+      }
+    }
 
-        violation.style.display = hideViolation ? 'none' : '';
-      });
+    function nextViolationPage() {
+      if (currentViolationPage + 1 < totalViolationPages) {
+        currentViolationPage++;
+        updateViolationPage();
+      }
+    }
+
+    function previousViolationPage() {
+      if (currentViolationPage > 0) {
+        currentViolationPage--;
+        updateViolationPage();
+      }
     }
 
     function updateToggleAllText() {
@@ -197,9 +360,7 @@
         ((event.clientY - rect.top) / rect.height) * viewHeight;
 
       let zoomFactor = event.deltaY < 0 ? 0.9 : 1.1;
-
       let newWidth = viewWidth * zoomFactor;
-
       const minWidth = originalWidth * MIN_ZOOM_FACTOR;
 
       if (newWidth < minWidth) {

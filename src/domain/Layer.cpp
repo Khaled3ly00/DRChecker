@@ -66,6 +66,56 @@ Layer layerFromString(const std::string& layerName)
     );
 }
 
+std::string layerToString(Layer layer)
+{
+    switch (layer)
+    {
+    case Layer::NW:
+        return "NW";
+
+    case Layer::NP:
+        return "NP";
+
+    case Layer::PP:
+        return "PP";
+
+    case Layer::M1:
+        return "M1";
+
+    case Layer::M1_PIN:
+        return "M1_PIN";
+
+    case Layer::M2:
+        return "M2";
+
+    case Layer::M2_PIN:
+        return "M2_PIN";
+
+    case Layer::PO:
+        return "PO";
+
+    case Layer::OD:
+        return "OD";
+
+    case Layer::CO:
+        return "CO";
+
+    case Layer::VIA1:
+        return "VIA1";
+    
+    case Layer::PDK:
+        return "PDK";
+
+    case Layer::VTL_N:
+        return "VTL_N";
+
+    case Layer::VTL_P:
+        return "VTL_P";
+    }
+
+    throw std::invalid_argument("Unknown layer");
+}
+
 Purpose purposeFromString(const std::string& purposeName) {
     if (purposeName == "drawing") {
         return Purpose::Drawing;

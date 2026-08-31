@@ -1,6 +1,6 @@
 #include "drcheck/rules/DensityRule.h"
-#include "drcheck/geometry/Constants.h"
 #include "drcheck/spatial/LayerSpatialIndex.h"
+#include "drcheck/rules/Constants.h"
 
 #include <stdexcept>
 #include <utility>
@@ -87,10 +87,10 @@ namespace drcheck::rules {
     {
         std::vector<geometry::BoundingBox> windows;
         
-        for (double y = region.getMinY(); y < region.getMaxY() - geometry::EPSILON; y += windowStep)
+        for (double y = region.getMinY(); y < region.getMaxY() - DRC_LENGTH_TOLERANCE; y += windowStep)
         {
             const double windowMaxY = std::min(y + windowSize, region.getMaxY());
-            for (double x = region.getMinX(); x < region.getMaxX() - geometry::EPSILON; x += windowStep)
+            for (double x = region.getMinX(); x < region.getMaxX() - DRC_LENGTH_TOLERANCE; x += windowStep)
             {
                 const double windowMaxX = std::min(x + windowSize, region.getMaxX());
                 windows.emplace_back(x, y, windowMaxX, windowMaxY);
@@ -121,10 +121,10 @@ namespace drcheck::rules {
         switch (limit)
         {
         case DensityLimit::Minimum:
-            return actualDensity + geometry::EPSILON < requiredDensity;
+            return actualDensity + DRC_LENGTH_TOLERANCE < requiredDensity;
 
         case DensityLimit::Maximum:
-            return actualDensity > requiredDensity + geometry::EPSILON;
+            return actualDensity > requiredDensity + DRC_LENGTH_TOLERANCE;
         }
 
         throw std::logic_error("Unknown density limit type");
@@ -140,6 +140,7 @@ namespace drcheck::rules {
         const domain::ViolationType violationType = limit == DensityLimit::Minimum ? domain::ViolationType::MinDensity : domain::ViolationType::MaxDensity;
         const std::string message = limit == DensityLimit::Minimum ? "Minimum density violation" : "Maximum density violation";
         // loop through windows and calculate their densities
+
         for (const auto& window : sampleWindows)
         {
             const double actualDensity = calculateDensity(window, spatialIndex);
@@ -154,8 +155,8 @@ namespace drcheck::rules {
                 .region = window,
                 .firstLayer = getLayer()
             };
-
-            violations.emplace_back(violationType, std::vector<std::size_t>{}, message, actualDensity, requiredDensity, marker);
+            const std::string msg = message + " on layer : " + domain::layerToString(layer) + "should be " + std::to_string(requiredDensity) + " actual" + std::to_string(actualDensity);
+            violations.emplace_back(violationType, std::vector<std::size_t>{}, msg, actualDensity, requiredDensity, marker);
         }
         return violations;
     }

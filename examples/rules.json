@@ -55,6 +55,64 @@
         "maxX": 50.0,
         "maxY": 70.0
       }
+    },
+    {
+      "type": "MinEnclosure",
+      "innerLayer": "VIA1",
+      "enclosureOptions": [
+        {
+          "outerLayer": "M1",
+          "allSidesMinEnclosure": 0.04
+        }
+      ]
+    },
+    {
+      "type": "MinEnclosure",
+      "innerLayer": "CO",
+      "enclosureOptions": [
+        {
+          "outerLayer": "M1",
+          "allSidesMinEnclosure": 0.04
+        },
+        {
+          "outerLayer": "PO",
+          "allSidesMinEnclosure": 0.03
+        }
+      ]
+    },
+    {
+      "type": "MinEnclosure",
+      "innerLayer": "CO",
+      "enclosureOptions": [
+        {
+          "outerLayer": "M1",
+          "allSidesMinEnclosure": 0.04,
+          "firstPairMinEnclosure": 0.00,
+          "secondPairMinEnclosure": 0.06
+        },
+        {
+          "outerLayer": "PO",
+          "allSidesMinEnclosure": 0.04,
+          "firstPairMinEnclosure": 0.00,
+          "secondPairMinEnclosure": 0.08
+        }
+      ]
+    },
+    {
+      "type": "MinEnclosure",
+      "innerLayer": "CO",
+      "enclosureOptions": [
+        {
+          "outerLayer": "M1",
+          "allSidesMinEnclosure": 0.04,
+          "firstPairMinEnclosure": 0.00,
+          "secondPairMinEnclosure": 0.06
+        },
+        {
+          "outerLayer": "PO",
+          "allSidesMinEnclosure": 0.04
+        }
+      ]
     }
   ]
 }

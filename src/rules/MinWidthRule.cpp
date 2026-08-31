@@ -1,5 +1,5 @@
 #include "drcheck/rules/MinWidthRule.h"
-#include "drcheck/geometry/Constants.h"
+#include "drcheck/rules/Constants.h"
 
 #include <stdexcept>
 #include <string>
@@ -26,7 +26,7 @@ std::vector<domain::Violation> MinWidthRule::check(const std::vector<domain::Sha
 			continue;
 		}
 		const geometry::PolygonEdgePairResult actualWidth = shape.getPolygon().minWidth();
-		if (actualWidth.distance + geometry::EPSILON < minimumWidth) {
+		if (actualWidth.distance + DRC_LENGTH_TOLERANCE < minimumWidth) {
 			domain::ViolationMarker marker{
 				.firstPoint = actualWidth.firstPoint,
 				.secondPoint = actualWidth.secondPoint,
@@ -34,9 +34,9 @@ std::vector<domain::Violation> MinWidthRule::check(const std::vector<domain::Sha
 				.secondEdgeIndex = actualWidth.secondEdgeIndex,
 				.firstLayer = getLayer()
 			};
-			std::string message = "Minimum width violation: required ";
+			const std::string msg = "Minimum width violation on layer: " + domain::layerToString(layer) + "should be " + std::to_string(minimumWidth) + " actual" + std::to_string(actualWidth.distance);
 			// If the shape's width is less than the minimum width, create a violation (object) and add it to the violations vector
-			violations.emplace_back(domain::ViolationType::MinWidth, std::vector<std::size_t>{shape.getId()}, std::move(message), actualWidth.distance, minimumWidth, marker);
+			violations.emplace_back(domain::ViolationType::MinWidth, std::vector<std::size_t>{shape.getId()}, std::move(msg), actualWidth.distance, minimumWidth, marker);
 		}
 	}
 	return violations;

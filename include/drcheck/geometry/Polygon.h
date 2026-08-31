@@ -5,7 +5,6 @@
 #include <vector>
 #include <optional>
 #include <utility>
-#include <optional>
 #include <cstddef>
 
 #include "drcheck/geometry/Segment.h"
@@ -23,6 +22,15 @@ namespace drcheck::geometry {
 		std::size_t firstEdgeIndex;
 		std::size_t secondEdgeIndex;
 	};
+
+	struct PairwiseEnclosureResult
+	{
+		double left;
+		double right;
+		double bottom;
+		double top;
+	};
+
 	class Polygon
 	{
 	public:
@@ -38,7 +46,7 @@ namespace drcheck::geometry {
 		BoundingBox getBoundingBox() const;
 
 		bool contains(const Point& point, bool includeBoundary = true) const;
-		bool contains(const Polygon& other) const;
+		bool contains(const Polygon& other, bool includeBoundary = false) const;
 
 		bool intersects(const Polygon& other) const;
 
@@ -52,6 +60,8 @@ namespace drcheck::geometry {
 		PolygonEdgePairResult orthogonalMinWidth() const;
 
 		double areaInsideWindow(const BoundingBox& region) const;
+
+		PairwiseEnclosureResult pairwiseEnclosure(const Polygon& outerPolygon) const;
 	private:
 		enum class ClipBoundary
 		{
@@ -63,6 +73,7 @@ namespace drcheck::geometry {
 		std::vector<Point> vertices;
 		bool hasSelfIntersection() const;
 		bool isOrthogonal() const;
+		bool isAxisAlignedRectangle() const;
 		static std::optional<std::pair<double, double>>positiveOverlapInterval(double minA, double maxA, double minB, double maxB);
 		double edgePairFacingScore(const Segment& firstEdge, const Segment& secondEdge, const Point& firstPoint, const Point& secondPoint) const;
 		bool isPointInsideWindow(const Point& point, const BoundingBox& window, ClipBoundary boundary) const;

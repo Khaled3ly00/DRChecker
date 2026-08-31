@@ -1,439 +1,64 @@
 {
-    "violationCount": 33,
+    "violationCount": 4,
     "violations": [
         {
-            "type": "MinWidth",
-            "shapeIds": [
-                21
-            ],
-            "message": "Minimum width violation: required ",
-            "actual": 0.110001,
-            "required": 0.12,
-            "marker": {
-                "firstPoint": {
-                    "x": 0.16,
-                    "y": 0.815
-                },
-                "secondPoint": {
-                    "x": 0.27,
-                    "y": 0.815
-                },
-                "firstEdgeIndex": 1,
-                "secondEdgeIndex": 3
-            }
-        },
-        {
-            "type": "MinWidth",
-            "shapeIds": [
-                28
-            ],
-            "message": "Minimum width violation: required ",
-            "actual": 0.11,
-            "required": 0.12,
-            "marker": {
-                "firstPoint": {
-                    "x": 0.27,
-                    "y": 1.215
-                },
-                "secondPoint": {
-                    "x": 0.16,
-                    "y": 1.215
-                },
-                "firstEdgeIndex": 1,
-                "secondEdgeIndex": 3
-            }
-        },
-        {
-            "type": "MinWidth",
-            "shapeIds": [
-                30
-            ],
-            "message": "Minimum width violation: required ",
-            "actual": 0.11,
-            "required": 0.12,
-            "marker": {
-                "firstPoint": {
-                    "x": 0.68,
-                    "y": 1.215
-                },
-                "secondPoint": {
-                    "x": 0.57,
-                    "y": 1.215
-                },
-                "firstEdgeIndex": 1,
-                "secondEdgeIndex": 3
-            }
-        },
-        {
-            "type": "MinWidth",
-            "shapeIds": [
-                33
-            ],
-            "message": "Minimum width violation: required ",
-            "actual": 0.11,
-            "required": 0.12,
-            "marker": {
-                "firstPoint": {
-                    "x": 0.68,
-                    "y": 0.415
-                },
-                "secondPoint": {
-                    "x": 0.57,
-                    "y": 0.415
-                },
-                "firstEdgeIndex": 1,
-                "secondEdgeIndex": 3
-            }
-        },
-        {
             "type": "Enclosure",
             "shapeIds": [
                 21
             ],
-            "message": "Inner shape is not enclosed by any outer shape",
+            "message": "POis not enclosed by any allowed outer layer",
             "actual": 0.0,
-            "required": 0.15
+            "required": 0.0,
+            "marker": {
+                "firstLayer": [
+                    "firstLayer",
+                    7
+                ]
+            }
         },
         {
             "type": "Enclosure",
             "shapeIds": [
                 28
             ],
-            "message": "Inner shape is not enclosed by any outer shape",
+            "message": "POis not enclosed by any allowed outer layer",
             "actual": 0.0,
-            "required": 0.15
+            "required": 0.0,
+            "marker": {
+                "firstLayer": [
+                    "firstLayer",
+                    7
+                ]
+            }
         },
         {
             "type": "Enclosure",
             "shapeIds": [
                 30
             ],
-            "message": "Inner shape is not enclosed by any outer shape",
+            "message": "POis not enclosed by any allowed outer layer",
             "actual": 0.0,
-            "required": 0.15
+            "required": 0.0,
+            "marker": {
+                "firstLayer": [
+                    "firstLayer",
+                    7
+                ]
+            }
         },
         {
             "type": "Enclosure",
             "shapeIds": [
                 33
             ],
-            "message": "Inner shape is not enclosed by any outer shape",
+            "message": "POis not enclosed by any allowed outer layer",
             "actual": 0.0,
-            "required": 0.15
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                21
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.15
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                28
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.15
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                30
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.15
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                33
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.15
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                2
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.01
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                3
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.01
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                4
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.01
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                5
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.01
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                6
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.01
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                12
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.01
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                13
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.01
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                14
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.01
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                15
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.01
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                16
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.01
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                27
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.015
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                29
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.015
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                31
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.015
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                32
-            ],
-            "message": "Inner shape is not enclosed by any outer shape",
-            "actual": 0.0,
-            "required": 0.015
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                27,
-                18
-            ],
-            "message": "Enclosure violation",
-            "actual": 0.005,
-            "required": 0.025,
+            "required": 0.0,
             "marker": {
-                "firstPoint": {
-                    "x": 0.17,
-                    "y": 1.26
-                },
-                "secondPoint": {
-                    "x": 0.165,
-                    "y": 1.26
-                },
-                "firstEdgeIndex": 3,
-                "secondEdgeIndex": 3
-            }
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                29,
-                19
-            ],
-            "message": "Enclosure violation",
-            "actual": 0.005,
-            "required": 0.025,
-            "marker": {
-                "firstPoint": {
-                    "x": 0.67,
-                    "y": 1.17
-                },
-                "secondPoint": {
-                    "x": 0.675,
-                    "y": 1.17
-                },
-                "firstEdgeIndex": 1,
-                "secondEdgeIndex": 5
-            }
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                31,
-                18
-            ],
-            "message": "Enclosure violation",
-            "actual": 0.005,
-            "required": 0.025,
-            "marker": {
-                "firstPoint": {
-                    "x": 0.17,
-                    "y": 0.86
-                },
-                "secondPoint": {
-                    "x": 0.165,
-                    "y": 0.86
-                },
-                "firstEdgeIndex": 3,
-                "secondEdgeIndex": 3
-            }
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                32,
-                17
-            ],
-            "message": "Enclosure violation",
-            "actual": 0.01,
-            "required": 0.025,
-            "marker": {
-                "firstPoint": {
-                    "x": 0.58,
-                    "y": 0.46
-                },
-                "secondPoint": {
-                    "x": 0.57,
-                    "y": 0.46
-                },
-                "firstEdgeIndex": 3,
-                "secondEdgeIndex": 9
-            }
-        },
-        {
-            "type": "MinWidth",
-            "shapeIds": [
-                20
-            ],
-            "message": "Minimum width violation: required ",
-            "actual": 0.099999,
-            "required": 0.1,
-            "marker": {
-                "firstPoint": {
-                    "x": 0.625,
-                    "y": 0.965
-                },
-                "secondPoint": {
-                    "x": 0.625,
-                    "y": 1.065
-                },
-                "firstEdgeIndex": 0,
-                "secondEdgeIndex": 2
-            }
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                34,
-                19
-            ],
-            "message": "Enclosure violation",
-            "actual": 0.0,
-            "required": 0.03,
-            "marker": {
-                "firstPoint": {
-                    "x": 0.675,
-                    "y": 0.965
-                },
-                "secondPoint": {
-                    "x": 0.675,
-                    "y": 0.965
-                },
-                "firstEdgeIndex": 1,
-                "secondEdgeIndex": 5
-            }
-        },
-        {
-            "type": "Enclosure",
-            "shapeIds": [
-                35,
-                18
-            ],
-            "message": "Enclosure violation",
-            "actual": 0.0,
-            "required": 0.03,
-            "marker": {
-                "firstPoint": {
-                    "x": 0.165,
-                    "y": 1.065
-                },
-                "secondPoint": {
-                    "x": 0.165,
-                    "y": 1.065
-                },
-                "firstEdgeIndex": 3,
-                "secondEdgeIndex": 3
+                "firstLayer": [
+                    "firstLayer",
+                    7
+                ]
             }
         }
     ]

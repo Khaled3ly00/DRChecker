@@ -135,3 +135,82 @@ TEST(TclRuleParserTest, ParsesDensityRuleWithAnalysisRegion)
     EXPECT_NEAR(region.getMaxX(), 100.0, EPSILON);
     EXPECT_NEAR(region.getMaxY(), 100.0, EPSILON);
 }
+
+TEST(TclRuleParserTest, ParsesEnclosureRuleWithOneSimpleOption)
+{
+    const std::string filePath = std::string(DRCHECK_SOURCE_DIR) + "/examples/rules.tcl";
+    const auto rules = TclRuleParser::load(filePath);
+
+    const auto* minEnclosureRule = dynamic_cast<const MinEnclosureRule*>(rules[7].get());
+
+    ASSERT_NE(minEnclosureRule, nullptr);
+
+    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::CO);
+
+    const auto& option = minEnclosureRule->getEnclosureOption(0);
+    EXPECT_EQ(option.getOuterLayer(), Layer::M1);
+    EXPECT_DOUBLE_EQ(option.getAllSidesMinEnclosure(), 0.04);
+}
+
+TEST(TclRuleParserTest, ParsesEnclosureRuleWithTwoSimpleOptions)
+{
+    const std::string filePath = std::string(DRCHECK_SOURCE_DIR) + "/examples/rules.tcl";
+    const auto rules = TclRuleParser::load(filePath);
+
+    const auto* minEnclosureRule = dynamic_cast<const MinEnclosureRule*>(rules[8].get());
+    ASSERT_NE(minEnclosureRule, nullptr);
+
+    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::CO);
+
+    const auto& option0 = minEnclosureRule->getEnclosureOption(0);
+    EXPECT_EQ(option0.getOuterLayer(), Layer::M1);
+    EXPECT_DOUBLE_EQ(option0.getAllSidesMinEnclosure(), 0.04);
+
+    const auto& option1 = minEnclosureRule->getEnclosureOption(1);
+    EXPECT_EQ(option1.getOuterLayer(), Layer::PO);
+    EXPECT_DOUBLE_EQ(option1.getAllSidesMinEnclosure(), 0.03);
+}
+
+TEST(TclRuleParserTest, ParsesEnclosureRuleWithTwoComplexOptions)
+{
+    const std::string filePath = std::string(DRCHECK_SOURCE_DIR) + "/examples/rules.tcl";
+    const auto rules = TclRuleParser::load(filePath);
+
+    const auto* minEnclosureRule = dynamic_cast<const MinEnclosureRule*>(rules[9].get());
+    ASSERT_NE(minEnclosureRule, nullptr);
+
+    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::CO);
+
+    const auto& option0 = minEnclosureRule->getEnclosureOption(0);
+    EXPECT_EQ(option0.getOuterLayer(), Layer::M1);
+    EXPECT_DOUBLE_EQ(option0.getAllSidesMinEnclosure(), 0.04);
+    EXPECT_DOUBLE_EQ(option0.getFirstPairMinEnclosure(), 0.00);
+    EXPECT_DOUBLE_EQ(option0.getSecondPairMinEnclosure(), 0.06);
+
+    const auto& option1 = minEnclosureRule->getEnclosureOption(1);
+    EXPECT_EQ(option1.getOuterLayer(), Layer::PO);
+    EXPECT_DOUBLE_EQ(option1.getAllSidesMinEnclosure(), 0.04);
+    EXPECT_DOUBLE_EQ(option1.getFirstPairMinEnclosure(), 0.00);
+    EXPECT_DOUBLE_EQ(option1.getSecondPairMinEnclosure(), 0.08);
+}
+
+TEST(TclRuleParserTest, ParsesEnclosureRuleWithOneSimpleOneComplexOptions)
+{
+    const std::string filePath = std::string(DRCHECK_SOURCE_DIR) + "/examples/rules.tcl";
+    const auto rules = TclRuleParser::load(filePath);
+
+    const auto* minEnclosureRule = dynamic_cast<const MinEnclosureRule*>(rules[10].get());
+    ASSERT_NE(minEnclosureRule, nullptr);
+
+    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::CO);
+
+    const auto& option0 = minEnclosureRule->getEnclosureOption(0);
+    EXPECT_EQ(option0.getOuterLayer(), Layer::M1);
+    EXPECT_DOUBLE_EQ(option0.getAllSidesMinEnclosure(), 0.04);
+    EXPECT_DOUBLE_EQ(option0.getFirstPairMinEnclosure(), 0.00);
+    EXPECT_DOUBLE_EQ(option0.getSecondPairMinEnclosure(), 0.06);
+
+    const auto& option1 = minEnclosureRule->getEnclosureOption(1);
+    EXPECT_EQ(option1.getOuterLayer(), Layer::PO);
+    EXPECT_DOUBLE_EQ(option1.getAllSidesMinEnclosure(), 0.04);
+}

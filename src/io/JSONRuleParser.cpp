@@ -2,6 +2,7 @@
 #include "drcheck/rules/RuleFactory.h"
 #include "drcheck/geometry/BoundingBox.h"
 #include "drcheck/rules/DensityRule.h"
+#include "drcheck/rules/MinEnclosureRule.h"
 
 #include <nlohmann/json.hpp>
 #include <fstream>
@@ -83,8 +84,51 @@ namespace drcheck::io {
             else if (type == "MinEnclosure")
             {
                 params.innerLayer = domain::layerFromString(ruleJson.at("innerLayer").get<std::string>());
-                params.outerLayer = domain::layerFromString(ruleJson.at("outerLayer").get<std::string>());
-                params.value = ruleJson.at("value").get<double>();
+
+                if (ruleJson.contains("enclosureOptions"))
+                {
+                    const auto& optionsJson = ruleJson.at("enclosureOptions");
+
+                    if (!optionsJson.is_array() || optionsJson.empty())
+                    {
+                        throw std::invalid_argument("MinEnclosure enclosureOptions must be a non-empty array");
+                    }
+
+                    std::vector<rules::EnclosureOption> enclosureOptions;
+                    enclosureOptions.reserve(optionsJson.size());
+
+                    for (const auto& optionJson : optionsJson)
+                    {
+                        const domain::Layer outerLayer = domain::layerFromString(optionJson.at("outerLayer").get<std::string>());
+                        const double allSidesMinEnclosure = optionJson.at("allSidesMinEnclosure").get<double>();
+                        const bool hasFirstPair = optionJson.contains("firstPairMinEnclosure");
+                        const bool hasSecondPair = optionJson.contains("secondPairMinEnclosure");
+
+                        if (hasFirstPair != hasSecondPair)
+                        {
+                            throw std::invalid_argument("MinEnclosure option must provide both firstPairMinEnclosure and secondPairMinEnclosure"
+                            );
+                        }
+
+                        if (hasFirstPair)
+                        {
+                            enclosureOptions.emplace_back(outerLayer, allSidesMinEnclosure, optionJson.at("firstPairMinEnclosure").get<double>(),
+                                optionJson.at("secondPairMinEnclosure").get<double>());
+                        }
+                        else
+                        {
+                            enclosureOptions.emplace_back(outerLayer, allSidesMinEnclosure);
+                        }
+                    }
+
+                    params.enclosureOptions = std::move(enclosureOptions);
+                }
+                else
+                {
+                    // Backward-compatible MinEnclosure format
+                    params.outerLayer = domain::layerFromString(ruleJson.at("outerLayer").get<std::string>());
+                    params.value = ruleJson.at("value").get<double>();
+                }
 
                 parsedRules.push_back(rules::RuleFactory::create("min_enclosure", params));
             }

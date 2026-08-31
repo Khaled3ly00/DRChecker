@@ -775,6 +775,26 @@ TEST(PolygonTest, InnerPolygonCompletelyInsideConcavePolygon) {
     EXPECT_TRUE(secondPolygon.contains(firstPolygon));
 }
 
+TEST(PolygonTest, ContainsPolygonAllowsBoundaryWhenRequested)
+{
+    Polygon outer({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+
+    Polygon inner({
+        Point(2, 0),
+        Point(8, 0),
+        Point(8, 5),
+        Point(2, 5)
+        });
+
+    EXPECT_FALSE(outer.contains(inner));
+    EXPECT_TRUE(outer.contains(inner, true));
+}
+
 // Tests for witness reporting (closest verticies and edges)
 
 TEST(PolygonTest, DistanceBetweenSeparatedRectangles)
@@ -1140,4 +1160,79 @@ TEST(PolygonTest, OverlappingPolgonsSpecialCase)
 
 
     EXPECT_TRUE(first.overlaps(second));
+}
+
+TEST(PolygonTest, PairwiseEnclosureReturnsFourSideDistances)
+{
+    Polygon outer({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+
+    Polygon inner({
+        Point(2, 3),
+        Point(7, 3),
+        Point(7, 8),
+        Point(2, 8)
+        });
+
+    const PairwiseEnclosureResult result = inner.pairwiseEnclosure(outer);
+
+    EXPECT_NEAR(result.left, 2.0, EPSILON);
+    EXPECT_NEAR(result.right, 3.0, EPSILON);
+    EXPECT_NEAR(result.bottom, 3.0, EPSILON);
+    EXPECT_NEAR(result.top, 2.0, EPSILON);
+}
+
+TEST(PolygonTest, PairwiseEnclosureSupportsZeroOnOppositePair)
+{
+    Polygon outer({
+        Point(-0.04, 0.0),
+        Point(1.04, 0.0),
+        Point(1.04, 1.0),
+        Point(-0.04, 1.0)
+        });
+
+    Polygon inner({
+        Point(0.0, 0.0),
+        Point(1.0, 0.0),
+        Point(1.0, 1.0),
+        Point(0.0, 1.0)
+        });
+
+    const PairwiseEnclosureResult result = inner.pairwiseEnclosure(outer);
+
+    EXPECT_NEAR(result.left, 0.04, EPSILON);
+    EXPECT_NEAR(result.right, 0.04, EPSILON);
+    EXPECT_NEAR(result.bottom, 0.0, EPSILON);
+    EXPECT_NEAR(result.top, 0.0, EPSILON);
+}
+
+TEST(PolygonTest, PairwiseEnclosureAcceptsRectangleWithCollinearVertices)
+{
+    Polygon outer({
+        Point(0, 0),
+        Point(10, 0),
+        Point(10, 10),
+        Point(0, 10)
+        });
+
+    Polygon inner({
+        Point(2, 2),
+        Point(4, 2),
+        Point(6, 2),
+        Point(8, 2),
+        Point(8, 8),
+        Point(5, 8),
+        Point(2, 8)
+        });
+
+    const PairwiseEnclosureResult result = inner.pairwiseEnclosure(outer);
+
+    EXPECT_NEAR(result.left, 2.0, EPSILON);
+    EXPECT_NEAR(result.right, 2.0, EPSILON);
+    EXPECT_NEAR(result.bottom, 2.0, EPSILON);
+    EXPECT_NEAR(result.top, 2.0, EPSILON);
 }

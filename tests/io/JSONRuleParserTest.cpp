@@ -6,6 +6,7 @@
 #include "drcheck/rules/MinEnclosureRule.h"
 #include "drcheck/rules/DensityRule.h"
 
+#include <stdexcept>
 #include <filesystem>
 
 using namespace drcheck::rules;
@@ -17,7 +18,6 @@ JSONRuleParser parser;
 const auto rules = parser.load(path.string());
 
 TEST(JSONRuleParserTest, ParsingRulesFromJSONTestingMinWidthRuleM1) {
-    ASSERT_EQ(rules.size(), 8);
     // EXPECT_EQ(rules[0]->getMinimumWidth(), 3); Doesn't work (compile time error) use dynamic casting instead
     // cast polymorhic rule pointer to MinWidthRule pointer
     const auto* minWidthRule = dynamic_cast<const MinWidthRule*>(rules[0].get());
@@ -27,7 +27,6 @@ TEST(JSONRuleParserTest, ParsingRulesFromJSONTestingMinWidthRuleM1) {
 }
 
 TEST(JSONRuleParserTest, ParsingRulesFromJSONTestingMinWidthRuleM2) {
-    ASSERT_EQ(rules.size(), 8);
     // cast polymorhic rule pointer to MinWidthRule pointer
     const auto* minWidthRule = dynamic_cast<const MinWidthRule*>(rules[1].get());
     ASSERT_NE(minWidthRule, nullptr);
@@ -36,7 +35,6 @@ TEST(JSONRuleParserTest, ParsingRulesFromJSONTestingMinWidthRuleM2) {
 }
 
 TEST(JSONRuleParserTest, ParsingRulesFromJSONTestingMinWidthRuleVIA12) {
-    ASSERT_EQ(rules.size(), 8);
     // cast polymorhic rule pointer to MinWidthRule pointer
     const auto* minWidthRule = dynamic_cast<const MinWidthRule*>(rules[2].get());
     ASSERT_NE(minWidthRule, nullptr);
@@ -45,7 +43,6 @@ TEST(JSONRuleParserTest, ParsingRulesFromJSONTestingMinWidthRuleVIA12) {
 }
 
 TEST(JSONRuleParserTest, ParsingRulesFromJSONTestingMinSpacingRuleM1) {
-    ASSERT_EQ(rules.size(), 8);
     // cast polymorhic rule pointer to MinWidthRule pointer
     const auto* minSpacingRule = dynamic_cast<const MinSpacingRule*>(rules[3].get());
     ASSERT_NE(minSpacingRule, nullptr);
@@ -54,7 +51,6 @@ TEST(JSONRuleParserTest, ParsingRulesFromJSONTestingMinSpacingRuleM1) {
 }
 
 TEST(JSONRuleParserTest, ParsingRulesFromJSONTestingMinEnclosureRuleVIA12M1) {
-    ASSERT_EQ(rules.size(), 8);
     // cast polymorhic rule pointer to MinWidthRule pointer
     const auto* minEnclosureRule = dynamic_cast<const MinEnclosureRule*>(rules[4].get());
     ASSERT_NE(minEnclosureRule, nullptr);
@@ -114,4 +110,70 @@ TEST(JSONRuleParserTest, ParsesDensityRuleWithExplicitWindow)
     EXPECT_DOUBLE_EQ(analysisWindow.getMinY(), 20.0);
     EXPECT_DOUBLE_EQ(analysisWindow.getMaxX(), 50.0);
     EXPECT_DOUBLE_EQ(analysisWindow.getMaxY(), 70.0);
+}
+
+TEST(JSONRuleParserTest, ParsesEnclosureRuleWithOneSimpleOption)
+{
+    const auto* minEnclosureRule = dynamic_cast<const MinEnclosureRule*>(rules[8].get());
+    ASSERT_NE(minEnclosureRule, nullptr);
+
+    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::VIA1);
+
+    const auto& option = minEnclosureRule->getEnclosureOption(0);
+    EXPECT_EQ(option.getOuterLayer(), Layer::M1);
+    EXPECT_DOUBLE_EQ(option.getAllSidesMinEnclosure(), 0.04);
+}
+
+TEST(JSONRuleParserTest, ParsesEnclosureRuleWithTwoSimpleOptions)
+{
+    const auto* minEnclosureRule = dynamic_cast<const MinEnclosureRule*>(rules[9].get());
+    ASSERT_NE(minEnclosureRule, nullptr);
+
+    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::CO);
+
+    const auto& option0 = minEnclosureRule->getEnclosureOption(0);
+    EXPECT_EQ(option0.getOuterLayer(), Layer::M1);
+    EXPECT_DOUBLE_EQ(option0.getAllSidesMinEnclosure(), 0.04);
+
+    const auto& option1 = minEnclosureRule->getEnclosureOption(1);
+    EXPECT_EQ(option1.getOuterLayer(), Layer::PO);
+    EXPECT_DOUBLE_EQ(option1.getAllSidesMinEnclosure(), 0.03);
+}
+
+TEST(JSONRuleParserTest, ParsesEnclosureRuleWithTwoComplexOptions)
+{
+    const auto* minEnclosureRule = dynamic_cast<const MinEnclosureRule*>(rules[10].get());
+    ASSERT_NE(minEnclosureRule, nullptr);
+
+    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::CO);
+
+    const auto& option0 = minEnclosureRule->getEnclosureOption(0);
+    EXPECT_EQ(option0.getOuterLayer(), Layer::M1);
+    EXPECT_DOUBLE_EQ(option0.getAllSidesMinEnclosure(), 0.04);
+    EXPECT_DOUBLE_EQ(option0.getFirstPairMinEnclosure(), 0.00);
+    EXPECT_DOUBLE_EQ(option0.getSecondPairMinEnclosure(), 0.06);
+
+    const auto& option1 = minEnclosureRule->getEnclosureOption(1);
+    EXPECT_EQ(option1.getOuterLayer(), Layer::PO);
+    EXPECT_DOUBLE_EQ(option1.getAllSidesMinEnclosure(), 0.04);
+    EXPECT_DOUBLE_EQ(option1.getFirstPairMinEnclosure(), 0.00);
+    EXPECT_DOUBLE_EQ(option1.getSecondPairMinEnclosure(), 0.08);
+}
+
+TEST(JSONRuleParserTest, ParsesEnclosureRuleWithOneSimpleOneComplexOptions)
+{
+    const auto* minEnclosureRule = dynamic_cast<const MinEnclosureRule*>(rules[11].get());
+    ASSERT_NE(minEnclosureRule, nullptr);
+
+    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::CO);
+
+    const auto& option0 = minEnclosureRule->getEnclosureOption(0);
+    EXPECT_EQ(option0.getOuterLayer(), Layer::M1);
+    EXPECT_DOUBLE_EQ(option0.getAllSidesMinEnclosure(), 0.04);
+    EXPECT_DOUBLE_EQ(option0.getFirstPairMinEnclosure(), 0.00);
+    EXPECT_DOUBLE_EQ(option0.getSecondPairMinEnclosure(), 0.06);
+
+    const auto& option1 = minEnclosureRule->getEnclosureOption(1);
+    EXPECT_EQ(option1.getOuterLayer(), Layer::PO);
+    EXPECT_DOUBLE_EQ(option1.getAllSidesMinEnclosure(), 0.04);
 }

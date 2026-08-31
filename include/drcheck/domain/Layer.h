@@ -31,4 +31,6 @@ namespace drcheck::domain {
     Layer layerFromString(const std::string& layerName);
 
     Purpose purposeFromString(const std::string& purposeName);
+
+    std::string layerToString(Layer layer);
 }

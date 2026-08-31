@@ -9,7 +9,7 @@
 
 namespace {
 
-    constexpr int CLIPPER_PRECISION = 6;
+    constexpr int CLIPPER_PRECISION = 5;
 
     // Helper function to convert Polygon points to Clipper Path
     Clipper2Lib::PathD toClipperPath(const drcheck::geometry::Polygon& polygon)

@@ -3,6 +3,7 @@
 #include "drcheck/domain/Layer.h"
 #include "drcheck/rules/RuleFactory.h"
 #include "drcheck/geometry/BoundingBox.h"
+#include "drcheck/rules/MinEnclosureRule.h"
 
 #include <tcl.h>
 #include <exception>
@@ -98,6 +99,105 @@ geometry::BoundingBox parseRegion(Tcl_Interp* interpreter, Tcl_Obj* regionObj)
 
     return geometry::BoundingBox(minX, minY, maxX, maxY);
 }
+
+std::vector<rules::EnclosureOption> parseEnclosureOptions(Tcl_Interp* interpreter, Tcl_Obj* optionsObj)
+{
+    #if TCL_MAJOR_VERSION >= 9
+    Tcl_Size optionCount = 0;
+    #else
+    int optionCount = 0;
+    #endif
+
+    Tcl_Obj** optionObjects = nullptr;
+
+    if (Tcl_ListObjGetElements(interpreter, optionsObj, &optionCount, &optionObjects) != TCL_OK)
+    {
+        throw std::invalid_argument(Tcl_GetString(Tcl_GetObjResult(interpreter)));
+    }
+
+    if (optionCount == 0)
+    {
+        throw std::invalid_argument("min_enclosure -options must contain at least one enclosure option");
+    }
+
+    std::vector<rules::EnclosureOption> enclosureOptions;
+    enclosureOptions.reserve(optionCount);
+
+    for (int i = 0; i < optionCount; ++i)
+    {
+        #if TCL_MAJOR_VERSION >= 9
+        Tcl_Size elementCount = 0;
+        #else
+        int elementCount = 0;
+        #endif
+
+        Tcl_Obj** elements = nullptr;
+
+        if (Tcl_ListObjGetElements(interpreter, optionObjects[i], &elementCount, &elements) != TCL_OK)
+        {
+            throw std::invalid_argument(Tcl_GetString(Tcl_GetObjResult(interpreter)));
+        }
+
+        if (elementCount % 2 != 0)
+        {
+            throw std::invalid_argument("Enclosure option values must be provided as -option value pairs");
+        }
+
+        std::map<std::string, Tcl_Obj*> optionValues;
+
+        for (int j = 0; j < elementCount; j += 2)
+        {
+            const std::string option = Tcl_GetString(elements[j]);
+
+            if (option.empty() || option[0] != '-')
+            {
+                throw std::invalid_argument("Invalid enclosure option: " + option);
+            }
+
+            if (optionValues.contains(option))
+            {
+                throw std::invalid_argument("Duplicate enclosure option: " + option);
+            }
+
+            optionValues.emplace(option, elements[j + 1]);
+        }
+
+        if (!optionValues.contains("-outer") || !optionValues.contains("-all_sides"))
+        {
+            throw std::invalid_argument("Enclosure option requires -outer and -all_sides");
+        }
+
+        const bool hasFirstPair = optionValues.contains("-first_pair");
+        const bool hasSecondPair = optionValues.contains("-second_pair");
+
+        if (hasFirstPair != hasSecondPair)
+        {
+            throw std::invalid_argument("Enclosure option must provide both -first_pair and -second_pair");
+        }
+
+        if ((!hasFirstPair && optionValues.size() != 2) || (hasFirstPair && optionValues.size() != 4))
+        {
+            throw std::invalid_argument("Unknown min_enclosure option");
+        }
+
+        const domain::Layer outerLayer = domain::layerFromString(Tcl_GetString(optionValues.at("-outer")));
+
+        const double allSidesMinEnclosure = getDoubleOption(interpreter, optionValues.at("-all_sides"));
+
+        if (!hasFirstPair)
+        {
+            enclosureOptions.emplace_back(outerLayer, allSidesMinEnclosure);
+            continue;
+        }
+
+        const double firstPairMinEnclosure = getDoubleOption(interpreter, optionValues.at("-first_pair"));
+        const double secondPairMinEnclosure = getDoubleOption(interpreter, optionValues.at("-second_pair"));
+
+        enclosureOptions.emplace_back(outerLayer, allSidesMinEnclosure, firstPairMinEnclosure, secondPairMinEnclosure);
+    }
+    return enclosureOptions;
+}
+
 int ruleCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Obj* const objv[])
 {
     auto* rules = static_cast<std::vector<std::unique_ptr<rules::Rule>>*>(clientData);
@@ -125,13 +225,32 @@ int ruleCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Ob
         }
         else if (type == "min_enclosure")
         {
-            if (options.size() != 3 || !options.contains("-inner") || !options.contains("-outer") || !options.contains("-value"))
+            if (!options.contains("-inner"))
             {
-                throw std::invalid_argument("min_enclosure requires -inner, -outer and -value");
+                throw std::invalid_argument("min_enclosure requires -inner");
             }
+
             params.innerLayer = domain::layerFromString(Tcl_GetString(options.at("-inner")));
-            params.outerLayer = domain::layerFromString(Tcl_GetString(options.at("-outer")));
-            params.value = getDoubleOption(interpreter, options.at("-value"));
+
+            if (options.contains("-options"))
+            {
+                if (options.size() != 2)
+                {
+                    throw std::invalid_argument("min_enclosure with -options requires only -inner and -options");
+                }
+
+                params.enclosureOptions = parseEnclosureOptions(interpreter, options.at("-options"));
+            }
+            else
+            {
+                if (options.size() != 3 || !options.contains("-outer") || !options.contains("-value"))
+                {
+                    throw std::invalid_argument("min_enclosure requires either -inner, -outer and -value or -inner and -options");
+                }
+
+                params.outerLayer = domain::layerFromString(Tcl_GetString(options.at("-outer")));
+                params.value = getDoubleOption(interpreter, options.at("-value"));
+            }
         }
         else if (type == "density")
         {

@@ -4,7 +4,7 @@
         {
             "type": "MinDensity",
             "shapeIds": [],
-            "message": "Minimum density violation",
+            "message": "Minimum density violation on layer : M1should be 0.300000 actual0.200000",
             "actual": 0.2,
             "required": 0.3,
             "marker": {
@@ -13,13 +13,17 @@
                     "minY": 5.0,
                     "maxX": 10.0,
                     "maxY": 10.0
-                }
+                },
+                "firstLayer": [
+                    "firstLayer",
+                    3
+                ]
             }
         },
         {
             "type": "MinDensity",
             "shapeIds": [],
-            "message": "Minimum density violation",
+            "message": "Minimum density violation on layer : M1should be 0.300000 actual0.000000",
             "actual": 0.0,
             "required": 0.3,
             "marker": {
@@ -28,13 +32,17 @@
                     "minY": 5.0,
                     "maxX": 15.0,
                     "maxY": 10.0
-                }
+                },
+                "firstLayer": [
+                    "firstLayer",
+                    3
+                ]
             }
         },
         {
             "type": "MinDensity",
             "shapeIds": [],
-            "message": "Minimum density violation",
+            "message": "Minimum density violation on layer : M1should be 0.300000 actual0.000000",
             "actual": 0.0,
             "required": 0.3,
             "marker": {
@@ -43,13 +51,17 @@
                     "minY": 5.0,
                     "maxX": 20.0,
                     "maxY": 10.0
-                }
+                },
+                "firstLayer": [
+                    "firstLayer",
+                    3
+                ]
             }
         },
         {
             "type": "MinDensity",
             "shapeIds": [],
-            "message": "Minimum density violation",
+            "message": "Minimum density violation on layer : M1should be 0.300000 actual0.000000",
             "actual": 0.0,
             "required": 0.3,
             "marker": {
@@ -58,7 +70,11 @@
                     "minY": 5.0,
                     "maxX": 20.0,
                     "maxY": 10.0
-                }
+                },
+                "firstLayer": [
+                    "firstLayer",
+                    3
+                ]
             }
         }
     ]

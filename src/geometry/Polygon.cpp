@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <utility>
+#include <limits>
 
 namespace drcheck::geometry {
 	Polygon::Polygon(std::vector<Point> vertices)
@@ -93,6 +94,15 @@ namespace drcheck::geometry {
 		return BoundingBox(minX, minY, maxX, maxY);
 	}
 
+	bool Polygon::isAxisAlignedRectangle() const {
+		const geometry::BoundingBox innerBox = getBoundingBox();
+
+		const double boundingBoxArea = (innerBox.getMaxX() - innerBox.getMinX()) * (innerBox.getMaxY() - innerBox.getMinY());
+
+		return (std::abs(area() - boundingBoxArea) < EPSILON);
+
+	}
+
 	bool Polygon::contains(const Point& point, bool includeBoundary) const
 	{
 		// Bounding box check (Broad-phase rejection).
@@ -137,26 +147,46 @@ namespace drcheck::geometry {
 		return inside;
 	}
 	// Checks whether this polygon completely contains the other polygon.
-	bool Polygon::contains(const Polygon& other) const
-	{	
-		//  Every vertex of the other polygon must lie inside this polygon.
-		for (const Point& vertex : other.getVertices()) {
-			if (!contains(vertex)) {
+	bool Polygon::contains(const Polygon& other, bool includeBoundary) const
+	{
+		// Every vertex of the other polygon must lie inside this polygon.
+		// Boundary vertices are accepted only when includeBoundary is true.
+		for (const Point& vertex : other.getVertices())
+		{
+			if (!contains(vertex, includeBoundary))
+			{
 				return false;
 			}
 		}
-		// Strict containment does not allow the two polygon boundaries to cross (touching not counted as intersection).
-		// Tailored to MinEnclosure as inner polygon touching is considered contained
+
 		const auto thisEdges = getEdges();
 		const auto otherEdges = other.getEdges();
 
-		for (const Segment& edge1 : thisEdges) {
-			for (const Segment& edge2 : otherEdges) {
-				if (edge1.intersects(edge2, false)) {
-					return false;
+		for (const Segment& edge1 : thisEdges)
+		{
+			for (const Segment& edge2 : otherEdges)
+			{
+				if (includeBoundary)
+				{
+					// Boundary touching/overlap is allowed,
+					// but proper crossing is not.
+					if (edge1.intersects(edge2, false))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					// Strict containment:
+					// any boundary contact is invalid.
+					if (edge1.intersects(edge2, true))
+					{
+						return false;
+					}
 				}
 			}
 		}
+
 		return true;
 	}
 	// Check if two polygons intersect by checking for edge intersections and containment
@@ -662,5 +692,95 @@ namespace drcheck::geometry {
 		}
 
 		return std::abs(twiceArea) / 2.0;
+	}
+
+	PairwiseEnclosureResult Polygon::pairwiseEnclosure(const Polygon& outerPolygon) const {
+		if (!isAxisAlignedRectangle() || !isOrthogonal())
+		{
+			throw std::invalid_argument("Pairwise enclosure requires a rectangular inner polygon");
+		}
+
+		if (!outerPolygon.isOrthogonal())
+		{
+			throw std::invalid_argument("Pairwise enclosure requires an orthogonal outer polygon");
+		}
+
+		const geometry::BoundingBox innerBox = getBoundingBox();
+
+		const double innerMinX = innerBox.getMinX();
+		const double innerMaxX = innerBox.getMaxX();
+		const double innerMinY = innerBox.getMinY();
+		const double innerMaxY = innerBox.getMaxY();
+
+		const double innerCenterX = (innerMinX + innerMaxX) / 2.0;
+		const double innerCenterY = (innerMinY + innerMaxY) / 2.0;
+
+		double leftEnclosure = std::numeric_limits<double>::infinity();
+		double rightEnclosure = std::numeric_limits<double>::infinity();
+		double bottomEnclosure = std::numeric_limits<double>::infinity();
+		double topEnclosure = std::numeric_limits<double>::infinity();
+
+		const auto outerEdges = outerPolygon.getEdges();
+
+		for (const Segment& edge : outerEdges)
+		{
+			const Point& start = edge.getStart();
+			const Point& end = edge.getEnd();
+
+			if (edge.isVertical())
+			{
+				const double edgeX = start.getX();
+				const double edgeMinY = std::min(start.getY(), end.getY());
+				const double edgeMaxY = std::max(start.getY(), end.getY());
+				const auto overlap = positiveOverlapInterval(edgeMinY, edgeMaxY, innerMinY, innerMaxY);
+
+				if (!overlap.has_value())
+				{
+					continue;
+				}
+
+				if (edgeX < innerCenterX)
+				{
+					leftEnclosure = std::min(leftEnclosure, innerMinX - edgeX);
+				}
+				else
+				{
+					rightEnclosure = std::min(rightEnclosure, edgeX - innerMaxX);
+				}
+			}
+			else if (edge.isHorizontal())
+			{
+				const double edgeY = start.getY();
+				const double edgeMinX = std::min(start.getX(), end.getX());
+				const double edgeMaxX = std::max(start.getX(), end.getX());
+				const auto overlap = positiveOverlapInterval(edgeMinX, edgeMaxX, innerMinX, innerMaxX);
+
+				if (!overlap.has_value())
+				{
+					continue;
+				}
+
+				if (edgeY < innerCenterY)
+				{
+					bottomEnclosure = std::min(bottomEnclosure, innerMinY - edgeY);
+				}
+				else
+				{
+					topEnclosure = std::min(topEnclosure, edgeY - innerMaxY);
+				}
+			}
+		}
+		if (!std::isfinite(leftEnclosure) || !std::isfinite(rightEnclosure) ||
+			!std::isfinite(bottomEnclosure) || !std::isfinite(topEnclosure))
+		{
+			throw std::logic_error("Unable to determine pairwise enclosure");
+		}
+
+		return PairwiseEnclosureResult{
+		.left = leftEnclosure,
+		.right = rightEnclosure,
+		.bottom = bottomEnclosure,
+		.top = topEnclosure
+		};
 	}
 }

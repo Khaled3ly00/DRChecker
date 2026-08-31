@@ -109,3 +109,19 @@ TEST(RuleFactoryTest, RejectsUnknownRuleType)
 
     EXPECT_THROW(RuleFactory::create("unknown_rule", params), std::invalid_argument);
 }
+
+
+TEST(RuleFactoryTest, CreatesMinEnclosureRuleWithOptions)
+{
+    RuleParameters params;
+
+    params.innerLayer = Layer::CO;
+
+    params.enclosureOptions = std::vector<EnclosureOption>{EnclosureOption(Layer::OD, 0.04, 0.00, 0.03), EnclosureOption(Layer::PO, 0.03)};
+
+    auto rule = RuleFactory::create("min_enclosure", params);
+
+    const auto* minEnclosureRule = dynamic_cast<const MinEnclosureRule*>(rule.get());
+
+    ASSERT_NE(minEnclosureRule, nullptr);
+}

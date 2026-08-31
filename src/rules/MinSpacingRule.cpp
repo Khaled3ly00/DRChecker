@@ -1,5 +1,5 @@
 #include "drcheck/rules/MinSpacingRule.h"
-#include "drcheck/geometry/Constants.h"
+#include "drcheck/rules/Constants.h"
 #include "drcheck/geometry/Polygon.h"
 #include "drcheck/spatial/LayerSpatialIndex.h"
 
@@ -45,7 +45,7 @@ std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::S
 
             const geometry::PolygonEdgePairResult actualSpacing = firstShape.getPolygon().distanceTo(secondShape->getPolygon());
 
-            if (actualSpacing.distance + geometry::EPSILON < minimumSpacing)
+            if (actualSpacing.distance + DRC_LENGTH_TOLERANCE < minimumSpacing)
             {
                 domain::ViolationMarker marker{
                     .firstPoint = actualSpacing.firstPoint,
@@ -54,6 +54,7 @@ std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::S
                     .secondEdgeIndex = actualSpacing.secondEdgeIndex,
                     .firstLayer = getLayer()
                 };
+                const std::string msg = "Minimum spacing violation on layer: " + domain::layerToString(layer) + "should be " + std::to_string(minimumSpacing) + " actual" + std::to_string(actualSpacing.distance);
 
                 violations.emplace_back(domain::ViolationType::MinSpacing, std::vector<std::size_t>{firstShape.getId(), secondShape->getId()},
                     "Minimum spacing violation", actualSpacing.distance, minimumSpacing, marker);
