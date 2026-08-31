@@ -7,7 +7,7 @@
                 21,
                 29
             ],
-            "message": "Minimum Enclosure violation: PO enclosed by NPshould be 0.150000 actual0.110001",
+            "message": "Minimum Enclosure violation: PO enclosed by NP should be 0.150000 actual 0.110001",
             "actual": 0.110001,
             "required": 0.15,
             "marker": {
@@ -21,14 +21,8 @@
                 },
                 "firstEdgeIndex": 2,
                 "secondEdgeIndex": 2,
-                "firstLayer": [
-                    "firstLayer",
-                    7
-                ],
-                "secondLayer": [
-                    "firstLayer",
-                    1
-                ]
+                "firstLayer": "PO",
+                "secondLayer": "NP"
             }
         },
         {
@@ -37,7 +31,7 @@
                 32,
                 38
             ],
-            "message": "Minimum Enclosure violation: PO enclosed by PPshould be 0.150000 actual0.110000",
+            "message": "Minimum Enclosure violation: PO enclosed by PP should be 0.150000 actual 0.110000",
             "actual": 0.11,
             "required": 0.15,
             "marker": {
@@ -51,14 +45,8 @@
                 },
                 "firstEdgeIndex": 6,
                 "secondEdgeIndex": 0,
-                "firstLayer": [
-                    "firstLayer",
-                    7
-                ],
-                "secondLayer": [
-                    "firstLayer",
-                    2
-                ]
+                "firstLayer": "PO",
+                "secondLayer": "PP"
             }
         },
         {
@@ -67,7 +55,7 @@
                 33,
                 38
             ],
-            "message": "Minimum Enclosure violation: PO enclosed by PPshould be 0.150000 actual0.110000",
+            "message": "Minimum Enclosure violation: PO enclosed by PP should be 0.150000 actual 0.110000",
             "actual": 0.11,
             "required": 0.15,
             "marker": {
@@ -81,14 +69,8 @@
                 },
                 "firstEdgeIndex": 6,
                 "secondEdgeIndex": 0,
-                "firstLayer": [
-                    "firstLayer",
-                    7
-                ],
-                "secondLayer": [
-                    "firstLayer",
-                    2
-                ]
+                "firstLayer": "PO",
+                "secondLayer": "PP"
             }
         },
         {
@@ -97,7 +79,7 @@
                 40,
                 29
             ],
-            "message": "Minimum Enclosure violation: PO enclosed by NPshould be 0.150000 actual0.110001",
+            "message": "Minimum Enclosure violation: PO enclosed by NP should be 0.150000 actual 0.110001",
             "actual": 0.110001,
             "required": 0.15,
             "marker": {
@@ -111,14 +93,8 @@
                 },
                 "firstEdgeIndex": 6,
                 "secondEdgeIndex": 0,
-                "firstLayer": [
-                    "firstLayer",
-                    7
-                ],
-                "secondLayer": [
-                    "firstLayer",
-                    1
-                ]
+                "firstLayer": "PO",
+                "secondLayer": "NP"
             }
         }
     ]

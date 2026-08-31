@@ -1,11 +1,11 @@
 #include "drcheck/rules/MinEnclosureRule.h"
 #include "drcheck/rules/Constants.h"
-#include "drcheck/domain/Layer.h"
 #include "drcheck/spatial/LayerSpatialIndex.h"
 
 #include <stdexcept>
 #include <optional>
 #include <limits>
+#include <algorithm>
 
 namespace drcheck::rules {
 

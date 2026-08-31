@@ -860,7 +860,7 @@ namespace drcheck::io {
                 << "id=\"violation-details-text\" "
                 << "x=\"" << detailsX + 8.0 << "\" "
                 << "y=\"" << detailsY + 40.0 << "\" "
-                << "font-size=\"11\" "
+                << "font-size=\"13\" "
                 << "fill=\"#555555\">"
                 << "Select a violation"
                 << "</text>\n";
@@ -919,75 +919,131 @@ namespace drcheck::io {
     let currentViolationPage = 0;
     const totalViolationPages = )JS" << totalViolationPages << R"JS(;
 
-    function toggleViolation(item) {
-        const violationId = item.dataset.violationId;
-        const overlay = document.getElementById(violationId);
-        const details = document.getElementById('violation-details-text');
+function setWrappedSvgText(textElement, message, maxWidth, lineHeight, maxLines) {
+    while (textElement.firstChild) {
+        textElement.removeChild(textElement.firstChild);
+    }
 
-        if (!overlay) {
-            return;
-        }
+    const x = textElement.getAttribute('x');
+    const words = message.split(/\s+/);
 
-        const isActive = item.classList.toggle('active');
+    let line = '';
+    let lineCount = 0;
+    let tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
 
-        overlay.style.display = isActive ? '' : 'none';
+    tspan.setAttribute('x', x);
+    tspan.setAttribute('dy', '0');
+    textElement.appendChild(tspan);
 
-        if (!details) {
-            return;
-        }
+    for (let i = 0; i < words.length; ++i) {
+        const testLine = line === '' ? words[i] : line + ' ' + words[i];
+        tspan.textContent = testLine;
 
-        if (isActive) {
-            details.textContent = item.dataset.message;
+        if (tspan.getComputedTextLength() > maxWidth && line !== '') {
+            tspan.textContent = line;
+            lineCount++;
+
+            if (lineCount >= maxLines) {
+                let truncated = line;
+
+                while (truncated.length > 0) {
+                    tspan.textContent = truncated + '...';
+
+                    if (tspan.getComputedTextLength() <= maxWidth) {
+                        break;
+                    }
+
+                    truncated = truncated.slice(0, -1);
+                }
+
+                return;
+            }
+
+            line = words[i];
+
+            tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+            tspan.setAttribute('x', x);
+            tspan.setAttribute('dy', lineHeight);
+            tspan.textContent = line;
+            textElement.appendChild(tspan);
         }
         else {
-            const activeItems =
-                document.querySelectorAll('.violation-list-item.active');
-
-            details.textContent =
-                activeItems.length === 0
-                    ? 'Select a violation'
-                    : 'Multiple violations selected';
-        }
-    }
-    function showAllViolations() {
-        document.querySelectorAll('.violation-list-item').forEach(function(item) {
-            item.classList.add('active');
-
-            const overlay =
-                document.getElementById(item.dataset.violationId);
-
-            if (overlay && item.style.display !== 'none') {
-                overlay.style.display = '';
-            }
-        });
-
-        const details =
-            document.getElementById('violation-details-text');
-
-        if (details) {
-            details.textContent = 'All violations are shown';
+            line = testLine;
         }
     }
 
-    function hideAllViolations() {
-        document.querySelectorAll('.violation-list-item').forEach(function(item) {
-            item.classList.remove('active');
+    tspan.textContent = line;
+}
 
-            const overlay =
-                document.getElementById(item.dataset.violationId);
+function setViolationDetails(message) {
+    const details = document.getElementById('violation-details-text');
 
-            if (overlay) {
-                overlay.style.display = 'none';
-            }
-        });
+    if (!details) {
+        return;
+    }
 
-        const details =
-            document.getElementById('violation-details-text');
+    const text = message && message.trim() !== ''
+        ? message
+        : 'Select a violation';
 
-        if (details) {
-            details.textContent = 'Select a violation';
+    setWrappedSvgText(details, text, 260, 14, 4);
+}
+
+function toggleViolation(item) {
+    const violationId = item.dataset.violationId;
+    const overlay = document.getElementById(violationId);
+
+    if (!overlay) {
+        return;
+    }
+
+    const isActive = item.classList.toggle('active');
+
+    overlay.style.display = isActive ? '' : 'none';
+
+    if (isActive) {
+        setViolationDetails(item.dataset.message);
+    }
+    else {
+        const activeItems =
+            document.querySelectorAll('.violation-list-item.active');
+
+        if (activeItems.length === 0) {
+            setViolationDetails('Select a violation');
+        }
+        else {
+            setViolationDetails('Multiple violations selected');
         }
     }
+}
+
+function showAllViolations() {
+    document.querySelectorAll('.violation-list-item').forEach(function(item) {
+        item.classList.add('active');
+
+        const overlay = document.getElementById(item.dataset.violationId);
+
+        if (overlay && item.style.display !== 'none') {
+            overlay.style.display = '';
+        }
+    });
+
+    setViolationDetails('All violations are shown');
+}
+
+function hideAllViolations() {
+    document.querySelectorAll('.violation-list-item').forEach(function(item) {
+        item.classList.remove('active');
+
+        const overlay = document.getElementById(item.dataset.violationId);
+
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+    });
+
+    setViolationDetails('Select a violation');
+}
     function getHiddenLayers() {
       const hiddenLayers = new Set();
 

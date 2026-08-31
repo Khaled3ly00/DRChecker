@@ -4,6 +4,10 @@
 
 DRCheck is a C++ Design Rule Checker for simplified IC layouts. The project focuses on modern C++, computational geometry, IC verification concepts, unit testing, spatial indexing, and evidence-based performance optimization.
 
+![Interactive SVG report for the inverter example](docs/images/inverter-svg-report.png)
+
+*Inverter example rendered by DRCheck's standalone SVG report, with layer controls, selectable violations, and violation details.*
+
 The current end-to-end application and integration tooling can:
 
 - load purpose-tagged layout geometry from JSON and rule definitions from JSON or Tcl;
@@ -740,6 +744,9 @@ drcheck/
 │   │   └── quadtree_parameter_tuning.txt
 │   ├── MinEnclosureBenchmark.cpp
 │   └── MinSpacingBenchmark.cpp
+├── docs/
+│   └── images/
+│       └── inverter-svg-report.png
 ├── examples/
 ├── include/drcheck/
 │   ├── domain/

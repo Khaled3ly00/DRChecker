@@ -6,14 +6,11 @@
             "shapeIds": [
                 21
             ],
-            "message": "POis not enclosed by any allowed outer layer",
+            "message": "PO is not enclosed by any allowed outer layer",
             "actual": 0.0,
             "required": 0.0,
             "marker": {
-                "firstLayer": [
-                    "firstLayer",
-                    7
-                ]
+                "firstLayer": "PO"
             }
         },
         {
@@ -21,14 +18,11 @@
             "shapeIds": [
                 28
             ],
-            "message": "POis not enclosed by any allowed outer layer",
+            "message": "PO is not enclosed by any allowed outer layer",
             "actual": 0.0,
             "required": 0.0,
             "marker": {
-                "firstLayer": [
-                    "firstLayer",
-                    7
-                ]
+                "firstLayer": "PO"
             }
         },
         {
@@ -36,14 +30,11 @@
             "shapeIds": [
                 30
             ],
-            "message": "POis not enclosed by any allowed outer layer",
+            "message": "PO is not enclosed by any allowed outer layer",
             "actual": 0.0,
             "required": 0.0,
             "marker": {
-                "firstLayer": [
-                    "firstLayer",
-                    7
-                ]
+                "firstLayer": "PO"
             }
         },
         {
@@ -51,14 +42,11 @@
             "shapeIds": [
                 33
             ],
-            "message": "POis not enclosed by any allowed outer layer",
+            "message": "PO is not enclosed by any allowed outer layer",
             "actual": 0.0,
             "required": 0.0,
             "marker": {
-                "firstLayer": [
-                    "firstLayer",
-                    7
-                ]
+                "firstLayer": "PO"
             }
         }
     ]
