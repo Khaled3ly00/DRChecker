@@ -11,7 +11,6 @@ DRCheck is a C++ Design Rule Checker for simplified IC layouts. The project focu
 The current end-to-end application and integration tooling can:
 
 - load purpose-tagged layout geometry from JSON and rule definitions from JSON or Tcl;
-- preserve supplied shape IDs during parsing, generate deterministic normalized IDs for checking, and distinguish supported drawing and pin geometry;
 - export supported Cadence Virtuoso layout geometry to DRCheck JSON with optional hierarchy flattening;
 - normalize connected same-layer polygons before DRC execution;
 - translate parsed rule parameters into validated polymorphic rules through a central factory;
@@ -20,7 +19,7 @@ The current end-to-end application and integration tooling can:
 - check missing enclosure and configure alternative outer layers with all-sides or opposite-pair requirements from C++, JSON, or Tcl;
 - build one shared, layer-aware spatial index for a rule run;
 - report actual and required rule values;
-- attach optional point/edge or region-based witness geometry to violations;
+- attach optional closest-point witnesses, edge indices where applicable, or region-based geometry to violations;
 - write machine-readable JSON reports;
 - render fitted SVG layouts with highlighted violation geometry, including density regions; and
 - provide an interactive, paginated SVG violation browser with layer visibility, selective overlays, hover details, and cursor-centered zoom.
@@ -519,7 +518,7 @@ The geometry layer is isolated under `drcheck::geometry` and contains no rule or
 - polygon area clipped to an axis-aligned bounding box through `areaInsideWindow()`; and
 - detailed edge-pair and closest-point results.
 
-Detailed measurements preserve the geometry that produced them. `DistanceResult` stores the distance and closest points, while `PolygonEdgePairResult` also identifies the corresponding polygon edges. Rules use those results to create optional `ViolationMarker` data.
+Detailed measurements preserve the geometry that produced them. `DistanceResult` stores the distance and closest points, while `PolygonEdgePairResult` also identifies the corresponding polygon edges. Rules select only the witness data needed by their reports: width violations retain points and edge indices, while spacing and enclosure violations retain the closest-point pair without edge indices.
 
 `contains(const Polygon&, bool includeBoundary = false)` now defaults to strict containment. Passing `true` allows boundary touching or shared boundary segments while still rejecting proper crossings. The point overload retains its boundary-inclusive default. `MinEnclosureRule` explicitly requests boundary-inclusive polygon containment so touching geometry can be measured and evaluated against the configured requirement.
 
@@ -540,9 +539,9 @@ A `Violation` records:
 - required rule value; and
 - an optional `ViolationMarker`.
 
-`ViolationMarker` supports two forms of violation geometry. Distance- and width-based rules can preserve two witness points and their polygon-edge indices, while window-based rules can preserve a region. It also carries optional `firstLayer` and `secondLayer` values so a report can describe the physical layer or layer pair independently of shape lookup. Width, spacing, enclosure, and density rules populate the applicable layer fields; `DensityRule` uses the region form plus `firstLayer` to identify the exact failing window and its target layer.
+`ViolationMarker` supports optional witness points, polygon-edge indices, and a region. `MinWidthRule` stores two witness points plus the two corresponding edge indices. `MinSpacingRule` and `MinEnclosureRule` store only their two closest witness points; their `firstEdgeIndex` and `secondEdgeIndex` fields remain unset. Window-based density violations store a region instead. The marker also carries optional `firstLayer` and `secondLayer` values so a report can describe the physical layer or layer pair independently of shape lookup. Width, spacing, enclosure, and density rules populate the applicable layer fields; `DensityRule` uses the region form plus `firstLayer` to identify the exact failing window and its target layer.
 
-`JSONReportWriter` serializes marker geometry only when it is present. Point/edge markers retain their witness fields, and region markers emit the region bounds needed by downstream consumers. Reported actual values, witness coordinates, and region bounds are rounded to six decimal places to avoid floating-point noise. The SVG writer consumes the marker layer fields for human-readable violation summaries and measurement labels.
+`JSONReportWriter` serializes marker fields only when they are present. Width markers can therefore contain `firstPoint`, `secondPoint`, `firstEdgeIndex`, and `secondEdgeIndex`, while spacing and enclosure markers emit their points without edge-index fields. Region markers emit the bounds needed by downstream consumers. Reported actual values, witness coordinates, and region bounds are rounded to avoid floating-point noise. The SVG writer consumes the marker layer fields for human-readable violation summaries and measurement labels.
 
 An unenclosed inner shape produces an `Enclosure` violation with only its own shape ID, the message `Inner shape is not enclosed by any allowed outer layer`, and `actual = 0.0`, `required = 0.0`. Its marker identifies `firstLayer` but has no point, edge, or region witness. Those zero values describe the missing-enclosure case, not a configured zero threshold; consumers should inspect the message and participating IDs.
 
@@ -576,13 +575,13 @@ This makes the SVG stacking order deterministic while retaining source order wit
 
 Only layers that exist in the current layout appear in the legend. It provides clickable per-layer controls plus `Hide All`/`Show All`. Hiding a layer hides its shapes, related violation-list rows, and any active shape-referenced overlays associated with that layer.
 
-The left panel turns the standalone SVG into a lightweight violation browser. It shows the total violation count and one compact row per violation containing its number, type, available marker layer or layer pair, and `actual/required` values. Overlays start hidden rather than covering the layout all at once. Clicking a row independently toggles its available red witness edges, measurement line, points, or density region; active rows receive distinct highlighting. Panel-level `Show All` marks every row active and immediately reveals overlays for currently visible rows; `Hide All` clears every selection and overlay. Page/layer updates then synchronize active overlays with layer visibility.
+The left panel turns the standalone SVG into a lightweight violation browser. It shows the total violation count and one compact row per violation containing its number, type, available marker layer or layer pair, and `actual/required` values. Overlays start hidden rather than covering the layout all at once. Clicking a row independently toggles the geometry available for that violation: width can show its two witness edges, measurement line, and points; spacing and enclosure show only their measurement line and closest points; density shows its region. Active rows receive distinct highlighting. Panel-level `Show All` marks every row active and immediately reveals overlays for currently visible rows; `Hide All` clears every selection and overlay. Page/layer updates then synchronize active overlays with layer visibility.
 
 The list is paginated at 19 violations per page with `Prev`, `Next`, and a page indicator, including a valid `1 / 1` state for an empty list. Pagination changes the visible list rows without clearing selected overlays from another page; hiding a related layer does clear the affected selection and overlay.
 
 A dedicated `Violation Details` box displays `Violation::getMessage()` when a row is activated. Deselecting a row returns to `Select a violation` when nothing remains selected, or `Multiple violations selected` otherwise. `Show All` displays `All violations are shown`, while `Hide All` restores the selection prompt. This also exposes the reason for missing-enclosure violations, which have a list entry but no geometric witness to draw. Details currently use a single SVG text line rather than automatic wrapping.
 
-When an active point/edge violation is hovered, its two-line label shows the violation type, available marker layers, and `actual/required` measurement. Shapes provide an SVG tooltip with their normalized shape ID and layer.
+When an active closest-point violation is hovered, its two-line label shows the violation type, available marker layers, and `actual/required` measurement. Shapes provide an SVG tooltip with their normalized shape ID and layer.
 
 The generated SVG contains its own JavaScript and remains a standalone file:
 
@@ -612,7 +611,7 @@ For every shape on the target layer, the rule:
 1. expands the shape bounding box by the required minimum spacing;
 2. queries that layer through the shared `LayerSpatialIndex`;
 3. removes self-pairs and duplicate A-B/B-A pairs; and
-4. calls `Polygon::distanceTo()` for exact spacing and witness geometry.
+4. calls `Polygon::distanceTo()` for exact spacing and the closest-point witness pair.
 
 ```text
 target-layer shape
@@ -690,7 +689,7 @@ For every inner-layer shape, the rule:
 6. when relevant candidates all fail, reports one violation using the alternative closest to passing; and
 7. when no relevant allowed outer geometry exists, reports the inner shape as unenclosed.
 
-Failure selection compares the all-sides deficit with each orientation's largest pair deficit, then retains the smallest deficit across alternatives and outer candidates. The reported `actual/required` values describe that chosen failure. Pairwise failures still obtain point/edge witness geometry from `distanceTo(..., false)`; directional witnesses are not yet part of `PairwiseEnclosureResult`.
+Failure selection compares the all-sides deficit with each orientation's largest pair deficit, then retains the smallest deficit across alternatives and outer candidates. The reported `actual/required` values describe that chosen failure. Pairwise failures obtain the two closest witness points from `distanceTo(..., false)` but deliberately omit its edge indices; directional witnesses are not yet part of `PairwiseEnclosureResult`.
 
 Missing enclosure is no longer a conditional skip. An inner shape completely outside all allowed outer geometry, or with no allowed outer layer present, produces a violation. Overlapping/intersecting candidates remain eligible for failure reporting; a later valid option can still make the same inner shape pass.
 
@@ -1054,28 +1053,18 @@ These are workload- and machine-specific measurements, not universal performance
 
 ## Known Limitations
 
-The current implementation intentionally favors a clear, well-tested architecture over full production-rule coverage.
+This section lists user-facing capabilities that are reasonable to expect from a layout DRC workflow but are not currently supported.
 
-- `MinWidthRule` currently supports orthogonal polygons only.
-- Normalization assigns new sequential shape IDs, so violation `shapeIds` from the complete runner refer to normalized geometry rather than the original exporter IDs.
-- Pairwise enclosure requires a rectangular, axis-aligned inner polygon and an orthogonal outer polygon. Unsupported geometry or unresolved directional measurements raise exceptions rather than falling back to another measurement method.
-- Enclosure options provide all-sides OR opposite-pair alternatives in either orientation, not a general Boolean rule language or fixed horizontal/vertical requirements.
-- Pairwise violations report one selected scalar failure and use generic nearest-boundary witnesses; they do not serialize all four side distances or provide pair-specific witness geometry.
-- Missing-enclosure violations identify the inner shape and explain the failure, but currently use `0.0/0.0` values and a layer-only marker. They appear in the SVG list/details without a geometric overlay.
-- QuadTree queries can return false-positive candidates; exact geometry remains required.
-- Spatial-index performance depends on geometry distribution and can degrade toward brute-force behavior in unfavorable layouts.
-- `DensityRule` uses a fixed, axis-aligned grid with one `windowSize` and `windowStep`; adaptive or multiscale density analysis is not implemented.
-- Automatic density analysis bounds require at least one layout shape; an explicit analysis region is required for an empty layout.
-- `DensityRule` currently reuses the numeric `DRC_LENGTH_TOLERANCE` for dimensionless density comparisons as well as its window-grid bounds. There is no separate density tolerance or rule-deck tolerance setting.
-- Layout JSON currently accepts only micrometer units, the enumerated layer names, and the exact `drawing` or `pin` purpose strings.
-- Rules and the spatial index select geometry by `Layer`; `Purpose` is preserved on `Shape` but is not yet an independent rule-deck selector. Pin geometry that must be checked separately therefore relies on explicit layer identities such as `M1_PIN` and `M2_PIN`.
-- The Virtuoso exporter supports `rect`, `polygon`, `path`, `pathSeg`, and `1 x 1` `stdVia` geometry. A supported via emits its cut and two enclosure regions, but via arrays and other figure types are skipped, and hierarchy remaining beyond the requested flatten depth is not serialized.
-- The Virtuoso exporter preserves the source PDK's layer and purpose strings. Exported names outside DRCheck's current layer/purpose vocabulary must be mapped or added before the JSON can be loaded.
-- SVG layer filtering associates violations through participating shape IDs. Region-only density violations do not carry shape IDs, so their highlighted regions are not currently tied to a layer toggle.
-- The CLI selects rule-deck parsers by the exact `.json` or `.tcl` extension; other extensions are rejected.
-- Tcl rule decks expose `rule`, while automation scripts expose only `drc_run` and `drc_error_count` as DRCheck-specific commands.
-- `drc_run` always writes its JSON report immediately and optionally writes SVG; deferred export is not implemented.
-- Automation state retains only the most recent run's violations.
+- Layout import is limited to DRCheck's polygon JSON format; the checker does not read GDSII directly. Input units must be `"um"`, and layers and purposes must use the names listed in this README.
+- The implemented rule-deck families are minimum width, same-layer minimum spacing, minimum enclosure, and density. Other foundry checks are not accepted as rule types, and minimum spacing cannot compare two different layers.
+- Minimum-width checking supports Manhattan/orthogonal polygons only; non-Manhattan width is not implemented.
+- Pairwise enclosure requires an axis-aligned rectangular inner polygon and an orthogonal outer polygon. Its options support all-sides requirements and orientation-independent opposite-pair alternatives, but not arbitrary Boolean combinations or requirements permanently assigned to horizontal versus vertical sides.
+- Density rules use square, axis-aligned windows on a fixed grid. Rectangular or rotated windows, explicit grid offsets, and adaptive or multiscale sampling are not supported.
+- Rules select geometry by `Layer`, not by `Purpose`. The imported `drawing`/`pin` purpose is preserved, but it cannot be used as a rule-deck filter.
+- Layout normalization cannot represent holes or a multi-contour union result in one `Shape`; such a union is rejected. It also replaces exporter IDs with sequential normalized IDs, and reports do not provide a mapping back to the source-shape IDs.
+- The Virtuoso exporter supports `rect`, `polygon`, `path`, `pathSeg`, and only `1 x 1` standard vias. Via arrays and other figure types are skipped, and hierarchy that remains beyond the requested flatten depth is not serialized.
+- The SVG viewer supports wheel zoom and full-view reset but not click-drag panning. Region-only density violations also have no participating shape IDs, so hiding their target layer does not hide the corresponding region or violation-list item.
+- Tcl automation exposes only `drc_run` and `drc_error_count`, and retains only the latest run's violations. Per-run history, violation filtering, and richer result queries are not available.
 
 ## Next Development Areas
 

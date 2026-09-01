@@ -8,19 +8,17 @@
                 29
             ],
             "message": "Minimum Enclosure violation: PO enclosed by NP should be 0.150000 actual 0.110001",
-            "actual": 0.110001,
+            "actual": 0.11,
             "required": 0.15,
             "marker": {
                 "firstPoint": {
-                    "x": 0.214996,
-                    "y": 0.904999
+                    "x": 0.215,
+                    "y": 0.905
                 },
                 "secondPoint": {
-                    "x": 0.214996,
-                    "y": 1.014999
+                    "x": 0.215,
+                    "y": 1.015
                 },
-                "firstEdgeIndex": 2,
-                "secondEdgeIndex": 2,
                 "firstLayer": "PO",
                 "secondLayer": "NP"
             }
@@ -36,15 +34,13 @@
             "required": 0.15,
             "marker": {
                 "firstPoint": {
-                    "x": 0.160004,
+                    "x": 0.16,
                     "y": 1.125
                 },
                 "secondPoint": {
-                    "x": 0.160004,
+                    "x": 0.16,
                     "y": 1.015
                 },
-                "firstEdgeIndex": 6,
-                "secondEdgeIndex": 0,
                 "firstLayer": "PO",
                 "secondLayer": "PP"
             }
@@ -67,8 +63,6 @@
                     "x": 0.57,
                     "y": 1.015
                 },
-                "firstEdgeIndex": 6,
-                "secondEdgeIndex": 0,
                 "firstLayer": "PO",
                 "secondLayer": "PP"
             }
@@ -80,19 +74,17 @@
                 29
             ],
             "message": "Minimum Enclosure violation: PO enclosed by NP should be 0.150000 actual 0.110001",
-            "actual": 0.110001,
+            "actual": 0.11,
             "required": 0.15,
             "marker": {
                 "firstPoint": {
                     "x": 0.57,
-                    "y": 0.324997
+                    "y": 0.325
                 },
                 "secondPoint": {
                     "x": 0.57,
-                    "y": 0.214996
+                    "y": 0.215
                 },
-                "firstEdgeIndex": 6,
-                "secondEdgeIndex": 0,
                 "firstLayer": "PO",
                 "secondLayer": "NP"
             }

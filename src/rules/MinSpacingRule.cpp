@@ -50,14 +50,12 @@ std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::S
                 domain::ViolationMarker marker{
                     .firstPoint = actualSpacing.firstPoint,
                     .secondPoint = actualSpacing.secondPoint,
-                    .firstEdgeIndex = actualSpacing.firstEdgeIndex,
-                    .secondEdgeIndex = actualSpacing.secondEdgeIndex,
                     .firstLayer = getLayer()
                 };
                 const std::string msg = "Minimum spacing violation on layer: " + domain::layerToString(layer) + "should be " + std::to_string(minimumSpacing) + " actual" + std::to_string(actualSpacing.distance);
 
                 violations.emplace_back(domain::ViolationType::MinSpacing, std::vector<std::size_t>{firstShape.getId(), secondShape->getId()},
-                    "Minimum spacing violation", actualSpacing.distance, minimumSpacing, marker);
+                   msg, actualSpacing.distance, minimumSpacing, marker);
             }
         }
     }

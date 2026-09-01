@@ -228,8 +228,6 @@
   </g>
   <g id="violations">
     <g id="violation-0" class="violation-overlay" data-layers="layer-PO layer-NP" style="display: none;">
-    <line class="violation-edge" x1="633.934" y1="453.384" x2="603.822" y2="453.384" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="843.365" y1="423.27" x2="618.877" y2="423.27" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
     <line class="violation-marker" x1="618.877" y1="453.384" x2="618.877" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
     <circle class="violation-point" cx="618.877" cy="453.384" r="4" fill="red" />
@@ -238,8 +236,6 @@
   </g>
     </g>
     <g id="violation-1" class="violation-overlay" data-layers="layer-PO layer-PP" style="display: none;">
-    <line class="violation-edge" x1="603.822" y1="393.156" x2="633.934" y2="393.156" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="506.634" y1="423.27" x2="843.364" y2="423.27" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
     <line class="violation-marker" x1="603.822" y1="393.156" x2="603.822" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
     <circle class="violation-point" cx="603.822" cy="393.156" r="4" fill="red" />
@@ -248,8 +244,6 @@
   </g>
     </g>
     <g id="violation-2" class="violation-overlay" data-layers="layer-PO layer-PP" style="display: none;">
-    <line class="violation-edge" x1="716.064" y1="393.156" x2="746.178" y2="393.156" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="506.634" y1="423.27" x2="843.364" y2="423.27" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
     <line class="violation-marker" x1="716.064" y1="393.156" x2="716.064" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
     <circle class="violation-point" cx="716.064" cy="393.156" r="4" fill="red" />
@@ -258,8 +252,6 @@
   </g>
     </g>
     <g id="violation-3" class="violation-overlay" data-layers="layer-PO layer-NP" style="display: none;">
-    <line class="violation-edge" x1="716.064" y1="612.168" x2="746.178" y2="612.168" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="690.056" y1="642.282" x2="843.365" y2="642.282" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
     <line class="violation-marker" x1="716.064" y1="612.168" x2="716.064" y2="642.282" stroke="red" stroke-width="2" stroke-linecap="round" />
     <circle class="violation-point" cx="716.064" cy="612.168" r="4" fill="red" />

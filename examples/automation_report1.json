@@ -14,10 +14,7 @@
                     "maxX": 10.0,
                     "maxY": 10.0
                 },
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         },
         {
@@ -33,10 +30,7 @@
                     "maxX": 15.0,
                     "maxY": 10.0
                 },
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         },
         {
@@ -52,10 +46,7 @@
                     "maxX": 20.0,
                     "maxY": 10.0
                 },
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         },
         {
@@ -71,10 +62,7 @@
                     "maxX": 20.0,
                     "maxY": 10.0
                 },
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         }
     ]

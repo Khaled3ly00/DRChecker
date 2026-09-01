@@ -6,7 +6,7 @@
             "shapeIds": [
                 1
             ],
-            "message": "Minimum width violation on layer: M1should be 3.000000 actual2.000000",
+            "message": "Minimum width violation on layer: M1 should be 3.000000 actual 2.000000",
             "actual": 2.0,
             "required": 3.0,
             "marker": {
@@ -20,10 +20,7 @@
                 },
                 "firstEdgeIndex": 1,
                 "secondEdgeIndex": 3,
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         },
         {
@@ -32,7 +29,7 @@
                 1,
                 2
             ],
-            "message": "Minimum spacing violation",
+            "message": "Minimum spacing violation on layer: M1should be 3.000000 actual2.000000",
             "actual": 2.0,
             "required": 3.0,
             "marker": {
@@ -44,12 +41,7 @@
                     "x": 4.0,
                     "y": 5.0
                 },
-                "firstEdgeIndex": 1,
-                "secondEdgeIndex": 3,
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         },
         {
@@ -58,7 +50,7 @@
                 2,
                 4
             ],
-            "message": "Minimum spacing violation",
+            "message": "Minimum spacing violation on layer: M1should be 3.000000 actual2.000000",
             "actual": 2.0,
             "required": 3.0,
             "marker": {
@@ -70,12 +62,7 @@
                     "x": 12.0,
                     "y": 5.0
                 },
-                "firstEdgeIndex": 1,
-                "secondEdgeIndex": 3,
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         },
         {
@@ -96,16 +83,8 @@
                     "x": 4.0,
                     "y": 3.0
                 },
-                "firstEdgeIndex": 3,
-                "secondEdgeIndex": 3,
-                "firstLayer": [
-                    "firstLayer",
-                    "VIA1"
-                ],
-                "secondLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "VIA1",
+                "secondLayer": "M1"
             }
         },
         {
@@ -121,10 +100,7 @@
                     "maxX": 20.0,
                     "maxY": 10.0
                 },
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         }
     ]

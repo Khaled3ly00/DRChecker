@@ -6,7 +6,7 @@
             "shapeIds": [
                 1
             ],
-            "message": "Minimum width violation on layer: M1should be 3.000000 actual2.000000",
+            "message": "Minimum width violation on layer: M1 should be 3.000000 actual 2.000000",
             "actual": 2.0,
             "required": 3.0,
             "marker": {
@@ -20,10 +20,7 @@
                 },
                 "firstEdgeIndex": 1,
                 "secondEdgeIndex": 3,
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         },
         {
@@ -39,10 +36,7 @@
                     "maxX": 10.0,
                     "maxY": 10.0
                 },
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         },
         {
@@ -58,10 +52,7 @@
                     "maxX": 15.0,
                     "maxY": 10.0
                 },
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         },
         {
@@ -77,10 +68,7 @@
                     "maxX": 20.0,
                     "maxY": 10.0
                 },
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         },
         {
@@ -96,10 +84,7 @@
                     "maxX": 20.0,
                     "maxY": 10.0
                 },
-                "firstLayer": [
-                    "firstLayer",
-                    "M1"
-                ]
+                "firstLayer": "M1"
             }
         }
     ]

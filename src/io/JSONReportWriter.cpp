@@ -8,7 +8,7 @@
 namespace {
     double roundForReport(double value)
     {
-        constexpr double scale = 1'000'000.0;
+        constexpr double scale = 10'000.0;
         return std::round(value * scale) / scale;
     }
 }

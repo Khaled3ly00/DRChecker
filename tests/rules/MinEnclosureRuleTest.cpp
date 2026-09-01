@@ -84,7 +84,7 @@ TEST(MinEnclosureRuleTest, RejectsLessThanMinEnclosure)
     Shape first(1, Layer::M1, Purpose::Drawing, std::move(firstPolygon));
     Shape second(2, Layer::VIA1, Purpose::Drawing, std::move(secondPolygon));
     MinEnclosureRule rule(Layer::VIA1, Layer::M1, 3.0);
-    const std::vector<Shape> shapes{first, second};
+    const std::vector<Shape> shapes{ first, second };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
 
@@ -97,20 +97,9 @@ TEST(MinEnclosureRuleTest, RejectsLessThanMinEnclosure)
     ASSERT_TRUE(violations[0].getMarker().has_value());
     const auto& marker = violations[0].getMarker().value();
     // First nearst edge (point)
-    ASSERT_TRUE(marker.firstEdgeIndex.has_value());
-    EXPECT_EQ(marker.firstEdgeIndex, 0);
-    ASSERT_TRUE(marker.secondEdgeIndex.has_value());
-    EXPECT_EQ(marker.secondEdgeIndex, 3);
     ASSERT_TRUE(marker.firstPoint.has_value());
     ASSERT_TRUE(marker.secondPoint.has_value());
     EXPECT_NEAR(Point::vectorBetween(marker.firstPoint.value(), marker.secondPoint.value()).length(), 2.0, EPSILON);
-    const auto innerEdges = second.getPolygon().getEdges();
-    const auto outerEdges = first.getPolygon().getEdges();
-    ASSERT_TRUE(marker.firstEdgeIndex.has_value());
-    ASSERT_TRUE(marker.secondEdgeIndex.has_value());
-    EXPECT_TRUE(innerEdges[marker.firstEdgeIndex.value()].contains(marker.firstPoint.value()));
-    EXPECT_TRUE(outerEdges[marker.secondEdgeIndex.value()].contains(marker.secondPoint.value()));
-
 }
 
 TEST(MinEnclosureRuleTest, IntersectingAllowedOuterLayerReportsZeroEnclosure) // Intersecting polygon should return violation as enclosure distance is zero

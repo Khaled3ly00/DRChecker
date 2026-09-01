@@ -54,8 +54,6 @@
   </g>
     </g>
     <g id="violation-1" class="violation-overlay" data-layers="layer-M1" style="display: none;">
-    <line class="violation-edge" x1="423" y1="557.5" x2="423" y2="242.5" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="486" y1="400" x2="486" y2="557.5" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
     <line class="violation-marker" x1="423" y1="400" x2="486" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
     <circle class="violation-point" cx="423" cy="400" r="4" fill="red" />
@@ -64,8 +62,6 @@
   </g>
     </g>
     <g id="violation-2" class="violation-overlay" data-layers="layer-M1" style="display: none;">
-    <line class="violation-edge" x1="675" y1="557.5" x2="675" y2="400" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="738" y1="400" x2="738" y2="557.5" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
     <line class="violation-marker" x1="675" y1="400" x2="738" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
     <circle class="violation-point" cx="675" cy="400" r="4" fill="red" />
@@ -74,8 +70,6 @@
   </g>
     </g>
     <g id="violation-3" class="violation-overlay" data-layers="layer-VIA1 layer-M1" style="display: none;">
-    <line class="violation-edge" x1="517.5" y1="463" x2="517.5" y2="494.5" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="486" y1="400" x2="486" y2="557.5" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
     <line class="violation-marker" x1="517.5" y1="463" x2="486" y2="463" stroke="red" stroke-width="2" stroke-linecap="round" />
     <circle class="violation-point" cx="517.5" cy="463" r="4" fill="red" />
@@ -101,15 +95,15 @@
       <rect x="140" y="70" width="80" height="24" fill="#eeeeee" stroke="#999999" stroke-width="1" />
       <text x="180" y="86" font-size="12" text-anchor="middle" fill="black">Hide All</text>
     </g>
-    <g id="violation-item-0" class="violation-list-item" data-violation-id="violation-0" data-message="Minimum width violation on layer: M1should be 3.000000 actual2.000000" data-page="0" data-layers="layer-M1" onclick="toggleViolation(this)" style="cursor: pointer;">
+    <g id="violation-item-0" class="violation-list-item" data-violation-id="violation-0" data-message="Minimum width violation on layer: M1 should be 3.000000 actual 2.000000" data-page="0" data-layers="layer-M1" onclick="toggleViolation(this)" style="cursor: pointer;">
       <rect x="50" y="96" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
       <text x="58" y="114" font-size="12" fill="black">1. MinWidth M1 2/3</text>
     </g>
-    <g id="violation-item-1" class="violation-list-item" data-violation-id="violation-1" data-message="Minimum spacing violation" data-page="0" data-layers="layer-M1" onclick="toggleViolation(this)" style="cursor: pointer;">
+    <g id="violation-item-1" class="violation-list-item" data-violation-id="violation-1" data-message="Minimum spacing violation on layer: M1should be 3.000000 actual2.000000" data-page="0" data-layers="layer-M1" onclick="toggleViolation(this)" style="cursor: pointer;">
       <rect x="50" y="128" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
       <text x="58" y="146" font-size="12" fill="black">2. MinSpacing M1 2/3</text>
     </g>
-    <g id="violation-item-2" class="violation-list-item" data-violation-id="violation-2" data-message="Minimum spacing violation" data-page="0" data-layers="layer-M1" onclick="toggleViolation(this)" style="cursor: pointer;">
+    <g id="violation-item-2" class="violation-list-item" data-violation-id="violation-2" data-message="Minimum spacing violation on layer: M1should be 3.000000 actual2.000000" data-page="0" data-layers="layer-M1" onclick="toggleViolation(this)" style="cursor: pointer;">
       <rect x="50" y="160" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
       <text x="58" y="178" font-size="12" fill="black">3. MinSpacing M1 2/3</text>
     </g>

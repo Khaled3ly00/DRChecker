@@ -334,8 +334,6 @@ std::vector<domain::Violation> MinEnclosureRule::check(const std::vector<domain:
             domain::ViolationMarker marker{
                 .firstPoint = actualEnclosure.firstPoint,
                 .secondPoint = actualEnclosure.secondPoint,
-                .firstEdgeIndex = actualEnclosure.firstEdgeIndex,
-                .secondEdgeIndex = actualEnclosure.secondEdgeIndex,
                 .firstLayer = getInnerLayer(),
                 .secondLayer = bestFailedOuterShape->getLayer()
             };
