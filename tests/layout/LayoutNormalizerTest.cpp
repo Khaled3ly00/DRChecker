@@ -2,6 +2,7 @@
 
 #include "drcheck/layout/LayoutNormalizer.h"
 #include "drcheck/geometry/Constants.h"
+#include "drcheck/domain/LayerRegistry.h"
 
 #include <algorithm>
 #include <stdexcept>
@@ -11,11 +12,16 @@ using drcheck::geometry::Polygon;
 using drcheck::geometry::Point;
 using drcheck::geometry::EPSILON;
 using drcheck::domain::Shape;
+using drcheck::domain::LayerRegistry;
 using drcheck::domain::Layer;
-using drcheck::domain::Purpose;
 
 TEST(LayoutNormalizerTest, OverlappingPolygonsWithSameLayerMergable)
 {
+
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
     Polygon first({
     Point(0, 0),
     Point(4, 0),
@@ -30,8 +36,8 @@ TEST(LayoutNormalizerTest, OverlappingPolygonsWithSameLayerMergable)
         Point(2, 2)
         });
 
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(first));
-    Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(second));
+    Shape shape1(1, M1, std::move(first));
+    Shape shape2(2, M1, std::move(second));
     const std::vector<Shape> shapes{ shape1, shape2 };
 
     const auto normalized = LayoutNormalizer::normalize(shapes);
@@ -41,6 +47,11 @@ TEST(LayoutNormalizerTest, OverlappingPolygonsWithSameLayerMergable)
 
 TEST(LayoutNormalizerTest, SharingFullBoundaryWithSameLayerMergable)
 {
+
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
     Polygon first({
         Point(0, 0),
         Point(4, 0),
@@ -55,8 +66,8 @@ TEST(LayoutNormalizerTest, SharingFullBoundaryWithSameLayerMergable)
         Point(4, 4)
         });
 
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(first));
-    Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(second));
+    Shape shape1(1, M1, std::move(first));
+    Shape shape2(2, M1, std::move(second));
     const std::vector<Shape> shapes{ shape1, shape2 };
 
     const auto normalized = LayoutNormalizer::normalize(shapes);
@@ -87,6 +98,11 @@ TEST(LayoutNormalizerTest, SharingFullBoundaryWithSameLayerMergable)
 
 TEST(LayoutNormalizerTest, SharingPartialBoundaryWithSameLayerMergable)
 {
+
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
     Polygon first({
         Point(0, 0),
         Point(4, 0),
@@ -101,8 +117,8 @@ TEST(LayoutNormalizerTest, SharingPartialBoundaryWithSameLayerMergable)
         Point(4, 2)
         });
 
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(first));
-    Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(second));
+    Shape shape1(1, M1, std::move(first));
+    Shape shape2(2, M1, std::move(second));
     const std::vector<Shape> shapes{ shape1, shape2 };
 
     const auto normalized = LayoutNormalizer::normalize(shapes);
@@ -112,6 +128,11 @@ TEST(LayoutNormalizerTest, SharingPartialBoundaryWithSameLayerMergable)
 
 TEST(LayoutNormalizerTest, TouchingVerticesPolygonsWithSameLayerNotMergable)
 {
+
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
     Polygon first({
         Point(0, 0),
         Point(4, 0),
@@ -126,8 +147,8 @@ TEST(LayoutNormalizerTest, TouchingVerticesPolygonsWithSameLayerNotMergable)
         Point(4, 8)
         });
 
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(first));
-    Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(second));
+    Shape shape1(1, M1, std::move(first));
+    Shape shape2(2, M1, std::move(second));
     const std::vector<Shape> shapes{ shape1, shape2 };
 
     const auto normalized = LayoutNormalizer::normalize(shapes);
@@ -137,6 +158,11 @@ TEST(LayoutNormalizerTest, TouchingVerticesPolygonsWithSameLayerNotMergable)
 
 TEST(LayoutNormalizerTest, SeparatedPolygonsWithSameLayerNotMergable)
 {
+
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
     Polygon first({
         Point(0.0, 0.0),
         Point(4.0, 0.0),
@@ -151,8 +177,8 @@ TEST(LayoutNormalizerTest, SeparatedPolygonsWithSameLayerNotMergable)
         Point(10.0, 4.0)
         });
 
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(first));
-    Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(second));
+    Shape shape1(1, M1, std::move(first));
+    Shape shape2(2, M1, std::move(second));
     const std::vector<Shape> shapes{ shape1, shape2 };
 
     const auto normalized = LayoutNormalizer::normalize(shapes);
@@ -162,6 +188,11 @@ TEST(LayoutNormalizerTest, SeparatedPolygonsWithSameLayerNotMergable)
 
 TEST(LayoutNormalizerTest, OverlappingPolygonsWithDifferentLayerNotMergable)
 {
+
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
     Polygon first({
     Point(0, 0),
     Point(4, 0),
@@ -176,8 +207,8 @@ TEST(LayoutNormalizerTest, OverlappingPolygonsWithDifferentLayerNotMergable)
         Point(2, 2)
         });
 
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(first));
-    Shape shape2(2, Layer::M2, Purpose::Drawing, std::move(second));
+    Shape shape1(1, M1, std::move(first));
+    Shape shape2(2, M2, std::move(second));
     const std::vector<Shape> shapes{ shape1, shape2 };
 
     const auto normalized = LayoutNormalizer::normalize(shapes);
@@ -187,6 +218,11 @@ TEST(LayoutNormalizerTest, OverlappingPolygonsWithDifferentLayerNotMergable)
 
 TEST(LayoutNormalizerTest, ThreeConsecutivePolygonsWithSameLayerMergable)
 {
+
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
     Polygon first({
         Point(0, 0),
         Point(4, 0),
@@ -208,9 +244,9 @@ TEST(LayoutNormalizerTest, ThreeConsecutivePolygonsWithSameLayerMergable)
     Point(10, 4)
         });
 
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(first));
-    Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(second));
-    Shape shape3(3, Layer::M1, Purpose::Drawing, std::move(third));
+    Shape shape1(1, M1, std::move(first));
+    Shape shape2(2, M1, std::move(second));
+    Shape shape3(3, M1, std::move(third));
     const std::vector<Shape> shapes{ shape1, shape2, shape3 };
 
     const auto normalized = LayoutNormalizer::normalize(shapes);

@@ -31,8 +31,8 @@ struct ViolationMarker
 
     std::optional<geometry::BoundingBox> region;
 
-    std::optional<domain::Layer> firstLayer;
-    std::optional<domain::Layer> secondLayer;
+    const domain::Layer* firstLayer = nullptr;
+    const domain::Layer* secondLayer = nullptr;
 };
 
 enum class ViolationType

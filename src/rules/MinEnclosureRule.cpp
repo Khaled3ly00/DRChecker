@@ -9,9 +9,13 @@
 
 namespace drcheck::rules {
 
-EnclosureOption::EnclosureOption(domain::Layer outerLayer, double allSidesMinEnclosure)
+EnclosureOption::EnclosureOption(const domain::Layer* outerLayer, double allSidesMinEnclosure)
     : outerLayer(outerLayer), allSidesMinEnclosure(allSidesMinEnclosure), firstPairMinEnclosure(std::nullopt), secondPairMinEnclosure(std::nullopt)
 {
+    if (outerLayer == nullptr)
+    {
+        throw std::invalid_argument("Enclosure outer layer cannot be null");
+    }
     // If Minenclosure is 0 then intersecting inner shapes won't create a violation
     // To support that disable checking for intersecting shapes
     if (allSidesMinEnclosure <= 0.0) {
@@ -19,9 +23,13 @@ EnclosureOption::EnclosureOption(domain::Layer outerLayer, double allSidesMinEnc
     }
 }
 // Two opposite sides option constructor
-EnclosureOption::EnclosureOption(domain::Layer outerLayer, double allSidesMinEnclosure, double firstPairMinEnclosure, double secondPairMinEnclosure)
+EnclosureOption::EnclosureOption(const domain::Layer* outerLayer, double allSidesMinEnclosure, double firstPairMinEnclosure, double secondPairMinEnclosure)
     : outerLayer(outerLayer), allSidesMinEnclosure(allSidesMinEnclosure), firstPairMinEnclosure(firstPairMinEnclosure), secondPairMinEnclosure(secondPairMinEnclosure)
 {
+    if (outerLayer == nullptr)
+    {
+        throw std::invalid_argument("Enclosure outer layer cannot be null");
+    }
     if (firstPairMinEnclosure < 0.0 || secondPairMinEnclosure < 0.0 || allSidesMinEnclosure < 0.0)
     {
         throw std::invalid_argument("Enclosure values cannot be negative");
@@ -58,20 +66,25 @@ double EnclosureOption::getAllSidesMinEnclosure() const
     return allSidesMinEnclosure;
 }
 
-domain::Layer EnclosureOption::getOuterLayer() const
+const domain::Layer* EnclosureOption::getOuterLayer() const
 {
     return outerLayer;
 }
 
 // Delegate constructor for backward compatability 
-MinEnclosureRule::MinEnclosureRule(domain::Layer innerLayer, domain::Layer outerLayer, double allSidesMinEnclosure)
+MinEnclosureRule::MinEnclosureRule(const domain::Layer* innerLayer, const domain::Layer* outerLayer, double allSidesMinEnclosure)
     : MinEnclosureRule(innerLayer, std::vector<EnclosureOption>{EnclosureOption(outerLayer, allSidesMinEnclosure)})
 {
 }
 
-MinEnclosureRule::MinEnclosureRule(domain::Layer innerLayer, std::vector<EnclosureOption> enclosureOptions) 
+MinEnclosureRule::MinEnclosureRule(const domain::Layer* innerLayer, std::vector<EnclosureOption> enclosureOptions) 
     : innerLayer(innerLayer), enclosureOptions(std::move(enclosureOptions))
 {
+    if (innerLayer == nullptr)
+    {
+        throw std::invalid_argument("MinEnclosureRule inner layer cannot be null");
+    }
+
     if (this->enclosureOptions.empty())
     {
         throw std::invalid_argument("MinEnclosureRule requires at least one enclosure option");
@@ -338,8 +351,8 @@ std::vector<domain::Violation> MinEnclosureRule::check(const std::vector<domain:
                 .secondLayer = bestFailedOuterShape->getLayer()
             };
 
-            const std::string msg = "Minimum Enclosure violation: " + domain::layerToString(getInnerLayer()) + " enclosed by " + domain::layerToString(bestFailedOuterShape->getLayer())
-                + " should be " + std::to_string(bestRequiredEnclosure) + " actual " + std::to_string(bestActualEnclosure);
+			const std::string msg = "Minimum Enclosure violation: " + getInnerLayer()->getName() + " enclosed by " + bestFailedOuterShape->getLayer()->getName()
+                + " required " + std::to_string(bestRequiredEnclosure) + " actual " + std::to_string(bestActualEnclosure);
 
             violations.emplace_back(domain::ViolationType::Enclosure, std::vector<std::size_t>{ innerShape.getId(), bestFailedOuterShape->getId()},
                 msg, bestActualEnclosure, bestRequiredEnclosure, marker);
@@ -347,7 +360,7 @@ std::vector<domain::Violation> MinEnclosureRule::check(const std::vector<domain:
         }
 
         domain::ViolationMarker marker{ .firstLayer = getInnerLayer() };
-        const std::string msg = domain::layerToString(getInnerLayer()) + " is not enclosed by any allowed outer layer";
+        const std::string msg = getInnerLayer()->getName()+ " is not enclosed by any allowed outer layer";
 
         violations.emplace_back(domain::ViolationType::Enclosure, std::vector<std::size_t>{ innerShape.getId() },
           msg, 0.0, 0.0, marker);
@@ -355,12 +368,12 @@ std::vector<domain::Violation> MinEnclosureRule::check(const std::vector<domain:
     return violations;
 }
 
-domain::Layer MinEnclosureRule::getInnerLayer() const
+const domain::Layer* MinEnclosureRule::getInnerLayer() const
 {
     return innerLayer;
 }
 
-domain::Layer MinEnclosureRule::getOuterLayer() const
+const domain::Layer* MinEnclosureRule::getOuterLayer() const
 {
     return enclosureOptions.front().getOuterLayer();
 }

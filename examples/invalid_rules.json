@@ -1,9 +1,10 @@
 {
+  "layers": ["M8"],
   "rules": [
     {
       "type": "MinWidth",
-      "layer": "Metal12",
-      "value": -1
+      "layer": "M1",
+      "value": 2
     }
   ]
 }

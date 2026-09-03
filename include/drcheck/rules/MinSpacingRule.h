@@ -8,16 +8,16 @@ namespace drcheck::rules {
 class MinSpacingRule : public Rule
 {
 public:
-    MinSpacingRule(domain::Layer layer, double minimumSpacing);
+    MinSpacingRule(const domain::Layer* layer, double minimumSpacing);
 
     std::vector<domain::Violation> check(const std::vector<domain::Shape>& shapes, const spatial::LayerSpatialIndex& spatialIndex) const override;
 
-    domain::Layer getLayer() const;
+    const domain::Layer* getLayer() const;
 
     double getMinimumSpacing() const;
 
 private:
-    domain::Layer layer;
+    const domain::Layer* layer;
     double minimumSpacing;
 };
 

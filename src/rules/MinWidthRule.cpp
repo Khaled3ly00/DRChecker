@@ -7,9 +7,14 @@
 
 namespace drcheck::rules {
 
-MinWidthRule::MinWidthRule(domain::Layer layer, double minimumWidth)
+MinWidthRule::MinWidthRule(const domain::Layer* layer, double minimumWidth)
 	: layer(layer), minimumWidth(minimumWidth) {
 	// Validate the minimum width
+	if (layer == nullptr)
+	{
+		throw std::invalid_argument("MinWidthRule layer cannot be null");
+	}
+
 	if (minimumWidth <= 0) {
 		throw std::invalid_argument("Minimum width must be positive.");
 	}
@@ -34,7 +39,7 @@ std::vector<domain::Violation> MinWidthRule::check(const std::vector<domain::Sha
 				.secondEdgeIndex = actualWidth.secondEdgeIndex,
 				.firstLayer = getLayer()
 			};
-			const std::string msg = "Minimum width violation on layer: " + domain::layerToString(layer) + " should be " + std::to_string(minimumWidth) + " actual " + std::to_string(actualWidth.distance);
+			const std::string msg = "Minimum width violation on layer: " + layer->getName() + " required " + std::to_string(minimumWidth) + " actual " + std::to_string(actualWidth.distance);
 			// If the shape's width is less than the minimum width, create a violation (object) and add it to the violations vector
 			violations.emplace_back(domain::ViolationType::MinWidth, std::vector<std::size_t>{shape.getId()}, msg, actualWidth.distance, minimumWidth, marker);
 		}
@@ -44,7 +49,7 @@ std::vector<domain::Violation> MinWidthRule::check(const std::vector<domain::Sha
 double MinWidthRule::getMinimumWidth() const {
 	return minimumWidth;
 }
-domain::Layer MinWidthRule::getLayer() const {
+const domain::Layer* MinWidthRule::getLayer() const {
 	return layer;
 }
 }

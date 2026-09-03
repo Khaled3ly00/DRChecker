@@ -6,7 +6,7 @@
             "shapeIds": [
                 1
             ],
-            "message": "Minimum width violation on layer: M1 should be 3.000000 actual 2.000000",
+            "message": "Minimum width violation on layer: M1 required 3.000000 actual 2.000000",
             "actual": 2.0,
             "required": 3.0,
             "marker": {
@@ -29,7 +29,7 @@
                 1,
                 2
             ],
-            "message": "Minimum spacing violation on layer: M1should be 3.000000 actual2.000000",
+            "message": "Minimum spacing violation on layer: M1 required 3.000000, actual 2.000000",
             "actual": 2.0,
             "required": 3.0,
             "marker": {
@@ -50,7 +50,7 @@
                 2,
                 4
             ],
-            "message": "Minimum spacing violation on layer: M1should be 3.000000 actual2.000000",
+            "message": "Minimum spacing violation on layer: M1 required 3.000000, actual 2.000000",
             "actual": 2.0,
             "required": 3.0,
             "marker": {
@@ -71,7 +71,7 @@
                 3,
                 2
             ],
-            "message": "Minimum Enclosure violation: VIA1 enclosed by M1 should be 2.000000 actual 1.000000",
+            "message": "Minimum Enclosure violation: VIA1 enclosed by M1 required 2.000000 actual 1.000000",
             "actual": 1.0,
             "required": 2.0,
             "marker": {
@@ -90,7 +90,7 @@
         {
             "type": "MinDensity",
             "shapeIds": [],
-            "message": "Minimum density violation on layer : M1should be 0.500000 actual0.400000",
+            "message": "Minimum density violation on layer : M1 required 0.500000 actual 0.400000",
             "actual": 0.4,
             "required": 0.5,
             "marker": {

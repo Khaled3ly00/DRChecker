@@ -4,7 +4,6 @@
     {
       "id": 1,
       "layer": "M1",
-      "purpose": "drawing",
       "vertices": [
         [ 0, 0 ],
         [ 2, 0 ],

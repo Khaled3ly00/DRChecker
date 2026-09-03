@@ -8,7 +8,7 @@
 
 namespace drcheck::io {
 
-    std::vector<domain::Shape> JSONLayoutParser::load(const std::string& filePath)
+    std::vector<domain::Shape> JSONLayoutParser::load(const std::string& filePath, const domain::LayerRegistry& layerRegistry)
     {
         std::ifstream input(filePath);
 
@@ -60,11 +60,6 @@ namespace drcheck::io {
                 throw std::invalid_argument("Shape is missing required field: layer");
             }
 
-            if (!shapeJson.contains("purpose"))
-            {
-                throw std::invalid_argument("Shape is missing required field: purpose");
-            }
-
             if (!shapeJson.contains("vertices"))
             {
                 throw std::invalid_argument("Shape is missing required field: vertices");
@@ -82,14 +77,7 @@ namespace drcheck::io {
                 throw std::invalid_argument("Shape layer must be a string");
             }
 
-            if (!shapeJson["purpose"].is_string())
-            {
-                throw std::invalid_argument("Shape purpose must be a string");
-            }
-
-            const domain::Layer layer = domain::layerFromString(shapeJson["layer"].get<std::string>());
-
-            const domain::Purpose purpose = domain::purposeFromString(shapeJson["purpose"].get<std::string>());
+            const domain::Layer* layer = layerRegistry.resolve(shapeJson["layer"].get<std::string>());
 
             const auto& verticesJson = shapeJson["vertices"];
 
@@ -118,7 +106,7 @@ namespace drcheck::io {
 
             geometry::Polygon polygon(std::move(vertices));
 
-            shapes.emplace_back(id, layer, purpose, std::move(polygon));
+            shapes.emplace_back(id, layer, std::move(polygon));
         }
 
         return shapes;

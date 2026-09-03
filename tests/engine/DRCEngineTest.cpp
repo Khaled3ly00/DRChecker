@@ -1,6 +1,11 @@
 #include <gtest/gtest.h>
 
 #include "drcheck/engine/DRCEngine.h"
+#include "drcheck/domain/LayerRegistry.h"
+#include "drcheck/rules/MinWidthRule.h"
+#include "drcheck/rules/MinSpacingRule.h"
+#include "drcheck/rules/MinEnclosureRule.h"
+#include "drcheck/rules/DensityRule.h"
 
 using namespace drcheck::rules;
 using namespace drcheck::domain;
@@ -11,17 +16,20 @@ using drcheck::engine::DRCEngine;
 
 TEST(DRCEngineTest, CollectsViolationFromOneRule)
 {
+	LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     Polygon polygon({
         Point(0,0),
         Point(10,0),
         Point(10,2),
         Point(0,2)
         });
-    Shape shape(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    Shape shape(1, M1, std::move(polygon));
     std::vector<Shape> shapes{shape};
 
     std::vector<std::unique_ptr<Rule>> rules;
-    rules.push_back(std::make_unique<MinWidthRule>(Layer::M1, 3.0));
+    rules.push_back(std::make_unique<MinWidthRule>(M1, 3.0));
 
     DRCEngine engine;
 
@@ -33,26 +41,30 @@ TEST(DRCEngineTest, CollectsViolationFromOneRule)
 
 TEST(DRCEngineTest, MultipleShapesGeneratingMultipleViolations)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* VIA1 = registry.declare("VIA1");   
+
     Polygon firstPolygon({ // Violates Metal 1 Min Width
         Point(0,0),
         Point(2,0),
         Point(2,10),
         Point(0,10)
         });
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(firstPolygon));
+    Shape shape1(1, M1, std::move(firstPolygon));
     Polygon secondPolygon({ // Violates VIA12 Min Width & VIA12 enclosure with Metal 1
         Point(1,1),
         Point(1.5,1),
         Point(1.5,1.5),
         Point(1,1.5)
         });
-    Shape shape2(2, Layer::VIA1, Purpose::Drawing, std::move(secondPolygon));
+    Shape shape2(2, VIA1, std::move(secondPolygon));
     std::vector<Shape> shapes{shape1, shape2};
 
     std::vector<std::unique_ptr<Rule>> rules;
-    rules.push_back(std::make_unique<MinWidthRule>(Layer::M1, 3.0));
-    rules.push_back(std::make_unique<MinWidthRule>(Layer::VIA1, 1.0));
-    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M1, 1.0));
+    rules.push_back(std::make_unique<MinWidthRule>(M1, 3.0));
+    rules.push_back(std::make_unique<MinWidthRule>(VIA1, 1.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(VIA1, M1, 1.0));
 
     DRCEngine engine;
 
@@ -63,34 +75,38 @@ TEST(DRCEngineTest, MultipleShapesGeneratingMultipleViolations)
 
 TEST(DRCEngineTest, MultipleShapesGeneratingMultipleViolations1)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* VIA1 = registry.declare("VIA1");
+
     Polygon firstPolygon({ // Violates Metal 1 Min Width
         Point(0,0),
         Point(2,0),
         Point(2,10),
         Point(0,10)
         });
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(firstPolygon));
+    Shape shape1(1, M1, std::move(firstPolygon));
     Polygon secondPolygon({ // Violates VIA12 Min Width & VIA12 enclosure with Metal 1
         Point(1,1),
         Point(1.5,1),
         Point(1.5,1.5),
         Point(1,1.5)
         });
-    Shape shape2(2, Layer::VIA1, Purpose::Drawing, std::move(secondPolygon));
+    Shape shape2(2, VIA1, std::move(secondPolygon));
     Polygon ThirdPolygon({ // Violates Metal 1 Spacing (with first polygon)
         Point(3,0),
         Point(6,0),
         Point(6,10),
         Point(3,10)
         });
-    Shape shape3(3, Layer::M1, Purpose::Drawing, std::move(ThirdPolygon));
+    Shape shape3(3, M1, std::move(ThirdPolygon));
     std::vector<Shape> shapes{shape1, shape2, shape3};
 
     std::vector<std::unique_ptr<Rule>> rules;
-    rules.push_back(std::make_unique<MinWidthRule>(Layer::M1, 3.0));
-    rules.push_back(std::make_unique<MinWidthRule>(Layer::VIA1, 1.0));
-    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M1, 1.0));
-    rules.push_back(std::make_unique<MinSpacingRule>(Layer::M1, 2.0));
+    rules.push_back(std::make_unique<MinWidthRule>(M1, 3.0));
+    rules.push_back(std::make_unique<MinWidthRule>(VIA1, 1.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(VIA1, M1, 1.0));
+    rules.push_back(std::make_unique<MinSpacingRule>(M1, 2.0));
 
     DRCEngine engine;
 
@@ -100,24 +116,28 @@ TEST(DRCEngineTest, MultipleShapesGeneratingMultipleViolations1)
 }
 
 TEST(DRCEngineTest, MultipleViolationsFromOneRule) {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* VIA1 = registry.declare("VIA1");
+
     Polygon firstPolygon({ // Violates Metal 1 Min Width
         Point(0,0),
         Point(2,0),
         Point(2,10),
         Point(0,10)
         });
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(firstPolygon));
+    Shape shape1(1, M1, std::move(firstPolygon));
     Polygon secondPolygon({ // Violates Metal 1 Min Width
         Point(3,0),
         Point(5.5,0),
         Point(5.5,8),
         Point(3,8)
         });
-    Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(secondPolygon));
+    Shape shape2(2, M1, std::move(secondPolygon));
     std::vector<Shape> shapes{shape1, shape2};
 
     std::vector<std::unique_ptr<Rule>> rules;
-    rules.push_back(std::make_unique<MinWidthRule>(Layer::M1, 3.0));
+    rules.push_back(std::make_unique<MinWidthRule>(M1, 3.0));
 
     DRCEngine engine;
     const auto violations = engine.run(shapes, rules);
@@ -126,13 +146,16 @@ TEST(DRCEngineTest, MultipleViolationsFromOneRule) {
 }
 
 TEST(DRCEngineTest, ReturnsNoViolationsWhenNoRules) {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     Polygon polygon({
         Point(0,0),
         Point(10,0),
         Point(10,2),
         Point(0,2)
         });
-    Shape shape(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    Shape shape(1, M1, std::move(polygon));
     std::vector<Shape> shapes{shape};
 
     std::vector<std::unique_ptr<Rule>> rules;
@@ -144,12 +167,16 @@ TEST(DRCEngineTest, ReturnsNoViolationsWhenNoRules) {
 }
 
 TEST(DRCEngineTest, ReturnsNoViolationsWhenNoShapes) {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* VIA1 = registry.declare("VIA1");
+
     std::vector<Shape> shapes;
 
     std::vector<std::unique_ptr<Rule>> rules;
-    rules.push_back(std::make_unique<MinWidthRule>(Layer::M1, 3.0));
-    rules.push_back(std::make_unique<MinWidthRule>(Layer::VIA1, 1.0));
-    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M1, 1.0));
+    rules.push_back(std::make_unique<MinWidthRule>(M1, 3.0));
+    rules.push_back(std::make_unique<MinWidthRule>(VIA1, 1.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(VIA1, M1, 1.0));
 
     DRCEngine engine;
     const auto violations = engine.run(shapes, rules);
@@ -158,13 +185,16 @@ TEST(DRCEngineTest, ReturnsNoViolationsWhenNoShapes) {
 }
 
 TEST(DRCEngineTest, IgnoresNullRules) {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     Polygon polygon({
         Point(0,0),
         Point(10,0),
         Point(10,2),
         Point(0,2)
         });
-    Shape shape(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    Shape shape(1, M1, std::move(polygon));
     std::vector<Shape> shapes{shape};
 
     std::vector<std::unique_ptr<Rule>> rules;
@@ -178,6 +208,11 @@ TEST(DRCEngineTest, IgnoresNullRules) {
 
 
 TEST(DRCEngineTest, Via12PassesEnclosureByBothMetalLayers) {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+    const Layer* VIA1 = registry.declare("VIA1");
+
     Polygon metal1Polygon({
         Point(0, 0),
         Point(10, 0),
@@ -196,14 +231,14 @@ TEST(DRCEngineTest, Via12PassesEnclosureByBothMetalLayers) {
         Point(7, 7),
         Point(3, 7)
         });
-    Shape metal1Pol(1, Layer::M1, Purpose::Drawing, std::move(metal1Polygon));
-    Shape metal2Pol(2, Layer::M2, Purpose::Drawing, std::move(metal2Polygon));
-    Shape viaPol(3, Layer::VIA1, Purpose::Drawing, std::move(viaPolygon));
+    Shape metal1Pol(1, M1, std::move(metal1Polygon));
+    Shape metal2Pol(2, M2, std::move(metal2Polygon));
+    Shape viaPol(3, VIA1, std::move(viaPolygon));
     std::vector<Shape> shapes{ metal1Pol, metal2Pol, viaPol };
 
     std::vector<std::unique_ptr<Rule>> rules;
-    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M1, 2.0));
-    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M2, 3.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(VIA1, M1, 2.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(VIA1, M2, 3.0));
 
     DRCEngine engine;
     const auto violations = engine.run(shapes, rules);
@@ -213,6 +248,11 @@ TEST(DRCEngineTest, Via12PassesEnclosureByBothMetalLayers) {
 
 
 TEST(DRCEngineTest, Via12FailsOnlyMetal1Enclosure) {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+    const Layer* VIA1 = registry.declare("VIA1");
+
     Polygon metal1Polygon({
         Point(0, 0),
         Point(10, 0),
@@ -231,14 +271,14 @@ TEST(DRCEngineTest, Via12FailsOnlyMetal1Enclosure) {
         Point(8, 8),
         Point(2, 8)
         });
-    Shape metal1Pol(1, Layer::M1, Purpose::Drawing, std::move(metal1Polygon));
-    Shape metal2Pol(2, Layer::M2, Purpose::Drawing, std::move(metal2Polygon));
-    Shape viaPol(3, Layer::VIA1, Purpose::Drawing, std::move(viaPolygon));
+    Shape metal1Pol(1, M1, std::move(metal1Polygon));
+    Shape metal2Pol(2, M2, std::move(metal2Polygon));
+    Shape viaPol(3, VIA1, std::move(viaPolygon));
     std::vector<Shape> shapes{ metal1Pol, metal2Pol, viaPol };
 
     std::vector<std::unique_ptr<Rule>> rules;
-    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M1, 3.0));
-    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M2, 3.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(VIA1, M1, 3.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(VIA1, M2, 3.0));
 
     DRCEngine engine;
     const auto violations = engine.run(shapes, rules);
@@ -247,6 +287,11 @@ TEST(DRCEngineTest, Via12FailsOnlyMetal1Enclosure) {
 }
 
 TEST(DRCEngineTest, Via12FailsOnlyMetal2Enclosure) {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+    const Layer* VIA1 = registry.declare("VIA1");
+
     Polygon metal1Polygon({
         Point(-1, -1),
         Point(11, -1),
@@ -265,14 +310,14 @@ TEST(DRCEngineTest, Via12FailsOnlyMetal2Enclosure) {
         Point(8, 8),
         Point(2, 8)
         });
-    Shape metal1Pol(1, Layer::M1, Purpose::Drawing, std::move(metal1Polygon));
-    Shape metal2Pol(2, Layer::M2, Purpose::Drawing, std::move(metal2Polygon));
-    Shape viaPol(3, Layer::VIA1, Purpose::Drawing, std::move(viaPolygon));
+    Shape metal1Pol(1, M1, std::move(metal1Polygon));
+    Shape metal2Pol(2, M2, std::move(metal2Polygon));
+    Shape viaPol(3, VIA1, std::move(viaPolygon));
     std::vector<Shape> shapes{ metal1Pol, metal2Pol, viaPol };
 
     std::vector<std::unique_ptr<Rule>> rules;
-    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M1, 3.0));
-    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M2, 3.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(VIA1, M1, 3.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(VIA1, M2, 3.0));
 
     DRCEngine engine;
     const auto violations = engine.run(shapes, rules);
@@ -281,6 +326,11 @@ TEST(DRCEngineTest, Via12FailsOnlyMetal2Enclosure) {
 }
 
 TEST(DRCEngineTest, Via12FailsEnclosureByBothMetalLayers) {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+    const Layer* VIA1 = registry.declare("VIA1");
+
     Polygon metal1Polygon({
         Point(0, 0),
         Point(10, 0),
@@ -299,14 +349,14 @@ TEST(DRCEngineTest, Via12FailsEnclosureByBothMetalLayers) {
         Point(8, 8),
         Point(2, 8)
         });
-    Shape metal1Pol(1, Layer::M1, Purpose::Drawing, std::move(metal1Polygon));
-    Shape metal2Pol(2, Layer::M2, Purpose::Drawing, std::move(metal2Polygon));
-    Shape viaPol(3, Layer::VIA1, Purpose::Drawing, std::move(viaPolygon));
+    Shape metal1Pol(1, M1, std::move(metal1Polygon));
+    Shape metal2Pol(2, M2, std::move(metal2Polygon));
+    Shape viaPol(3, VIA1, std::move(viaPolygon));
     std::vector<Shape> shapes{ metal1Pol, metal2Pol, viaPol };
 
     std::vector<std::unique_ptr<Rule>> rules;
-    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M1, 3.0));
-    rules.push_back(std::make_unique<MinEnclosureRule>(Layer::VIA1, Layer::M2, 3.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(VIA1, M1, 3.0));
+    rules.push_back(std::make_unique<MinEnclosureRule>(VIA1, M2, 3.0));
 
     DRCEngine engine;
     const auto violations = engine.run(shapes, rules);
@@ -316,6 +366,11 @@ TEST(DRCEngineTest, Via12FailsEnclosureByBothMetalLayers) {
 
 TEST(DRCEngineTest, RunsDensityRule)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+    const Layer* VIA1 = registry.declare("VIA1");
+
     Polygon polygon({
         Point(0, 0),
         Point(2, 0),
@@ -324,10 +379,10 @@ TEST(DRCEngineTest, RunsDensityRule)
         });
 
     std::vector<Shape> shapes;
-    shapes.emplace_back(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    shapes.emplace_back(1, M1, std::move(polygon));
 
     std::vector<std::unique_ptr<Rule>> rules;
-    rules.push_back(std::make_unique<DensityRule>(Layer::M1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 10, 10)));
+    rules.push_back(std::make_unique<DensityRule>(M1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 10, 10)));
 
     DRCEngine engine;
 
@@ -353,6 +408,11 @@ TEST(DRCEngineTest, RunsDensityRule)
 
 TEST(DRCEngineTest, RunsDensityRuleWithOtherRules)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+    const Layer* VIA1 = registry.declare("VIA1");
+
     Polygon polygon({
         Point(0, 0),
         Point(2, 0),
@@ -361,13 +421,13 @@ TEST(DRCEngineTest, RunsDensityRuleWithOtherRules)
         });
 
     std::vector<Shape> shapes;
-    shapes.emplace_back(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    shapes.emplace_back(1, M1, std::move(polygon));
 
     std::vector<std::unique_ptr<Rule>> rules;
 
-    rules.push_back(std::make_unique<MinWidthRule>(Layer::M1, 3.0));
+    rules.push_back(std::make_unique<MinWidthRule>(M1, 3.0));
 
-    rules.push_back(std::make_unique<DensityRule>(Layer::M1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 10, 10)));
+    rules.push_back(std::make_unique<DensityRule>(M1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 10, 10)));
 
     DRCEngine engine;
 

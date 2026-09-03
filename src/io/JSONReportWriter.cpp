@@ -2,7 +2,7 @@
 
 #include <fstream>
 #include <stdexcept>
-
+#include <cmath>
 #include <nlohmann/json.hpp>
 
 namespace {
@@ -32,7 +32,7 @@ void JSONReportWriter::write(const std::vector<domain::Violation>& violations, c
         violationJson["shapeIds"] = violation.getShapeIds();
         violationJson["message"] = violation.getMessage();
         violationJson["actual"] = roundForReport(violation.getActualValue());
-        violationJson["required"] = violation.getRequiredValue();
+        violationJson["required"] = roundForReport(violation.getRequiredValue());
 
         if (violation.getMarker().has_value())
         {
@@ -82,11 +82,14 @@ void JSONReportWriter::write(const std::vector<domain::Violation>& violations, c
                     }
                 };
             }
-            if (marker.firstLayer.has_value()) {
-                violationJson["marker"]["firstLayer"] = domain::layerToString(marker.firstLayer.value());
+            if (marker.firstLayer != nullptr)
+            {
+                violationJson["marker"]["firstLayer"] = marker.firstLayer->getName();
             }
-            if (marker.secondLayer.has_value()) {
-                violationJson["marker"]["secondLayer"] = domain::layerToString(marker.secondLayer.value());
+
+            if (marker.secondLayer != nullptr)
+            {
+                violationJson["marker"]["secondLayer"] = marker.secondLayer->getName();
             }
         }
         // Push violationJson to violations

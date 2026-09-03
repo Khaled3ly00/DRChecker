@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="90vh" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; display: block;">
   <style>
     .violation-label {
       visibility: hidden;
@@ -25,238 +25,238 @@
     }
   </style>
   <g id="layout">
-  <g class="shape layer-NW">
-    <title>Shape ID: 7&#10;Layer: NW</title>
-  <polygon points="868.003,250.8 904.962,250.8 904.962,40 445.038,40 445.038,250.8 481.995,250.8 481.995,394.524 868.003,394.524 " fill="cream" fill-opacity="0.35" stroke="cream" stroke-width="2" />
-  </g>
-  <g class="shape layer-VTL_N">
-    <title>Shape ID: 31&#10;Layer: VTL_N</title>
-  <polygon points="677.737,593.005 789.979,593.005 789.979,472.548 672.263,472.548 560.019,472.548 560.019,593.005 " fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
-  </g>
-  <g class="shape layer-VTL_P">
-    <title>Shape ID: 39&#10;Layer: VTL_P</title>
-  <polygon points="560.019,373.993 789.98,373.993 789.98,253.536 560.019,253.536 " fill="gray" fill-opacity="0.35" stroke="gray" stroke-width="2" />
-  </g>
-  <g class="shape layer-PDK">
-    <title>Shape ID: 30&#10;Layer: PDK</title>
-  <polygon points="714.696,613.536 868.003,613.536 868.003,452.014 594.239,452.014 481.995,452.014 481.995,613.536 " fill="purple" fill-opacity="0.35" stroke="purple" stroke-width="2" />
-  </g>
-  <g class="shape layer-PO">
-    <title>Shape ID: 21&#10;Layer: PO</title>
-  <polygon points="627.091,502.662 633.934,502.662 633.934,453.384 603.822,453.384 603.822,502.662 610.664,502.662 610.664,516.349 610.664,549.202 610.664,587.528 627.091,587.528 627.091,549.202 627.091,516.349 " fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
-  </g>
-  <g class="shape layer-PO">
-    <title>Shape ID: 32&#10;Layer: PO</title>
-  <polygon points="627.091,259.012 610.664,259.012 610.664,297.339 610.664,330.189 610.664,343.878 603.822,343.878 603.822,393.156 633.934,393.156 633.934,343.878 627.091,343.878 627.091,330.189 627.091,297.339 " fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
-  </g>
-  <g class="shape layer-PO">
-    <title>Shape ID: 33&#10;Layer: PO</title>
-  <polygon points="739.334,259.012 722.909,259.012 722.909,297.339 722.909,330.189 722.909,343.878 716.064,343.878 716.064,393.156 746.178,393.156 746.178,343.878 739.334,343.878 739.334,330.189 739.334,297.339 " fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
-  </g>
-  <g class="shape layer-PO">
-    <title>Shape ID: 40&#10;Layer: PO</title>
-  <polygon points="739.334,478.022 722.909,478.022 722.909,516.349 722.909,549.202 722.909,562.891 716.064,562.891 716.064,612.168 746.178,612.168 746.178,562.891 739.334,562.891 739.334,549.202 739.334,516.349 " fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
-  </g>
-  <g class="shape layer-NP">
-    <title>Shape ID: 9&#10;Layer: NP</title>
-  <polygon points="491.577,204.259 491.577,86.5402 858.421,86.5402 858.421,204.259 " fill="gray" fill-opacity="0.35" stroke="gray" stroke-width="2" />
-  </g>
-  <g class="shape layer-NP">
-    <title>Shape ID: 29&#10;Layer: NP</title>
-  <polygon points="690.056,642.282 843.365,642.282 843.365,423.27 618.877,423.27 506.635,423.27 506.635,642.282 " fill="gray" fill-opacity="0.35" stroke="gray" stroke-width="2" />
-  </g>
-  <g class="shape layer-PP">
-    <title>Shape ID: 11&#10;Layer: PP</title>
-  <polygon points="491.577,760 491.577,642.281 858.421,642.281 858.421,760 " fill="magenta" fill-opacity="0.35" stroke="magenta" stroke-width="2" />
-  </g>
-  <g class="shape layer-PP">
-    <title>Shape ID: 38&#10;Layer: PP</title>
-  <polygon points="506.634,423.27 843.364,423.27 843.364,204.259 506.634,204.259 " fill="magenta" fill-opacity="0.35" stroke="magenta" stroke-width="2" />
-  </g>
-  <g class="shape layer-OD">
-    <title>Shape ID: 1&#10;Layer: OD</title>
-  <polygon points="527.167,168.669 527.167,122.129 822.832,122.129 822.832,168.669 " fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
-  </g>
-  <g class="shape layer-OD">
-    <title>Shape ID: 10&#10;Layer: OD</title>
-  <polygon points="527.167,724.411 527.167,677.871 822.832,677.871 822.832,724.411 " fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
-  </g>
-  <g class="shape layer-OD">
-    <title>Shape ID: 27&#10;Layer: OD</title>
-  <polygon points="583.288,549.202 610.664,549.202 627.091,549.202 654.467,549.202 654.467,553.308 695.533,553.308 695.533,549.202 722.909,549.202 739.334,549.202 766.71,549.202 766.71,553.308 807.775,553.308 807.775,512.243 766.71,512.243 766.71,516.349 739.334,516.349 722.909,516.349 695.533,516.349 695.533,512.243 654.467,512.243 654.467,516.349 627.091,516.349 610.664,516.349 583.288,516.349 583.288,512.243 542.223,512.243 542.223,553.308 583.288,553.308 " fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
-  </g>
-  <g class="shape layer-OD">
-    <title>Shape ID: 34&#10;Layer: OD</title>
-  <polygon points="583.288,330.189 610.664,330.189 627.091,330.189 654.467,330.189 654.467,334.298 695.533,334.298 695.533,330.189 739.334,330.189 766.71,330.189 766.71,334.298 807.775,334.298 807.775,293.233 766.71,293.233 766.71,297.339 739.334,297.339 695.533,297.339 695.533,293.233 654.467,293.233 654.467,297.339 627.091,297.339 610.664,297.339 583.288,297.339 583.288,293.233 542.223,293.233 542.223,334.298 583.288,334.298 " fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
-  </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 2&#10;Layer: CO</title>
-  <polygon points="774.923,157.719 799.562,157.719 799.562,133.08 774.923,133.08 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="974.924,157.719 999.563,157.719 999.563,133.08 974.924,133.08 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 3&#10;Layer: CO</title>
-  <polygon points="718.802,157.719 743.44,157.719 743.44,133.08 718.802,133.08 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="918.802,157.719 943.441,157.719 943.441,133.08 918.802,133.08 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 4&#10;Layer: CO</title>
-  <polygon points="662.68,157.719 687.319,157.719 687.319,133.08 662.68,133.08 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="862.681,157.719 887.319,157.719 887.319,133.08 862.681,133.08 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 5&#10;Layer: CO</title>
-  <polygon points="606.558,157.719 631.197,157.719 631.197,133.08 606.558,133.08 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="806.559,157.719 831.198,157.719 831.198,133.08 806.559,133.08 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 6&#10;Layer: CO</title>
-  <polygon points="550.437,157.719 575.076,157.719 575.076,133.08 550.437,133.08 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="750.437,157.719 775.076,157.719 775.076,133.08 750.437,133.08 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 12&#10;Layer: CO</title>
-  <polygon points="774.923,713.46 799.562,713.46 799.562,688.821 774.923,688.821 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="974.924,713.46 999.563,713.46 999.563,688.821 974.924,688.821 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 13&#10;Layer: CO</title>
-  <polygon points="718.802,713.46 743.44,713.46 743.44,688.821 718.802,688.821 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="918.802,713.46 943.441,713.46 943.441,688.821 918.802,688.821 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 14&#10;Layer: CO</title>
-  <polygon points="662.68,713.46 687.319,713.46 687.319,688.821 662.68,688.821 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="862.681,713.46 887.319,713.46 887.319,688.821 862.681,688.821 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 15&#10;Layer: CO</title>
-  <polygon points="606.558,713.46 631.197,713.46 631.197,688.821 606.558,688.821 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="806.559,713.46 831.198,713.46 831.198,688.821 806.559,688.821 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 16&#10;Layer: CO</title>
-  <polygon points="550.437,713.46 575.076,713.46 575.076,688.821 550.437,688.821 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="750.437,713.46 775.076,713.46 775.076,688.821 750.437,688.821 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 28&#10;Layer: CO</title>
-  <polygon points="550.437,545.095 575.076,545.095 575.076,520.456 550.437,520.456 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="750.437,545.095 775.076,545.095 775.076,520.456 750.437,520.456 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 35&#10;Layer: CO</title>
-  <polygon points="550.437,326.084 575.076,326.084 575.076,301.445 550.437,301.445 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="750.437,326.084 775.076,326.084 775.076,301.445 750.437,301.445 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 36&#10;Layer: CO</title>
-  <polygon points="774.923,326.084 799.562,326.084 799.562,301.445 774.923,301.445 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="974.924,326.084 999.563,326.084 999.563,301.445 974.924,301.445 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 37&#10;Layer: CO</title>
-  <polygon points="662.68,326.084 687.319,326.084 687.319,301.445 662.68,301.445 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="862.681,326.084 887.319,326.084 887.319,301.445 862.681,301.445 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 41&#10;Layer: CO</title>
-  <polygon points="774.923,545.095 799.562,545.095 799.562,520.456 774.923,520.456 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="974.924,545.095 999.563,545.095 999.563,520.456 974.924,520.456 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 42&#10;Layer: CO</title>
-  <polygon points="662.68,545.095 687.319,545.095 687.319,520.456 662.68,520.456 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="862.681,545.095 887.319,545.095 887.319,520.456 862.681,520.456 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 43&#10;Layer: CO</title>
-  <polygon points="606.558,380.837 631.197,380.837 631.197,356.198 606.558,356.198 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="806.559,380.837 831.198,380.837 831.198,356.198 806.559,356.198 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 44&#10;Layer: CO</title>
-  <polygon points="718.802,380.837 743.44,380.837 743.44,356.198 718.802,356.198 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="918.802,380.837 943.441,380.837 943.441,356.198 918.802,356.198 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 45&#10;Layer: CO</title>
-  <polygon points="606.558,490.342 631.197,490.342 631.197,465.704 606.558,465.704 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="806.559,490.342 831.198,490.342 831.198,465.703 806.559,465.703 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-CO">
+  <g class="shape" data-layer="CO">
     <title>Shape ID: 46&#10;Layer: CO</title>
-  <polygon points="718.802,599.848 743.44,599.848 743.44,575.209 718.802,575.209 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  <polygon points="918.802,599.848 943.441,599.848 943.441,575.209 918.802,575.209 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
   </g>
-  <g class="shape layer-M1">
+  <g class="shape" data-layer="M1">
     <title>Shape ID: 8&#10;Layer: M1</title>
-  <polygon points="576.444,171.408 773.554,171.408 773.554,337.034 800.93,337.034 800.93,171.408 825.57,171.408 825.57,119.392 800.93,119.392 773.554,119.392 576.444,119.392 549.068,119.392 524.43,119.392 524.43,171.408 549.068,171.408 549.068,337.034 576.444,337.034 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  <polygon points="776.445,171.407 973.555,171.407 973.555,337.034 1000.93,337.034 1000.93,171.407 1025.57,171.407 1025.57,119.392 1000.93,119.392 973.555,119.392 776.445,119.392 749.068,119.392 724.43,119.392 724.43,171.407 749.068,171.407 749.068,337.034 776.445,337.034 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
   </g>
-  <g class="shape layer-M1">
+  <g class="shape" data-layer="M1">
     <title>Shape ID: 17&#10;Layer: M1</title>
-  <polygon points="825.57,675.133 800.93,675.133 800.93,612.168 800.93,508.136 798.194,508.136 773.554,508.136 773.554,562.891 743.44,562.891 718.802,562.891 716.064,562.891 716.064,612.168 773.554,612.168 773.554,675.133 576.444,675.133 576.444,508.136 573.708,508.136 549.068,508.136 549.068,675.133 524.43,675.133 524.43,727.149 825.57,727.149 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  <polygon points="1025.57,675.133 1000.93,675.133 1000.93,612.167 1000.93,508.137 998.194,508.137 973.555,508.137 973.555,562.89 943.441,562.89 918.802,562.89 916.065,562.89 916.065,612.167 973.555,612.167 973.555,675.133 776.445,675.133 776.445,508.137 773.707,508.137 749.068,508.137 749.068,675.133 724.43,675.133 724.43,727.148 1025.57,727.148 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
   </g>
-  <g class="shape layer-M1">
+  <g class="shape" data-layer="M1">
     <title>Shape ID: 18&#10;Layer: M1</title>
-  <polygon points="632.566,343.878 631.198,343.878 606.558,343.878 605.19,343.878 605.19,502.662 632.566,502.662 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  <polygon points="832.567,343.878 831.198,343.878 806.559,343.878 805.19,343.878 805.19,502.662 832.567,502.662 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
   </g>
-  <g class="shape layer-M1">
+  <g class="shape" data-layer="M1">
     <title>Shape ID: 19&#10;Layer: M1</title>
-  <polygon points="744.81,343.878 743.44,343.878 718.802,343.878 717.432,343.878 717.432,447.908 744.81,447.908 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  <polygon points="944.81,343.878 943.441,343.878 918.802,343.878 917.433,343.878 917.433,447.909 944.81,447.909 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
   </g>
-  <g class="shape layer-M1">
+  <g class="shape" data-layer="M1">
     <title>Shape ID: 22&#10;Layer: M1</title>
-  <polygon points="688.688,290.494 687.318,290.494 662.68,290.494 661.312,290.494 661.312,556.046 688.688,556.046 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  <polygon points="888.688,290.494 887.319,290.494 862.681,290.494 861.312,290.494 861.312,556.046 888.688,556.046 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
   </g>
-  <g class="shape layer-M1_PIN">
+  <g class="shape" data-layer="M1_PIN">
     <title>Shape ID: 23&#10;Layer: M1_PIN</title>
-  <polygon points="661.311,436.958 688.688,436.958 688.688,409.582 661.311,409.582 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-      <line x1="661.311" y1="409.582" x2="688.688" y2="436.958" stroke="lightgray" stroke-width="1.5" />
-      <line x1="661.311" y1="436.958" x2="688.688" y2="409.582" stroke="lightgray" stroke-width="1.5" />
+  <polygon points="861.312,436.958 888.688,436.958 888.688,409.582 861.312,409.582 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+      <line x1="861.312" y1="409.582" x2="888.688" y2="436.958" stroke="lightgray" stroke-width="1.5" />
+      <line x1="861.312" y1="436.958" x2="888.688" y2="409.582" stroke="lightgray" stroke-width="1.5" />
   </g>
-  <g class="shape layer-M1_PIN">
+  <g class="shape" data-layer="M1_PIN">
     <title>Shape ID: 25&#10;Layer: M1_PIN</title>
-  <polygon points="549.068,171.407 601.083,171.407 601.083,119.392 549.068,119.392 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-      <line x1="549.068" y1="119.392" x2="601.083" y2="171.407" stroke="lightgray" stroke-width="1.5" />
-      <line x1="549.068" y1="171.407" x2="601.083" y2="119.392" stroke="lightgray" stroke-width="1.5" />
+  <polygon points="749.068,171.407 801.084,171.407 801.084,119.392 749.068,119.392 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+      <line x1="749.068" y1="119.392" x2="801.084" y2="171.407" stroke="lightgray" stroke-width="1.5" />
+      <line x1="749.068" y1="171.407" x2="801.084" y2="119.392" stroke="lightgray" stroke-width="1.5" />
   </g>
-  <g class="shape layer-M1_PIN">
+  <g class="shape" data-layer="M1_PIN">
     <title>Shape ID: 26&#10;Layer: M1_PIN</title>
-  <polygon points="549.068,727.148 601.083,727.148 601.083,675.133 549.068,675.133 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-      <line x1="549.068" y1="675.133" x2="601.083" y2="727.148" stroke="lightgray" stroke-width="1.5" />
-      <line x1="549.068" y1="727.148" x2="601.083" y2="675.133" stroke="lightgray" stroke-width="1.5" />
+  <polygon points="749.068,727.148 801.084,727.148 801.084,675.133 749.068,675.133 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+      <line x1="749.068" y1="675.133" x2="801.084" y2="727.148" stroke="lightgray" stroke-width="1.5" />
+      <line x1="749.068" y1="727.148" x2="801.084" y2="675.133" stroke="lightgray" stroke-width="1.5" />
   </g>
-  <g class="shape layer-VIA1">
-    <title>Shape ID: 47&#10;Layer: VIA1</title>
-  <polygon points="717.433,436.958 744.809,436.958 744.809,409.582 717.433,409.582 " fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
-  </g>
-  <g class="shape layer-VIA1">
-    <title>Shape ID: 48&#10;Layer: VIA1</title>
-  <polygon points="605.19,436.958 632.566,436.958 632.566,409.582 605.19,409.582 " fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
-  </g>
-  <g class="shape layer-M2">
+  <g class="shape" data-layer="M2">
     <title>Shape ID: 20&#10;Layer: M2</title>
-  <polygon points="643.517,436.959 755.759,436.959 755.759,409.581 706.483,409.581 643.517,409.581 594.239,409.581 594.239,436.959 " fill="gold" fill-opacity="0.35" stroke="gold" stroke-width="2" />
+  <polygon points="843.517,436.958 955.76,436.958 955.76,409.582 906.483,409.582 843.517,409.582 794.24,409.582 794.24,436.958 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
   </g>
-  <g class="shape layer-M2_PIN">
+  <g class="shape" data-layer="M2_PIN">
     <title>Shape ID: 24&#10;Layer: M2_PIN</title>
-  <polygon points="594.239,436.958 621.615,436.958 621.615,409.582 594.239,409.582 " fill="gold" fill-opacity="0.35" stroke="gold" stroke-width="2" />
-      <line x1="594.239" y1="409.582" x2="621.615" y2="436.958" stroke="lightgray" stroke-width="1.5" />
-      <line x1="594.239" y1="436.958" x2="621.615" y2="409.582" stroke="lightgray" stroke-width="1.5" />
+  <polygon points="794.24,436.958 821.616,436.958 821.616,409.582 794.24,409.582 " fill="crimson" fill-opacity="0.35" stroke="crimson" stroke-width="2" />
+      <line x1="794.24" y1="409.582" x2="821.616" y2="436.958" stroke="lightgray" stroke-width="1.5" />
+      <line x1="794.24" y1="436.958" x2="821.616" y2="409.582" stroke="lightgray" stroke-width="1.5" />
+  </g>
+  <g class="shape" data-layer="NP">
+    <title>Shape ID: 9&#10;Layer: NP</title>
+  <polygon points="691.578,204.259 691.578,86.5399 1058.42,86.5399 1058.42,204.259 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="NP">
+    <title>Shape ID: 29&#10;Layer: NP</title>
+  <polygon points="890.057,642.281 1043.37,642.281 1043.37,423.27 818.878,423.27 706.635,423.27 706.635,642.281 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="NW">
+    <title>Shape ID: 7&#10;Layer: NW</title>
+  <polygon points="1068,250.798 1104.96,250.798 1104.96,40 645.038,40 645.038,250.798 681.996,250.798 681.996,394.525 1068,394.525 " fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="OD">
+    <title>Shape ID: 1&#10;Layer: OD</title>
+  <polygon points="727.167,168.669 727.167,122.129 1022.83,122.129 1022.83,168.669 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="OD">
+    <title>Shape ID: 10&#10;Layer: OD</title>
+  <polygon points="727.167,724.411 727.167,677.871 1022.83,677.871 1022.83,724.411 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="OD">
+    <title>Shape ID: 27&#10;Layer: OD</title>
+  <polygon points="783.289,549.202 810.665,549.202 827.091,549.202 854.468,549.202 854.468,553.308 895.532,553.308 895.532,549.202 922.909,549.202 939.335,549.202 966.711,549.202 966.711,553.308 1007.78,553.308 1007.78,512.243 966.711,512.243 966.711,516.35 939.335,516.35 922.909,516.35 895.532,516.35 895.532,512.243 854.468,512.243 854.468,516.35 827.091,516.35 810.665,516.35 783.289,516.35 783.289,512.243 742.224,512.243 742.224,553.308 783.289,553.308 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="OD">
+    <title>Shape ID: 34&#10;Layer: OD</title>
+  <polygon points="783.289,330.19 810.665,330.19 827.091,330.19 854.468,330.19 854.468,334.297 895.532,334.297 895.532,330.19 939.335,330.19 966.711,330.19 966.711,334.297 1007.78,334.297 1007.78,293.232 966.711,293.232 966.711,297.338 939.335,297.338 895.532,297.338 895.532,293.232 854.468,293.232 854.468,297.338 827.091,297.338 810.665,297.338 783.289,297.338 783.289,293.232 742.224,293.232 742.224,334.297 783.289,334.297 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PDK">
+    <title>Shape ID: 30&#10;Layer: PDK</title>
+  <polygon points="914.696,613.536 1068,613.536 1068,452.015 794.24,452.015 681.996,452.015 681.996,613.536 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PO">
+    <title>Shape ID: 21&#10;Layer: PO</title>
+  <polygon points="827.091,502.662 833.935,502.662 833.935,453.384 803.821,453.384 803.821,502.662 810.665,502.662 810.665,516.35 810.665,549.202 810.665,587.529 827.091,587.529 827.091,549.202 827.091,516.35 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PO">
+    <title>Shape ID: 32&#10;Layer: PO</title>
+  <polygon points="827.091,259.011 810.665,259.011 810.665,297.338 810.665,330.19 810.665,343.878 803.821,343.878 803.821,393.156 833.935,393.156 833.935,343.878 827.091,343.878 827.091,330.19 827.091,297.338 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PO">
+    <title>Shape ID: 33&#10;Layer: PO</title>
+  <polygon points="939.335,259.011 922.909,259.011 922.909,297.338 922.909,330.19 922.909,343.878 916.065,343.878 916.065,393.156 946.179,393.156 946.179,343.878 939.335,343.878 939.335,330.19 939.335,297.338 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PO">
+    <title>Shape ID: 40&#10;Layer: PO</title>
+  <polygon points="939.335,478.023 922.909,478.023 922.909,516.35 922.909,549.202 922.909,562.89 916.065,562.89 916.065,612.167 946.179,612.167 946.179,562.89 939.335,562.89 939.335,549.202 939.335,516.35 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PP">
+    <title>Shape ID: 11&#10;Layer: PP</title>
+  <polygon points="691.578,760 691.578,642.281 1058.42,642.281 1058.42,760 " fill="coral" fill-opacity="0.35" stroke="coral" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PP">
+    <title>Shape ID: 38&#10;Layer: PP</title>
+  <polygon points="706.635,423.27 1043.37,423.27 1043.37,204.259 706.635,204.259 " fill="coral" fill-opacity="0.35" stroke="coral" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="VIA1">
+    <title>Shape ID: 47&#10;Layer: VIA1</title>
+  <polygon points="917.433,436.958 944.81,436.958 944.81,409.582 917.433,409.582 " fill="orange" fill-opacity="0.35" stroke="orange" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="VIA1">
+    <title>Shape ID: 48&#10;Layer: VIA1</title>
+  <polygon points="805.19,436.958 832.567,436.958 832.567,409.582 805.19,409.582 " fill="orange" fill-opacity="0.35" stroke="orange" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="VTL_N">
+    <title>Shape ID: 31&#10;Layer: VTL_N</title>
+  <polygon points="877.738,593.004 989.981,593.004 989.981,472.548 872.262,472.548 760.019,472.548 760.019,593.004 " fill="violet" fill-opacity="0.35" stroke="violet" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="VTL_P">
+    <title>Shape ID: 39&#10;Layer: VTL_P</title>
+  <polygon points="760.019,373.992 989.981,373.992 989.981,253.536 760.019,253.536 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
   </g>
   </g>
   <g id="violations">
-    <g id="violation-0" class="violation-overlay" data-layers="layer-PO layer-NP" style="display: none;">
+    <g id="violation-0" class="violation-overlay" data-layers="PO NP" style="display: none;">
   <g>
-    <line class="violation-marker" x1="618.877" y1="453.384" x2="618.877" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="618.877" cy="453.384" r="4" fill="red" />
-    <circle class="violation-point" cx="618.877" cy="423.27" r="4" fill="red" />
-    <text class="violation-label" x="618.877" y="431.327" font-size="14" text-anchor="middle" fill="red"><tspan x="618.877">Enclosure PO With NP</tspan><tspan x="618.877" dy="16">0.11/0.15</tspan></text>
+    <line class="violation-marker" x1="818.878" y1="453.384" x2="818.878" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="818.878" cy="453.384" r="4" fill="red" />
+    <circle class="violation-point" cx="818.878" cy="423.27" r="4" fill="red" />
+    <text class="violation-label" x="818.878" y="431.327" font-size="14" text-anchor="middle" fill="red"><tspan x="818.878">Enclosure PO With NP</tspan><tspan x="818.878" dy="16">0.11/0.15</tspan></text>
   </g>
     </g>
-    <g id="violation-1" class="violation-overlay" data-layers="layer-PO layer-PP" style="display: none;">
+    <g id="violation-1" class="violation-overlay" data-layers="PO PP" style="display: none;">
   <g>
-    <line class="violation-marker" x1="603.822" y1="393.156" x2="603.822" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="603.822" cy="393.156" r="4" fill="red" />
-    <circle class="violation-point" cx="603.822" cy="423.27" r="4" fill="red" />
-    <text class="violation-label" x="603.822" y="401.213" font-size="14" text-anchor="middle" fill="red"><tspan x="603.822">Enclosure PO With PP</tspan><tspan x="603.822" dy="16">0.11/0.15</tspan></text>
+    <line class="violation-marker" x1="803.821" y1="393.156" x2="803.821" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="803.821" cy="393.156" r="4" fill="red" />
+    <circle class="violation-point" cx="803.821" cy="423.27" r="4" fill="red" />
+    <text class="violation-label" x="803.821" y="401.213" font-size="14" text-anchor="middle" fill="red"><tspan x="803.821">Enclosure PO With PP</tspan><tspan x="803.821" dy="16">0.11/0.15</tspan></text>
   </g>
     </g>
-    <g id="violation-2" class="violation-overlay" data-layers="layer-PO layer-PP" style="display: none;">
+    <g id="violation-2" class="violation-overlay" data-layers="PO PP" style="display: none;">
   <g>
-    <line class="violation-marker" x1="716.064" y1="393.156" x2="716.064" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="716.064" cy="393.156" r="4" fill="red" />
-    <circle class="violation-point" cx="716.064" cy="423.27" r="4" fill="red" />
-    <text class="violation-label" x="716.064" y="401.213" font-size="14" text-anchor="middle" fill="red"><tspan x="716.064">Enclosure PO With PP</tspan><tspan x="716.064" dy="16">0.11/0.15</tspan></text>
+    <line class="violation-marker" x1="916.065" y1="393.156" x2="916.065" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="916.065" cy="393.156" r="4" fill="red" />
+    <circle class="violation-point" cx="916.065" cy="423.27" r="4" fill="red" />
+    <text class="violation-label" x="916.065" y="401.213" font-size="14" text-anchor="middle" fill="red"><tspan x="916.065">Enclosure PO With PP</tspan><tspan x="916.065" dy="16">0.11/0.15</tspan></text>
   </g>
     </g>
-    <g id="violation-3" class="violation-overlay" data-layers="layer-PO layer-NP" style="display: none;">
+    <g id="violation-3" class="violation-overlay" data-layers="PO NP" style="display: none;">
   <g>
-    <line class="violation-marker" x1="716.064" y1="612.168" x2="716.064" y2="642.282" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="716.064" cy="612.168" r="4" fill="red" />
-    <circle class="violation-point" cx="716.064" cy="642.282" r="4" fill="red" />
-    <text class="violation-label" x="716.064" y="620.225" font-size="14" text-anchor="middle" fill="red"><tspan x="716.064">Enclosure PO With NP</tspan><tspan x="716.064" dy="16">0.11/0.15</tspan></text>
+    <line class="violation-marker" x1="916.065" y1="612.167" x2="916.065" y2="642.281" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="916.065" cy="612.167" r="4" fill="red" />
+    <circle class="violation-point" cx="916.065" cy="642.281" r="4" fill="red" />
+    <text class="violation-label" x="916.065" y="620.224" font-size="14" text-anchor="middle" fill="red"><tspan x="916.065">Enclosure PO With NP</tspan><tspan x="916.065" dy="16">0.11/0.15</tspan></text>
   </g>
     </g>
   </g>
@@ -271,19 +271,19 @@
       <rect x="140" y="70" width="80" height="24" fill="#eeeeee" stroke="#999999" stroke-width="1" />
       <text x="180" y="86" font-size="12" text-anchor="middle" fill="black">Hide All</text>
     </g>
-    <g id="violation-item-0" class="violation-list-item" data-violation-id="violation-0" data-message="Minimum Enclosure violation: PO enclosed by NP should be 0.150000 actual 0.110001" data-page="0" data-layers="layer-PO layer-NP" onclick="toggleViolation(this)" style="cursor: pointer;">
+    <g id="violation-item-0" class="violation-list-item" data-violation-id="violation-0" data-message="Minimum Enclosure violation: PO enclosed by NP required 0.150000 actual 0.110000" data-page="0" data-layers="PO NP" onclick="toggleViolation(this)" style="cursor: pointer;">
       <rect x="50" y="96" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
       <text x="58" y="114" font-size="12" fill="black">1. Enclosure PO-NP 0.11/0.15</text>
     </g>
-    <g id="violation-item-1" class="violation-list-item" data-violation-id="violation-1" data-message="Minimum Enclosure violation: PO enclosed by PP should be 0.150000 actual 0.110000" data-page="0" data-layers="layer-PO layer-PP" onclick="toggleViolation(this)" style="cursor: pointer;">
+    <g id="violation-item-1" class="violation-list-item" data-violation-id="violation-1" data-message="Minimum Enclosure violation: PO enclosed by PP required 0.150000 actual 0.110000" data-page="0" data-layers="PO PP" onclick="toggleViolation(this)" style="cursor: pointer;">
       <rect x="50" y="128" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
       <text x="58" y="146" font-size="12" fill="black">2. Enclosure PO-PP 0.11/0.15</text>
     </g>
-    <g id="violation-item-2" class="violation-list-item" data-violation-id="violation-2" data-message="Minimum Enclosure violation: PO enclosed by PP should be 0.150000 actual 0.110000" data-page="0" data-layers="layer-PO layer-PP" onclick="toggleViolation(this)" style="cursor: pointer;">
+    <g id="violation-item-2" class="violation-list-item" data-violation-id="violation-2" data-message="Minimum Enclosure violation: PO enclosed by PP required 0.150000 actual 0.110000" data-page="0" data-layers="PO PP" onclick="toggleViolation(this)" style="cursor: pointer;">
       <rect x="50" y="160" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
       <text x="58" y="178" font-size="12" fill="black">3. Enclosure PO-PP 0.11/0.15</text>
     </g>
-    <g id="violation-item-3" class="violation-list-item" data-violation-id="violation-3" data-message="Minimum Enclosure violation: PO enclosed by NP should be 0.150000 actual 0.110001" data-page="0" data-layers="layer-PO layer-NP" onclick="toggleViolation(this)" style="cursor: pointer;">
+    <g id="violation-item-3" class="violation-list-item" data-violation-id="violation-3" data-message="Minimum Enclosure violation: PO enclosed by NP required 0.150000 actual 0.110000" data-page="0" data-layers="PO NP" onclick="toggleViolation(this)" style="cursor: pointer;">
       <rect x="50" y="192" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
       <text x="58" y="210" font-size="12" fill="black">4. Enclosure PO-NP 0.11/0.15</text>
     </g>
@@ -295,63 +295,63 @@
     <text id="violation-details-text" x="58" y="670" font-size="13" fill="#555555">Select a violation</text>
   </g>
   <g id="layer-legend">
-    <text x="1050" y="40" font-size="20" font-weight="bold" fill="black">Layers</text>
-    <text id="toggle-all-layers" x="1115" y="40" font-size="15" fill="#555555" text-decoration="underline" style="cursor: pointer;" onclick="toggleAllLayers()">Hide All</text>
-    <g class="legend-item" data-layer="layer-OD" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="65" width="18" height="18" fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
-      <text class="legend-label" x="1078" y="80" font-size="14" fill="black">OD</text>
+    <text x="1450" y="40" font-size="20" font-weight="bold" fill="black">Layers</text>
+    <text id="toggle-all-layers" x="1515" y="40" font-size="15" fill="#555555" text-decoration="underline" style="cursor: pointer;" onclick="toggleAllLayers()">Hide All</text>
+    <g class="legend-item" data-layer="CO" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="65" width="18" height="18" fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+      <text class="legend-label" x="1478" y="80" font-size="14" fill="black">CO</text>
     </g>
-    <g class="legend-item" data-layer="layer-CO" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="95" width="18" height="18" fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
-      <text class="legend-label" x="1078" y="110" font-size="14" fill="black">CO</text>
+    <g class="legend-item" data-layer="M1" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="95" width="18" height="18" fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+      <text class="legend-label" x="1478" y="110" font-size="14" fill="black">M1</text>
     </g>
-    <g class="legend-item" data-layer="layer-NW" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="125" width="18" height="18" fill="cream" fill-opacity="0.35" stroke="cream" stroke-width="2" />
-      <text class="legend-label" x="1078" y="140" font-size="14" fill="black">NW</text>
+    <g class="legend-item" data-layer="M1_PIN" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="125" width="18" height="18" fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+      <text class="legend-label" x="1478" y="140" font-size="14" fill="black">M1_PIN</text>
     </g>
-    <g class="legend-item" data-layer="layer-M1" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="155" width="18" height="18" fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-      <text class="legend-label" x="1078" y="170" font-size="14" fill="black">M1</text>
+    <g class="legend-item" data-layer="M2" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="155" width="18" height="18" fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+      <text class="legend-label" x="1478" y="170" font-size="14" fill="black">M2</text>
     </g>
-    <g class="legend-item" data-layer="layer-NP" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="185" width="18" height="18" fill="gray" fill-opacity="0.35" stroke="gray" stroke-width="2" />
-      <text class="legend-label" x="1078" y="200" font-size="14" fill="black">NP</text>
+    <g class="legend-item" data-layer="M2_PIN" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="185" width="18" height="18" fill="crimson" fill-opacity="0.35" stroke="crimson" stroke-width="2" />
+      <text class="legend-label" x="1478" y="200" font-size="14" fill="black">M2_PIN</text>
     </g>
-    <g class="legend-item" data-layer="layer-PP" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="215" width="18" height="18" fill="magenta" fill-opacity="0.35" stroke="magenta" stroke-width="2" />
-      <text class="legend-label" x="1078" y="230" font-size="14" fill="black">PP</text>
+    <g class="legend-item" data-layer="NP" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="215" width="18" height="18" fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+      <text class="legend-label" x="1478" y="230" font-size="14" fill="black">NP</text>
     </g>
-    <g class="legend-item" data-layer="layer-M2" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="245" width="18" height="18" fill="gold" fill-opacity="0.35" stroke="gold" stroke-width="2" />
-      <text class="legend-label" x="1078" y="260" font-size="14" fill="black">M2</text>
+    <g class="legend-item" data-layer="NW" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="245" width="18" height="18" fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
+      <text class="legend-label" x="1478" y="260" font-size="14" fill="black">NW</text>
     </g>
-    <g class="legend-item" data-layer="layer-PO" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="275" width="18" height="18" fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
-      <text class="legend-label" x="1078" y="290" font-size="14" fill="black">PO</text>
+    <g class="legend-item" data-layer="OD" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="275" width="18" height="18" fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+      <text class="legend-label" x="1478" y="290" font-size="14" fill="black">OD</text>
     </g>
-    <g class="legend-item" data-layer="layer-M1_PIN" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="305" width="18" height="18" fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
-      <text class="legend-label" x="1078" y="320" font-size="14" fill="black">M1_PIN</text>
+    <g class="legend-item" data-layer="PDK" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="305" width="18" height="18" fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+      <text class="legend-label" x="1478" y="320" font-size="14" fill="black">PDK</text>
     </g>
-    <g class="legend-item" data-layer="layer-M2_PIN" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="335" width="18" height="18" fill="gold" fill-opacity="0.35" stroke="gold" stroke-width="2" />
-      <text class="legend-label" x="1078" y="350" font-size="14" fill="black">M2_PIN</text>
+    <g class="legend-item" data-layer="PO" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="335" width="18" height="18" fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+      <text class="legend-label" x="1478" y="350" font-size="14" fill="black">PO</text>
     </g>
-    <g class="legend-item" data-layer="layer-PDK" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="365" width="18" height="18" fill="purple" fill-opacity="0.35" stroke="purple" stroke-width="2" />
-      <text class="legend-label" x="1078" y="380" font-size="14" fill="black">PDK</text>
+    <g class="legend-item" data-layer="PP" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="365" width="18" height="18" fill="coral" fill-opacity="0.35" stroke="coral" stroke-width="2" />
+      <text class="legend-label" x="1478" y="380" font-size="14" fill="black">PP</text>
     </g>
-    <g class="legend-item" data-layer="layer-VTL_N" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="395" width="18" height="18" fill="blue" fill-opacity="0.35" stroke="blue" stroke-width="2" />
-      <text class="legend-label" x="1078" y="410" font-size="14" fill="black">VTL_N</text>
+    <g class="legend-item" data-layer="VIA1" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="395" width="18" height="18" fill="orange" fill-opacity="0.35" stroke="orange" stroke-width="2" />
+      <text class="legend-label" x="1478" y="410" font-size="14" fill="black">VIA1</text>
     </g>
-    <g class="legend-item" data-layer="layer-VTL_P" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="425" width="18" height="18" fill="gray" fill-opacity="0.35" stroke="gray" stroke-width="2" />
-      <text class="legend-label" x="1078" y="440" font-size="14" fill="black">VTL_P</text>
+    <g class="legend-item" data-layer="VTL_N" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="425" width="18" height="18" fill="violet" fill-opacity="0.35" stroke="violet" stroke-width="2" />
+      <text class="legend-label" x="1478" y="440" font-size="14" fill="black">VTL_N</text>
     </g>
-    <g class="legend-item" data-layer="layer-VIA1" onclick="toggleLayer(this)" style="cursor: pointer;">
-    <rect x="1050" y="455" width="18" height="18" fill="yellow" fill-opacity="0.35" stroke="yellow" stroke-width="2" />
-      <text class="legend-label" x="1078" y="470" font-size="14" fill="black">VIA1</text>
+    <g class="legend-item" data-layer="VTL_P" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="455" width="18" height="18" fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+      <text class="legend-label" x="1478" y="470" font-size="14" fill="black">VTL_P</text>
     </g>
   </g>
   <script><![CDATA[
@@ -527,15 +527,8 @@ function hideAllViolations() {
       const hiddenLayers = getHiddenLayers();
 
       document.querySelectorAll('.shape').forEach(function(shape) {
-        let hideShape = false;
-
-        shape.classList.forEach(function(className) {
-          if (className.startsWith('layer-') && hiddenLayers.has(className)) {
-            hideShape = true;
-          }
-        });
-
-        shape.style.display = hideShape ? 'none' : '';
+        const layer = shape.dataset.layer || '';
+        shape.style.display = hiddenLayers.has(layer) ? 'none' : '';
       });
 
       updateViolationListVisibility(hiddenLayers);
@@ -608,7 +601,7 @@ function hideAllViolations() {
 
     const svg = document.documentElement;
 
-    const originalWidth = 1200;
+    const originalWidth = 1600;
     const originalHeight = 800;
 
     let viewX = 0;

@@ -4,7 +4,6 @@
     {
       "id": 1,
       "layer": "M1",
-      "purpose": "drawing",
       "vertices": [
         [ 0, 0 ],
         [ 2, 0 ],
@@ -15,7 +14,6 @@
     {
       "id": 2,
       "layer": "M1",
-      "purpose": "drawing",
       "vertices": [
         [ 4, 0 ],
         [ 10, 0 ],
@@ -26,7 +24,6 @@
     {
       "id": 3,
       "layer": "VIA1",
-      "purpose": "drawing",
       "vertices": [
         [ 5, 2 ],
         [ 6, 2 ],
@@ -37,7 +34,6 @@
     {
       "id": 4,
       "layer": "M1",
-      "purpose": "drawing",
       "vertices": [
         [ 12, 0 ],
         [ 20, 0 ],

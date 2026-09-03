@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Rule.h"
+#include "drcheck/domain/LayerRegistry.h"
 #include "drcheck/domain/Layer.h"
 
 namespace drcheck::rules {
@@ -8,16 +9,16 @@ namespace drcheck::rules {
 class MinWidthRule : public Rule
 {
 public:
-    MinWidthRule(domain::Layer layer, double minimumWidth);
+    MinWidthRule(const domain::Layer* layer, double minimumWidth);
 
     std::vector<domain::Violation> check (const std::vector<domain::Shape>& shapes, const spatial::LayerSpatialIndex& spatialIndex) const override;
 
-    domain::Layer getLayer() const;
+    const domain::Layer* getLayer() const;
 
     double getMinimumWidth() const;
 
 private:
-    domain::Layer layer;
+    const domain::Layer* layer;
     double minimumWidth;
 };
 

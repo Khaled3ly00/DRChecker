@@ -7,6 +7,7 @@
 #include "drcheck/io/JSONReportWriter.h"
 #include "drcheck/io/SVGReportWriter.h"
 #include "drcheck/io/TclRuleParser.h"
+#include "drcheck/domain/LayerRegistry.h"
 #include "drcheck/geometry/Constants.h"
 
 using drcheck::engine::DRCEngine;
@@ -15,15 +16,18 @@ using drcheck::io::JSONRuleParser;
 using drcheck::io::JSONReportWriter;
 using drcheck::io::SVGReportWriter;
 using drcheck::io::TclRuleParser;
+using drcheck::domain::LayerRegistry;
 using drcheck::geometry::EPSILON;
 
 TEST(EndToEndTest, ParsesFilesAndDetectsExpectedViolations)
 {
-    const std::filesystem::path layout_path = std::filesystem::path(DRCHECK_SOURCE_DIR) / "examples" / "cli_multiple_shapes_layout.json";
-    const auto shapes = JSONLayoutParser::load(layout_path.string());
+	LayerRegistry registry;
 
     const std::filesystem::path rules_path = std::filesystem::path(DRCHECK_SOURCE_DIR) / "examples" / "cli_rules.json";
-    const auto rules = JSONRuleParser::load(rules_path.string());
+    const auto rules = JSONRuleParser::load(rules_path.string(), registry);
+
+    const std::filesystem::path layout_path = std::filesystem::path(DRCHECK_SOURCE_DIR) / "examples" / "cli_multiple_shapes_layout.json";
+    const auto shapes = JSONLayoutParser::load(layout_path.string(), registry);
     
     const auto violations = DRCEngine::run(shapes, rules);
 
@@ -39,19 +43,23 @@ TEST(EndToEndTest, ParsesFilesAndDetectsExpectedViolations)
 
 TEST(EndToEndTest, JsonAndTclRuleDecksProduceSameViolations)
 {
+    LayerRegistry registry1;
+    LayerRegistry registry2;
+
     const std::string layoutPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/cli_multiple_shapes_layout.json";
     const std::string jsonRulesPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/equivalent_rules.json";
     const std::string tclRulesPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/equivalent_rules.tcl";
 
-    const auto shapes = JSONLayoutParser::load(layoutPath);
+    const auto jsonRules = JSONRuleParser::load(jsonRulesPath, registry1);
+    const auto tclRules = TclRuleParser::load(tclRulesPath, registry2);
 
-    const auto jsonRules = JSONRuleParser::load(jsonRulesPath);
-    const auto tclRules = TclRuleParser::load(tclRulesPath);
+    const auto jsonShapes = JSONLayoutParser::load(layoutPath, registry1);
+    const auto tclShapes = JSONLayoutParser::load(layoutPath, registry2);
 
     ASSERT_EQ(jsonRules.size(), tclRules.size());
 
-    const auto jsonViolations = DRCEngine::run(shapes, jsonRules);
-    const auto tclViolations = DRCEngine::run(shapes, tclRules);
+    const auto jsonViolations = DRCEngine::run(jsonShapes, jsonRules);
+    const auto tclViolations = DRCEngine::run(tclShapes, tclRules);
 
     ASSERT_EQ(jsonViolations.size(), tclViolations.size());
 

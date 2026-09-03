@@ -2,14 +2,14 @@
 #include <stdexcept>
 
 #include "drcheck/spatial/QuadTree.h"
+#include "drcheck/domain/LayerRegistry.h"
 
 using drcheck::spatial::QuadTree;
 using drcheck::geometry::BoundingBox;
 using drcheck::geometry::Polygon;
 using drcheck::geometry::Point;
 using drcheck::domain::Shape;
-using drcheck::domain::Layer;
-using drcheck::domain::Purpose;
+using drcheck::domain::LayerRegistry;
 
 TEST(QuadTreeTest, RejectsZeroCapacity)
 {
@@ -20,6 +20,9 @@ TEST(QuadTreeTest, RejectsZeroCapacity)
 
 TEST(QuadTreeTest, InsertOneShapeThenQueryRelatedRegion)
 {
+	LayerRegistry registry;
+	const auto* M1 = registry.declare("M1");
+
     BoundingBox boundary(0, 0, 100, 100);
 
     Polygon polygon({
@@ -28,7 +31,7 @@ TEST(QuadTreeTest, InsertOneShapeThenQueryRelatedRegion)
         Point(20, 20),
         Point(10, 20)
         });
-    Shape shape(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    Shape shape(1, M1, std::move(polygon));
 
     QuadTree quadtree(boundary, 2, 5);
 
@@ -45,6 +48,9 @@ TEST(QuadTreeTest, InsertOneShapeThenQueryRelatedRegion)
 
 TEST(QuadTreeTest, InsertOneShapeThenQueryUnrelatedRegion)
 {
+    LayerRegistry registry;
+    const auto* M1 = registry.declare("M1");
+
     BoundingBox boundary(0, 0, 100, 100);
 
     Polygon polygon({
@@ -53,7 +59,7 @@ TEST(QuadTreeTest, InsertOneShapeThenQueryUnrelatedRegion)
         Point(20, 20),
         Point(10, 20)
         });
-    Shape shape(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    Shape shape(1, M1, std::move(polygon));
 
     QuadTree quadtree(boundary, 2, 5);
 
@@ -69,6 +75,9 @@ TEST(QuadTreeTest, InsertOneShapeThenQueryUnrelatedRegion)
 
 TEST(QuadTreeTest, InsertMultipleShapesThenQuery)
 {
+    LayerRegistry registry;
+    const auto* M1 = registry.declare("M1");
+
     BoundingBox boundary(0, 0, 100, 100);
 
     Polygon polygon1({
@@ -77,7 +86,7 @@ TEST(QuadTreeTest, InsertMultipleShapesThenQuery)
         Point(20, 20),
         Point(10, 20)
         });
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(polygon1));
+    Shape shape1(1, M1, std::move(polygon1));
 
     Polygon polygon2({
         Point(60, 60),
@@ -85,7 +94,7 @@ TEST(QuadTreeTest, InsertMultipleShapesThenQuery)
         Point(80, 80),
         Point(60, 80)
         });
-    Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(polygon2));
+    Shape shape2(2, M1, std::move(polygon2));
 
     Polygon polygon3({
         Point(30, 60),
@@ -93,7 +102,7 @@ TEST(QuadTreeTest, InsertMultipleShapesThenQuery)
         Point(40, 80),
         Point(30, 80)
         });
-    Shape shape3(3, Layer::M1, Purpose::Drawing, std::move(polygon3));
+    Shape shape3(3, M1, std::move(polygon3));
 
     Polygon polygon4({
         Point(70, 60),
@@ -101,7 +110,7 @@ TEST(QuadTreeTest, InsertMultipleShapesThenQuery)
         Point(85, 80),
         Point(70, 80)
         });
-    Shape shape4(4, Layer::M1, Purpose::Drawing, std::move(polygon4));
+    Shape shape4(4, M1, std::move(polygon4));
 
     QuadTree quadtree(boundary, 1, 5);
 
@@ -123,6 +132,9 @@ TEST(QuadTreeTest, InsertMultipleShapesThenQuery)
 
 TEST(QuadTreeTest, InsertBoundaryCrossingShapeThenQuery)
 {
+    LayerRegistry registry;
+    const auto* M1 = registry.declare("M1");
+
     BoundingBox boundary(0, 0, 100, 100);
 
     Polygon polygon1({
@@ -131,7 +143,7 @@ TEST(QuadTreeTest, InsertBoundaryCrossingShapeThenQuery)
         Point(20, 20),
         Point(10, 20)
         });
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(polygon1));
+    Shape shape1(1, M1, std::move(polygon1));
 
     Polygon polygon2({
         Point(40, 60),
@@ -139,7 +151,7 @@ TEST(QuadTreeTest, InsertBoundaryCrossingShapeThenQuery)
         Point(60, 80),
         Point(40, 80)
         });
-    Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(polygon2));
+    Shape shape2(2, M1, std::move(polygon2));
 
     Polygon polygon3({
         Point(30, 60),
@@ -147,7 +159,7 @@ TEST(QuadTreeTest, InsertBoundaryCrossingShapeThenQuery)
         Point(40, 80),
         Point(30, 80)
         });
-    Shape shape3(3, Layer::M1, Purpose::Drawing, std::move(polygon3));
+    Shape shape3(3, M1, std::move(polygon3));
 
     Polygon polygon4({
         Point(70, 60),
@@ -155,7 +167,7 @@ TEST(QuadTreeTest, InsertBoundaryCrossingShapeThenQuery)
         Point(85, 80),
         Point(70, 80)
         });
-    Shape shape4(4, Layer::M1, Purpose::Drawing, std::move(polygon4));
+    Shape shape4(4, M1, std::move(polygon4));
 
     QuadTree quadtree(boundary, 1, 5);
 
@@ -180,6 +192,9 @@ TEST(QuadTreeTest, InsertBoundaryCrossingShapeThenQuery)
 
 TEST(QuadTreeTest, InsertShapeOutsideBoundary)
 {
+    LayerRegistry registry;
+    const auto* M1 = registry.declare("M1");
+
     BoundingBox boundary(0, 0, 100, 100);
 
     Polygon polygon({
@@ -188,7 +203,7 @@ TEST(QuadTreeTest, InsertShapeOutsideBoundary)
         Point(160, 160),
         Point(150, 160)
         });
-    Shape shape(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    Shape shape(1, M1, std::move(polygon));
 
     QuadTree quadtree(boundary, 2, 5);
 
@@ -209,6 +224,9 @@ TEST(QuadTreeTest, QueryEmptyTreeReturnsNoShapes)
 
 TEST(QuadTreeTest, SupportsRecursiveSubdivisionBeyondRoot)
 {
+    LayerRegistry registry;
+    const auto* M1 = registry.declare("M1");
+
     BoundingBox boundary(0, 0, 100, 100);
 
     Polygon polygon1({
@@ -217,7 +235,7 @@ TEST(QuadTreeTest, SupportsRecursiveSubdivisionBeyondRoot)
         Point(20, 20),
         Point(10, 20)
         });
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(polygon1));
+    Shape shape1(1, M1, std::move(polygon1));
 
     Polygon polygon2({
         Point(20, 20),
@@ -225,7 +243,7 @@ TEST(QuadTreeTest, SupportsRecursiveSubdivisionBeyondRoot)
         Point(30, 30),
         Point(20, 30)
         });
-    Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(polygon2));
+    Shape shape2(2, M1, std::move(polygon2));
 
     Polygon polygon3({
         Point(30, 30),
@@ -233,7 +251,7 @@ TEST(QuadTreeTest, SupportsRecursiveSubdivisionBeyondRoot)
         Point(40, 40),
         Point(30, 40)
         });
-    Shape shape3(3, Layer::M1, Purpose::Drawing, std::move(polygon3));
+    Shape shape3(3, M1, std::move(polygon3));
 
     QuadTree quadtree(boundary, 1, 5);
 
@@ -251,6 +269,9 @@ TEST(QuadTreeTest, SupportsRecursiveSubdivisionBeyondRoot)
 
 TEST(QuadTreeTest, InsertOneShapeTouchingBoundary)
 {
+    LayerRegistry registry;
+    const auto* M1 = registry.declare("M1");
+
     BoundingBox boundary(0, 0, 100, 100);
 
     Polygon polygon({
@@ -259,7 +280,7 @@ TEST(QuadTreeTest, InsertOneShapeTouchingBoundary)
         Point(100, 100),
         Point(0, 100)
         });
-    Shape shape(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    Shape shape(1, M1, std::move(polygon));
 
     QuadTree quadtree(boundary, 2, 5);
 

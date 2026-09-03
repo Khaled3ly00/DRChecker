@@ -55,6 +55,7 @@ add_library(drchecker
     src/domain/Shape.cpp
     src/domain/Violation.cpp
     src/domain/Layer.cpp
+    src/domain/LayerRegistry.cpp
 
     # Rules
     src/rules/MinWidthRule.cpp
@@ -135,6 +136,7 @@ if(DRCHECK_BUILD_TESTS)
         tests/domain/ShapeTest.cpp
         tests/domain/ViolationTest.cpp
         tests/domain/LayerTest.cpp
+        tests/domain/LayerRegistryTest.cpp
 
         # Rules Tests
         tests/rules/MinWidthRuleTest.cpp

@@ -6,21 +6,27 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include <cmath>
+#include <cstdint>
 
 namespace {
 
-    constexpr int CLIPPER_PRECISION = 5;
+    constexpr std::int64_t CLIPPER_SCALE = 100000;
 
     // Helper function to convert Polygon points to Clipper Path
-    Clipper2Lib::PathD toClipperPath(const drcheck::geometry::Polygon& polygon)
+    Clipper2Lib::Path64 toClipperPath(const drcheck::geometry::Polygon& polygon)
     {
-        Clipper2Lib::PathD path;
+        Clipper2Lib::Path64 path;
         path.reserve(polygon.getVertexCount());
 
         for (const auto& vertex : polygon.getVertices())
         {
-            path.emplace_back(vertex.getX(), vertex.getY());
+            const std::int64_t x = static_cast<std::int64_t>(std::llround(vertex.getX() * CLIPPER_SCALE));
+            const std::int64_t y = static_cast<std::int64_t>(std::llround(vertex.getY() * CLIPPER_SCALE));
+
+            path.emplace_back(x, y);
         }
+
         // Use consistent counter-clockwise orientation for all subject polygons
         // so they behave correctly together with the NonZero fill rule.
         if (polygon.getOrientation() == drcheck::geometry::Orientation::Clockwise)
@@ -32,14 +38,17 @@ namespace {
     }
 
     // Helper function to convert Clipper Path to Polygon points 
-    drcheck::geometry::Polygon toPolygon(const Clipper2Lib::PathD& path)
+    drcheck::geometry::Polygon toPolygon(const Clipper2Lib::Path64& path)
     {
         std::vector<drcheck::geometry::Point> vertices;
         vertices.reserve(path.size());
 
         for (const auto& point : path)
         {
-            vertices.emplace_back(point.x, point.y);
+            const double x = static_cast<double>(point.x) / CLIPPER_SCALE;
+            const double y = static_cast<double>(point.y) / CLIPPER_SCALE;
+
+            vertices.emplace_back(x, y);
         }
 
         return drcheck::geometry::Polygon(std::move(vertices));
@@ -127,7 +136,7 @@ namespace drcheck::layout {
     // Merges list of shapes provided
     domain::Shape LayoutNormalizer::mergeComponent(std::size_t normalizedId, const std::vector<const domain::Shape*>& component)
     {
-        Clipper2Lib::PathsD paths;
+        Clipper2Lib::Paths64 paths;
         paths.reserve(component.size());
 
         for (const domain::Shape* shape : component)
@@ -135,7 +144,7 @@ namespace drcheck::layout {
             paths.push_back(toClipperPath(shape->getPolygon()));
         }
         // Merge polygons
-        const Clipper2Lib::PathsD solution = Clipper2Lib::Union(paths, Clipper2Lib::FillRule::NonZero, CLIPPER_PRECISION);
+        const Clipper2Lib::Paths64 solution = Clipper2Lib::Union(paths, Clipper2Lib::FillRule::NonZero);
 
         if (solution.size() != 1)
         {
@@ -143,10 +152,10 @@ namespace drcheck::layout {
         }
         // Generated Polygon
         geometry::Polygon mergedPolygon = toPolygon(solution.front());
-        // first shape in components to retrieve layer and purpose
+        // Use the first shape in the component to retrieve the layer.
         const domain::Shape& firstShape = *component.front();
         // construct merged shape and return
-        return domain::Shape(normalizedId, firstShape.getLayer(), firstShape.getPurpose(), std::move(mergedPolygon));
+        return domain::Shape(normalizedId, firstShape.getLayer(), std::move(mergedPolygon));
     }
 
     std::vector<domain::Shape> LayoutNormalizer::normalize(const std::vector<domain::Shape>& shapes)
@@ -177,7 +186,7 @@ namespace drcheck::layout {
             {
                 const domain::Shape& original = *component.front();
 
-                normalizedShapes.emplace_back(normalizedId, original.getLayer(), original.getPurpose(), original.getPolygon());
+                normalizedShapes.emplace_back(normalizedId, original.getLayer(), original.getPolygon());
 
                 ++normalizedId;
             }

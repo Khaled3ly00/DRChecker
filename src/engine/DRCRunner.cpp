@@ -6,6 +6,7 @@
 #include "drcheck/io/SVGReportWriter.h"
 #include "drcheck/io/TclRuleParser.h"
 #include "drcheck/layout/LayoutNormalizer.h"
+#include "drcheck/domain/LayerRegistry.h"
 
 #include <filesystem>
 
@@ -13,9 +14,7 @@ namespace drcheck::engine {
 
 std::vector<domain::Violation> DRCRunner::run(const DRCRunConfig& config)
 {
-    const auto rawShapes = io::JSONLayoutParser::load(config.layoutPath);
-
-    const auto shapes = layout::LayoutNormalizer::normalize(rawShapes);
+    domain::LayerRegistry layerRegistry;
 
     std::vector<std::unique_ptr<rules::Rule>> rules;
 
@@ -23,16 +22,20 @@ std::vector<domain::Violation> DRCRunner::run(const DRCRunConfig& config)
 
     if (extension == ".json")
     {
-        rules = io::JSONRuleParser::load(config.rulesPath);
+        rules = io::JSONRuleParser::load(config.rulesPath, layerRegistry);
     }
     else if (extension == ".tcl")
     {
-        rules = io::TclRuleParser::load(config.rulesPath);
+        rules = io::TclRuleParser::load(config.rulesPath, layerRegistry);
     }
     else
     {
         throw std::invalid_argument("Unsupported rule file format: " + extension);
     }
+
+    const auto rawShapes = io::JSONLayoutParser::load(config.layoutPath, layerRegistry);
+
+    const auto shapes = layout::LayoutNormalizer::normalize(rawShapes);
 
     const auto violations = DRCEngine::run(shapes, rules);
 

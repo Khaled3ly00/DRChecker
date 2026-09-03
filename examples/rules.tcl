@@ -1,3 +1,9 @@
+layer M1
+layer M2
+layer VIA1
+layer CO
+layer PO
+
 rule min_spacing -layer M1 -value 0.25
 rule min_spacing -value 0.25 -layer M2
 rule min_width -layer M1 -value 0.20

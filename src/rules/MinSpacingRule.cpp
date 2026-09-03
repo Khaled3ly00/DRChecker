@@ -6,13 +6,14 @@
 #include <stdexcept>
 
 namespace drcheck::rules {
-MinSpacingRule::MinSpacingRule(domain::Layer layer, double minimumSpacing)
+MinSpacingRule::MinSpacingRule(const domain::Layer* layer, double minimumSpacing)
     : layer(layer), minimumSpacing(minimumSpacing)
 {
+	if (layer == nullptr) {
+		throw std::invalid_argument("Layer cannot be null");
+	}
     if (minimumSpacing <= 0.0) {
-        throw std::invalid_argument(
-            "Minimum spacing must be positive"
-        );
+        throw std::invalid_argument("Minimum spacing must be positive");
     }
 }
 std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::Shape>& shapes, const spatial::LayerSpatialIndex& spatialIndex) const
@@ -52,7 +53,7 @@ std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::S
                     .secondPoint = actualSpacing.secondPoint,
                     .firstLayer = getLayer()
                 };
-                const std::string msg = "Minimum spacing violation on layer: " + domain::layerToString(layer) + "should be " + std::to_string(minimumSpacing) + " actual" + std::to_string(actualSpacing.distance);
+                const std::string msg = "Minimum spacing violation on layer: " + layer->getName() + " required " + std::to_string(minimumSpacing) + ", actual " + std::to_string(actualSpacing.distance);
 
                 violations.emplace_back(domain::ViolationType::MinSpacing, std::vector<std::size_t>{firstShape.getId(), secondShape->getId()},
                    msg, actualSpacing.distance, minimumSpacing, marker);
@@ -61,7 +62,7 @@ std::vector<domain::Violation> MinSpacingRule::check(const std::vector<domain::S
     }
     return violations;
 }
-domain::Layer MinSpacingRule::getLayer() const
+const domain::Layer* MinSpacingRule::getLayer() const
 {
     return layer;
 }

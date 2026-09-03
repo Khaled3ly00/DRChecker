@@ -7,7 +7,7 @@
                 21,
                 29
             ],
-            "message": "Minimum Enclosure violation: PO enclosed by NP should be 0.150000 actual 0.110001",
+            "message": "Minimum Enclosure violation: PO enclosed by NP required 0.150000 actual 0.110000",
             "actual": 0.11,
             "required": 0.15,
             "marker": {
@@ -29,7 +29,7 @@
                 32,
                 38
             ],
-            "message": "Minimum Enclosure violation: PO enclosed by PP should be 0.150000 actual 0.110000",
+            "message": "Minimum Enclosure violation: PO enclosed by PP required 0.150000 actual 0.110000",
             "actual": 0.11,
             "required": 0.15,
             "marker": {
@@ -51,7 +51,7 @@
                 33,
                 38
             ],
-            "message": "Minimum Enclosure violation: PO enclosed by PP should be 0.150000 actual 0.110000",
+            "message": "Minimum Enclosure violation: PO enclosed by PP required 0.150000 actual 0.110000",
             "actual": 0.11,
             "required": 0.15,
             "marker": {
@@ -73,7 +73,7 @@
                 40,
                 29
             ],
-            "message": "Minimum Enclosure violation: PO enclosed by NP should be 0.150000 actual 0.110001",
+            "message": "Minimum Enclosure violation: PO enclosed by NP required 0.150000 actual 0.110000",
             "actual": 0.11,
             "required": 0.15,
             "marker": {

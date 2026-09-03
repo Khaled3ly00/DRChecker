@@ -36,7 +36,7 @@ drcheck::geometry::BoundingBox parseBoundingBox(const nlohmann::json& json)
 
 }
 namespace drcheck::io {
-    std::vector<std::unique_ptr<rules::Rule>> JSONRuleParser::load(const std::string& filePath) {
+    std::vector<std::unique_ptr<rules::Rule>> JSONRuleParser::load(const std::string& filePath, domain::LayerRegistry& layerRegistry) {
         std::ifstream input(filePath);
 
         if (!input) {
@@ -45,6 +45,26 @@ namespace drcheck::io {
 
         nlohmann::json json;
         input >> json;
+
+        if (!json.is_object())
+        {
+            throw std::invalid_argument("Rules file must contain a JSON object");
+        }
+
+        if (!json.contains("layers") || !json["layers"].is_array())
+        {
+            throw std::invalid_argument("Rules file must contain a layers array");
+        }
+
+        for (const auto& layerJson : json["layers"])
+        {
+            if (!layerJson.is_string())
+            {
+                throw std::invalid_argument("Each layer declaration must be a string");
+            }
+
+            layerRegistry.declare(layerJson.get<std::string>());
+        }
 
         // Check if JSON contains an array "rules"
         if (!json.contains("rules") || !json["rules"].is_array())
@@ -69,21 +89,21 @@ namespace drcheck::io {
             if (type == "MinWidth")
             {
 
-                params.layer = domain::layerFromString(ruleJson.at("layer").get<std::string>());
+                params.layer = layerRegistry.resolve(ruleJson.at("layer").get<std::string>());
                 params.value = ruleJson.at("value").get<double>();
 
                 parsedRules.push_back(rules::RuleFactory::create("min_width", params));
             }
             else if (type == "MinSpacing")
             {
-                params.layer = domain::layerFromString(ruleJson.at("layer").get<std::string>());
+                params.layer = layerRegistry.resolve(ruleJson.at("layer").get<std::string>());
                 params.value = ruleJson.at("value").get<double>();
 
                 parsedRules.push_back(rules::RuleFactory::create("min_spacing", params));
             }
             else if (type == "MinEnclosure")
             {
-                params.innerLayer = domain::layerFromString(ruleJson.at("innerLayer").get<std::string>());
+                params.innerLayer = layerRegistry.resolve(ruleJson.at("innerLayer").get<std::string>());
 
                 if (ruleJson.contains("enclosureOptions"))
                 {
@@ -99,7 +119,7 @@ namespace drcheck::io {
 
                     for (const auto& optionJson : optionsJson)
                     {
-                        const domain::Layer outerLayer = domain::layerFromString(optionJson.at("outerLayer").get<std::string>());
+                        const domain::Layer* outerLayer = layerRegistry.resolve(optionJson.at("outerLayer").get<std::string>());
                         const double allSidesMinEnclosure = optionJson.at("allSidesMinEnclosure").get<double>();
                         const bool hasFirstPair = optionJson.contains("firstPairMinEnclosure");
                         const bool hasSecondPair = optionJson.contains("secondPairMinEnclosure");
@@ -126,7 +146,7 @@ namespace drcheck::io {
                 else
                 {
                     // Backward-compatible MinEnclosure format
-                    params.outerLayer = domain::layerFromString(ruleJson.at("outerLayer").get<std::string>());
+                    params.outerLayer = layerRegistry.resolve(ruleJson.at("outerLayer").get<std::string>());
                     params.value = ruleJson.at("value").get<double>();
                 }
 
@@ -134,7 +154,7 @@ namespace drcheck::io {
             }
             else if (type == "Density")
             {
-                params.layer = domain::layerFromString(ruleJson.at("layer").get<std::string>());
+                params.layer = layerRegistry.resolve(ruleJson.at("layer").get<std::string>());
                 params.densityLimit = limitFromString(ruleJson.at("limit").get<std::string>());
                 params.value = ruleJson.at("value").get<double>();
                 params.windowSize = ruleJson.at("windowSize").get<double>();

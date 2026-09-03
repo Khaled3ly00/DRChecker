@@ -15,10 +15,10 @@ namespace drcheck::rules {
 
     struct RuleParameters
     {
-        std::optional<domain::Layer> layer;
+        const domain::Layer* layer = nullptr;
 
-        std::optional<domain::Layer> innerLayer;
-        std::optional<domain::Layer> outerLayer;
+        const domain::Layer* innerLayer = nullptr;
+        const domain::Layer* outerLayer = nullptr;
 
         std::optional<double> value;
         

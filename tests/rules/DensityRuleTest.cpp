@@ -3,6 +3,7 @@
 
 #include "drcheck/rules/DensityRule.h"
 #include "drcheck/geometry/Constants.h"
+#include "drcheck/domain/LayerRegistry.h"
 
 using drcheck::geometry::EPSILON;
 using drcheck::rules::Rule;
@@ -16,8 +17,11 @@ using namespace drcheck::domain;
 
 TEST(DensityRuleTest, StoresDensityConfiguration)
 {
-    DensityRule ruleMax(Layer::M2, DensityLimit::Maximum, 0.70, 10.0, 5.0);
-    DensityRule ruleMin(Layer::M2, DensityLimit::Minimum, 0.30, 10.0, 5.0);
+    LayerRegistry registry;
+    const Layer* M2 = registry.declare("M2");
+
+    DensityRule ruleMax(M2, DensityLimit::Maximum, 0.70, 10.0, 5.0);
+    DensityRule ruleMin(M2, DensityLimit::Minimum, 0.30, 10.0, 5.0);
 
     EXPECT_EQ(ruleMax.getLimit(), DensityLimit::Maximum);
     EXPECT_NEAR(ruleMax.getRequiredDensity(), 0.70, EPSILON);
@@ -27,9 +31,12 @@ TEST(DensityRuleTest, StoresDensityConfiguration)
 
 TEST(DensityRuleTest, StoresExplicitAnalysisWindow)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     BoundingBox region(10, 20, 40, 60);
 
-    DensityRule rule(Layer::M1, DensityLimit::Minimum, 0.40, 10.0, 5.0, region);
+    DensityRule rule(M1, DensityLimit::Minimum, 0.40, 10.0, 5.0, region);
 
     ASSERT_TRUE(rule.getAnalysisWindow().has_value());
     const auto& stored = rule.getAnalysisWindow().value();
@@ -41,24 +48,36 @@ TEST(DensityRuleTest, StoresExplicitAnalysisWindow)
 
 TEST(DensityRuleTest, RejectsInvalidRequiredDensity)
 {
-    EXPECT_THROW(DensityRule(Layer::M1, DensityLimit::Minimum, -0.1, 10.0, 5.0), std::invalid_argument);
-    EXPECT_THROW(DensityRule(Layer::M1, DensityLimit::Maximum, 1.1, 10.0, 5.0), std::invalid_argument);
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
+    EXPECT_THROW(DensityRule(M1, DensityLimit::Minimum, -0.1, 10.0, 5.0), std::invalid_argument);
+    EXPECT_THROW(DensityRule(M1, DensityLimit::Maximum, 1.1, 10.0, 5.0), std::invalid_argument);
 }
 
 TEST(DensityRuleTest, AcceptsValidRequiredDensity)
 {
-    EXPECT_NO_THROW(DensityRule(Layer::M1, DensityLimit::Minimum, 0.0, 10.0, 5.0));
-    EXPECT_NO_THROW(DensityRule(Layer::M1, DensityLimit::Maximum, 1.0, 10.0, 5.0));
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
+    EXPECT_NO_THROW(DensityRule(M1, DensityLimit::Minimum, 0.0, 10.0, 5.0));
+    EXPECT_NO_THROW(DensityRule(M1, DensityLimit::Maximum, 1.0, 10.0, 5.0));
 }
 
 TEST(DensityRuleTest, RejectsInvalidWindowSizeORStep)
 {
-    EXPECT_THROW(DensityRule(Layer::M1, DensityLimit::Minimum, 0.5, -1.0, 5.0), std::invalid_argument);
-    EXPECT_THROW(DensityRule(Layer::M1, DensityLimit::Maximum, 0.8, 10.0, -5.0), std::invalid_argument);
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
+    EXPECT_THROW(DensityRule(M1, DensityLimit::Minimum, 0.5, -1.0, 5.0), std::invalid_argument);
+    EXPECT_THROW(DensityRule(M1, DensityLimit::Maximum, 0.8, 10.0, -5.0), std::invalid_argument);
 }
 
 TEST(DensityRuleTest, AcceptsExactMinimumDensity)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     Polygon polygon({
         Point(0, 0),
         Point(3, 0),
@@ -67,11 +86,11 @@ TEST(DensityRuleTest, AcceptsExactMinimumDensity)
         });
 
     std::vector<Shape> shapes;
-    shapes.emplace_back(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    shapes.emplace_back(1, M1, std::move(polygon));
 
     LayerSpatialIndex spatialIndex(shapes);
 
-    DensityRule rule(Layer::M1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
+    DensityRule rule(M1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
 
     const auto violations = rule.check(shapes, spatialIndex);
     EXPECT_TRUE(violations.empty());
@@ -79,6 +98,9 @@ TEST(DensityRuleTest, AcceptsExactMinimumDensity)
 
 TEST(DensityRuleTest, RejectsBelowMinimumDensity)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     Polygon polygon({
         Point(0, 0),
         Point(2, 0),
@@ -87,10 +109,10 @@ TEST(DensityRuleTest, RejectsBelowMinimumDensity)
         });
 
     std::vector<Shape> shapes;
-    shapes.emplace_back(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    shapes.emplace_back(1, M1, std::move(polygon));
     LayerSpatialIndex spatialIndex(shapes);
 
-    DensityRule rule(Layer::M1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
+    DensityRule rule(M1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
 
     const auto violations = rule.check(shapes, spatialIndex);
 
@@ -102,6 +124,9 @@ TEST(DensityRuleTest, RejectsBelowMinimumDensity)
 
 TEST(DensityRuleTest, AcceptsExactMaximumDensity)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     Polygon polygon({
         Point(0, 0),
         Point(7, 0),
@@ -110,16 +135,19 @@ TEST(DensityRuleTest, AcceptsExactMaximumDensity)
         });
 
     std::vector<Shape> shapes;
-    shapes.emplace_back(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    shapes.emplace_back(1, M1, std::move(polygon));
     LayerSpatialIndex spatialIndex(shapes);
 
-    DensityRule rule(Layer::M1, DensityLimit::Maximum, 0.70, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
+    DensityRule rule(M1, DensityLimit::Maximum, 0.70, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
     const auto violations = rule.check(shapes, spatialIndex);
     EXPECT_TRUE(violations.empty());
 }
 
 TEST(DensityRuleTest, RejectsAboveMaximumDensity)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     Polygon polygon({
         Point(0, 0),
         Point(8, 0),
@@ -128,11 +156,11 @@ TEST(DensityRuleTest, RejectsAboveMaximumDensity)
         });
 
     std::vector<Shape> shapes;
-    shapes.emplace_back(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    shapes.emplace_back(1, M1, std::move(polygon));
 
     LayerSpatialIndex spatialIndex(shapes);
 
-    DensityRule rule(Layer::M1, DensityLimit::Maximum, 0.70, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
+    DensityRule rule(M1, DensityLimit::Maximum, 0.70, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
     const auto violations = rule.check(shapes, spatialIndex);
 
     ASSERT_EQ(violations.size(), 1);
@@ -142,6 +170,10 @@ TEST(DensityRuleTest, RejectsAboveMaximumDensity)
 
 TEST(DensityRuleTest, IgnoresShapesOnOtherLayers)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
     Polygon metal1Polygon({
         Point(0, 0),
         Point(2, 0),
@@ -158,10 +190,10 @@ TEST(DensityRuleTest, IgnoresShapesOnOtherLayers)
 
     std::vector<Shape> shapes;
 
-    shapes.emplace_back(1, Layer::M1, Purpose::Drawing, std::move(metal1Polygon));
-    shapes.emplace_back(2, Layer::M2, Purpose::Drawing, std::move(metal2Polygon));
+    shapes.emplace_back(1, M1, std::move(metal1Polygon));
+    shapes.emplace_back(2, M2, std::move(metal2Polygon));
     LayerSpatialIndex spatialIndex(shapes);
-    DensityRule rule(Layer::M1, DensityLimit::Minimum, 0.50, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
+    DensityRule rule(M1, DensityLimit::Minimum, 0.50, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
     const auto violations = rule.check(shapes, spatialIndex);
 
     ASSERT_EQ(violations.size(), 1);
@@ -170,6 +202,10 @@ TEST(DensityRuleTest, IgnoresShapesOnOtherLayers)
 
 TEST(DensityRuleTest, DefaultAnalysisWindowUsesAllLayoutShapes)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
     Polygon metal1Polygon({
         Point(0, 0),
         Point(10, 0),
@@ -186,10 +222,10 @@ TEST(DensityRuleTest, DefaultAnalysisWindowUsesAllLayoutShapes)
 
     std::vector<Shape> shapes;
 
-    shapes.emplace_back(1, Layer::M1, Purpose::Drawing, std::move(metal1Polygon));
-    shapes.emplace_back(2, Layer::M2, Purpose::Drawing, std::move(metal2Polygon));
+    shapes.emplace_back(1, M1, std::move(metal1Polygon));
+    shapes.emplace_back(2, M2, std::move(metal2Polygon));
     LayerSpatialIndex spatialIndex(shapes);
-    DensityRule rule(Layer::M1, DensityLimit::Minimum, 0.50, 30.0, 30.0);
+    DensityRule rule(M1, DensityLimit::Minimum, 0.50, 30.0, 30.0);
     const auto violations = rule.check(shapes, spatialIndex);
 
     ASSERT_EQ(violations.size(), 1);
@@ -198,6 +234,10 @@ TEST(DensityRuleTest, DefaultAnalysisWindowUsesAllLayoutShapes)
 
 TEST(DensityRuleTest, UsesExplicitAnalysisWindow)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
     Polygon metal1Polygon({
         Point(0, 0),
         Point(10, 0),
@@ -214,10 +254,10 @@ TEST(DensityRuleTest, UsesExplicitAnalysisWindow)
 
     std::vector<Shape> shapes;
 
-    shapes.emplace_back(1, Layer::M1, Purpose::Drawing, std::move(metal1Polygon));
-    shapes.emplace_back(2, Layer::M2, Purpose::Drawing, std::move(metal2Polygon));
+    shapes.emplace_back(1, M1, std::move(metal1Polygon));
+    shapes.emplace_back(2, M2, std::move(metal2Polygon));
     LayerSpatialIndex spatialIndex(shapes);
-    DensityRule rule(Layer::M1, DensityLimit::Minimum, 0.80, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
+    DensityRule rule(M1, DensityLimit::Minimum, 0.80, 10.0, 10.0, BoundingBox(0, 0, 10, 10));
 
     const auto violations = rule.check(shapes, spatialIndex);
     EXPECT_TRUE(violations.empty());
@@ -225,6 +265,9 @@ TEST(DensityRuleTest, UsesExplicitAnalysisWindow)
 
 TEST(DensityRuleTest, PartialEdgeSampleWindowUsesActualWindowArea)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     // Ensures that a partial sample window created for remaining area 
     // and it's density is measured according to partial sample window area
     Polygon polygon({
@@ -235,9 +278,9 @@ TEST(DensityRuleTest, PartialEdgeSampleWindowUsesActualWindowArea)
         });
 
     std::vector<Shape> shapes;
-    shapes.emplace_back(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    shapes.emplace_back(1, M1, std::move(polygon));
     LayerSpatialIndex spatialIndex(shapes);
-    DensityRule rule(Layer::M1, DensityLimit::Minimum, 1.0, 10.0, 10.0, BoundingBox(0, 0, 23, 10));
+    DensityRule rule(M1, DensityLimit::Minimum, 1.0, 10.0, 10.0, BoundingBox(0, 0, 23, 10));
     const auto violations = rule.check(shapes, spatialIndex);
     // First and Second windows passes, Third (partial window) violates
     ASSERT_EQ(violations.size(), 1);
@@ -250,6 +293,9 @@ TEST(DensityRuleTest, PartialEdgeSampleWindowUsesActualWindowArea)
 
 TEST(DensityRuleTest, SupportsOverlappingSamplingWindows)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     Polygon polygon({
         Point(0, 0),
         Point(10, 0),
@@ -258,9 +304,9 @@ TEST(DensityRuleTest, SupportsOverlappingSamplingWindows)
         });
 
     std::vector<Shape> shapes;
-    shapes.emplace_back(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    shapes.emplace_back(1, M1, std::move(polygon));
     LayerSpatialIndex spatialIndex(shapes);
-    DensityRule rule(Layer::M1, DensityLimit::Minimum, 1.0, 10.0, 5.0, BoundingBox(0, 0, 15, 5));
+    DensityRule rule(M1, DensityLimit::Minimum, 1.0, 10.0, 5.0, BoundingBox(0, 0, 15, 5));
     const auto violations = rule.check(shapes, spatialIndex);
     //Window 1: x 0–10      density = 100 %         PASS
     //Window 2: x 5–15      density = 50 %          FAIL
@@ -276,10 +322,13 @@ TEST(DensityRuleTest, SupportsOverlappingSamplingWindows)
 
 TEST(DensityRuleTest, ExplicitAnalysisWindowSupportsEmptyLayout)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     const std::vector<Shape> shapes;
     const LayerSpatialIndex spatialIndex(shapes);
 
-    DensityRule rule(Layer::M1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 20, 10));
+    DensityRule rule(M1, DensityLimit::Minimum, 0.30, 10.0, 10.0, BoundingBox(0, 0, 20, 10));
 
     const auto violations = rule.check(shapes, spatialIndex);
 
@@ -291,10 +340,13 @@ TEST(DensityRuleTest, ExplicitAnalysisWindowSupportsEmptyLayout)
 
 TEST(DensityRuleTest, RejectsEmptyLayoutWithoutExplicitAnalysisWindow)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     const std::vector<Shape> shapes;
     const LayerSpatialIndex spatialIndex(shapes);
 
-    DensityRule rule(Layer::M1, DensityLimit::Minimum, 0.30, 10.0, 10.0);
+    DensityRule rule(M1, DensityLimit::Minimum, 0.30, 10.0, 10.0);
 
     EXPECT_THROW(rule.check(shapes, spatialIndex), std::invalid_argument);
 }

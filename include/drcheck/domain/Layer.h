@@ -3,34 +3,16 @@
 #include <string>
 
 namespace drcheck::domain {
-
-    enum class Layer
+    class Layer
     {
-        NW,
-        NP,
-        PP,
-        M1,
-        M1_PIN,
-        M2,
-        M2_PIN,
-        PO,
-        OD,
-        CO,
-        VIA1,
-        PDK,
-        VTL_N,
-        VTL_P
+    public:
+        const std::string& getName() const;
+
+    private:
+        explicit Layer(std::string name);
+
+        std::string name;
+
+        friend class LayerRegistry;
     };
-
-    enum class Purpose
-    {
-        Drawing,
-        Pin
-    };
-
-    Layer layerFromString(const std::string& layerName);
-
-    Purpose purposeFromString(const std::string& purposeName);
-
-    std::string layerToString(Layer layer);
 }

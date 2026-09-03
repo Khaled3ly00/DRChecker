@@ -3,6 +3,7 @@
 #include "drcheck/rules/MinWidthRule.h"
 #include "drcheck/geometry/Segment.h"
 #include "drcheck/geometry/Constants.h"
+#include "drcheck/domain/LayerRegistry.h"
 
 #include <memory>
 
@@ -16,14 +17,17 @@ using drcheck::rules::Rule;
 
 TEST(MinWidthRuleTest, DetectsMinWidthViolation)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     Polygon polygon({
         Point(0.0, 0.0),
         Point(10.0, 0.0),
         Point(10.0, 3.0),
         Point(0.0, 3.0)
     });
-    Shape shape(1,Layer::M1, Purpose::Drawing, std::move(polygon));
-    MinWidthRule rule(Layer::M1,4.0);
+    Shape shape(1, M1, std::move(polygon));
+    MinWidthRule rule(M1, 4.0);
     const std::vector<Shape> shapes{ shape };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -48,6 +52,9 @@ TEST(MinWidthRuleTest, DetectsMinWidthViolation)
 
 TEST(MinWidthRuleTest, AcceptsShapeMeetingMinWidth)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     Polygon polygon({
         Point(0.0, 0.0),
         Point(10.0, 0.0),
@@ -55,9 +62,9 @@ TEST(MinWidthRuleTest, AcceptsShapeMeetingMinWidth)
         Point(0.0, 5.0)
         });
 
-    Shape shape(1, Layer::M1, Purpose::Drawing, std::move(polygon));
+    Shape shape(1, M1, std::move(polygon));
 
-    MinWidthRule rule(Layer::M1, 4.0);
+    MinWidthRule rule(M1, 4.0);
     const std::vector<Shape> shapes{ shape };
     LayerSpatialIndex spatialIndex(shapes);
     EXPECT_TRUE(rule.check(shapes, spatialIndex).empty());
@@ -65,14 +72,17 @@ TEST(MinWidthRuleTest, AcceptsShapeMeetingMinWidth)
 
 TEST(MinWidthRuleTest, AcceptsShapeExactlyAtMinimumWidth)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
 	Polygon polygon({
 		Point(0.0, 0.0),
 		Point(10.0, 0.0),
 		Point(10.0, 4.0),
 		Point(0.0, 4.0)
 		});
-	Shape shape(1, Layer::M1, Purpose::Drawing, std::move(polygon));
-	MinWidthRule rule(Layer::M1, 4.0);
+	Shape shape(1, M1, std::move(polygon));
+	MinWidthRule rule(M1, 4.0);
     const std::vector<Shape> shapes{ shape };
     LayerSpatialIndex spatialIndex(shapes);
     EXPECT_TRUE(rule.check(shapes, spatialIndex).empty());
@@ -80,14 +90,18 @@ TEST(MinWidthRuleTest, AcceptsShapeExactlyAtMinimumWidth)
 
 TEST(MinWidthRuleTest, IgnoresShapesOnOtherLayers)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
     Polygon polygon({
         Point(0,0),
         Point(10,0),
         Point(10,5),
         Point(0,5)
         });
-    Shape shape(7, Layer::M2, Purpose::Drawing, std::move(polygon));
-    MinWidthRule rule(Layer::M1, 4.0);
+    Shape shape(7, M2, std::move(polygon));
+    MinWidthRule rule(M1, 4.0);
     const std::vector<Shape> shapes{ shape };
     LayerSpatialIndex spatialIndex(shapes);
     EXPECT_TRUE(rule.check(shapes, spatialIndex).empty());
@@ -95,34 +109,40 @@ TEST(MinWidthRuleTest, IgnoresShapesOnOtherLayers)
 
 TEST(MinWidthRuleTest, ThrowsOnNonPositiveMinimumWidth)
 {
-	EXPECT_THROW(MinWidthRule(Layer::M1, 0.0), std::invalid_argument);
-	EXPECT_THROW(MinWidthRule(Layer::M1, -1.0), std::invalid_argument);
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
+	EXPECT_THROW(MinWidthRule(M1, 0.0), std::invalid_argument);
+	EXPECT_THROW(MinWidthRule(M1, -1.0), std::invalid_argument);
 }
 
 TEST(MinWidthRuleTest, MultipleShapesAgainstMinWidth)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
 	Polygon polygon1({
 		Point(0,0),
 		Point(10,0),
 		Point(10,3),
 		Point(0,3)
 		});
-	Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(polygon1));
+	Shape shape1(1, M1, std::move(polygon1));
 	Polygon polygon2({
 		Point(0,0),
 		Point(10,0),
 		Point(10,5),
 		Point(0,5)
 		});
-	Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(polygon2));
+	Shape shape2(2, M1, std::move(polygon2));
 	Polygon polygon3({
 	Point(0.0, 0.0),
 	Point(10.0, 0.0),
 	Point(10.0, 4.0),
 	Point(0.0, 4.0)
 		});
-	Shape shape3(3, Layer::M1, Purpose::Drawing, std::move(polygon3));
-	MinWidthRule rule(Layer::M1, 4.0);
+	Shape shape3(3, M1, std::move(polygon3));
+	MinWidthRule rule(M1, 4.0);
     const std::vector<Shape> shapes{ shape1, shape2, shape3 };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -131,6 +151,9 @@ TEST(MinWidthRuleTest, MultipleShapesAgainstMinWidth)
 }
 
 TEST(MinWidthRuleTest, MinimumWidthRuleOfHShape) {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     Polygon polygon({
         Point(0.0, 0.0),
         Point(6.0, 0.0),
@@ -145,8 +168,8 @@ TEST(MinWidthRuleTest, MinimumWidthRuleOfHShape) {
         Point(3.0, 2.0),
         Point(0.0, 2.0)
         });
-	Shape shape(10, Layer::M1, Purpose::Drawing, std::move(polygon));
-	MinWidthRule rule(Layer::M1, 1.5);
+	Shape shape(10, M1, std::move(polygon));
+	MinWidthRule rule(M1, 1.5);
     const std::vector<Shape> shapes{ shape };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule.check(shapes, spatialIndex);
@@ -159,22 +182,25 @@ TEST(MinWidthRuleTest, MinimumWidthRuleOfHShape) {
 // Test that MinWidthRule can be used through the Rule interface(Abstract Class)
 TEST(MinWidthRuleTest, WorksThroughRuleInterface)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
 	// Pointer to a Rule object, but actually holds a MinWidthRule
-    std::unique_ptr<Rule> rule = std::make_unique<MinWidthRule> (Layer::M1, 4.0);
+    std::unique_ptr<Rule> rule = std::make_unique<MinWidthRule> (M1, 4.0);
     Polygon polygon1({
         Point(0,0),
         Point(10,0),
         Point(10,3),
         Point(0,3)
         });
-    Shape shape1(1, Layer::M1, Purpose::Drawing, std::move(polygon1));
+    Shape shape1(1,M1, std::move(polygon1));
     Polygon polygon2({
         Point(0,0),
         Point(10,0),
         Point(10,5),
         Point(0,5)
         });
-    Shape shape2(2, Layer::M1, Purpose::Drawing, std::move(polygon2));
+    Shape shape2(2,M1, std::move(polygon2));
     const std::vector<Shape> shapes{ shape1, shape2 };
     LayerSpatialIndex spatialIndex(shapes);
     const auto violations = rule->check(shapes, spatialIndex);

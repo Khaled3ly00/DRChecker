@@ -1,4 +1,5 @@
 {
+  "layers": ["M1", "M2", "VIA1", "CO", "PO"],
   "rules": [
     {
       "type": "MinWidth",

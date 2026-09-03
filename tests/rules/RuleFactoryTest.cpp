@@ -14,9 +14,12 @@ using namespace drcheck::geometry;
 
 TEST(RuleFactoryTest, CreatesMinSpacingRule)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     RuleParameters params;
 
-    params.layer = Layer::M1;
+    params.layer = M1;
     params.value = 0.25;
 
     auto rule = RuleFactory::create("min_spacing", params);
@@ -25,15 +28,18 @@ TEST(RuleFactoryTest, CreatesMinSpacingRule)
 
     ASSERT_NE(minSpacingRule, nullptr);
 
-    EXPECT_EQ(minSpacingRule->getLayer(), Layer::M1);
+    EXPECT_EQ(minSpacingRule->getLayer(), M1);
     EXPECT_NEAR(minSpacingRule->getMinimumSpacing(), 0.25, EPSILON);
 }
 
 TEST(RuleFactoryTest, CreatesMinWidthRule)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
     RuleParameters params;
 
-    params.layer = Layer::M1;
+    params.layer =M1;
     params.value = 0.20;
 
     auto rule = RuleFactory::create("min_width", params);
@@ -42,16 +48,19 @@ TEST(RuleFactoryTest, CreatesMinWidthRule)
 
     ASSERT_NE(minWidthRule, nullptr);
 
-    EXPECT_EQ(minWidthRule->getLayer(), Layer::M1);
+    EXPECT_EQ(minWidthRule->getLayer(), M1);
     EXPECT_NEAR(minWidthRule->getMinimumWidth(), 0.20, EPSILON);
 }
 
 TEST(RuleFactoryTest, CreatesMinEnclosureRule)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* VIA1 = registry.declare("VIA1");
     RuleParameters params;
 
-    params.innerLayer = Layer::VIA1;
-    params.outerLayer = Layer::M1;
+    params.innerLayer = VIA1;
+    params.outerLayer = M1;
     params.value = 1.0;
 
     auto rule = RuleFactory::create("min_enclosure", params);
@@ -60,16 +69,18 @@ TEST(RuleFactoryTest, CreatesMinEnclosureRule)
 
     ASSERT_NE(minEnclosureRule, nullptr);
 
-    EXPECT_EQ(minEnclosureRule->getInnerLayer(), Layer::VIA1);
-    EXPECT_EQ(minEnclosureRule->getOuterLayer(), Layer::M1);
+    EXPECT_EQ(minEnclosureRule->getInnerLayer(), VIA1);
+    EXPECT_EQ(minEnclosureRule->getOuterLayer(), M1);
     EXPECT_NEAR(minEnclosureRule->getMinimumEnclosure(), 1.0, EPSILON);
 }
 
 TEST(RuleFactoryTest, CreatesDensityRule)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
     RuleParameters params;
 
-    params.layer = Layer::M1;
+    params.layer = M1;
     params.value = 0.30;
     params.densityLimit = DensityLimit::Minimum;
     params.windowSize = 10.0;
@@ -82,7 +93,7 @@ TEST(RuleFactoryTest, CreatesDensityRule)
 
     ASSERT_NE(densityRule, nullptr);
 
-    EXPECT_EQ(densityRule->getLayer(), Layer::M1);
+    EXPECT_EQ(densityRule->getLayer(), M1);
     EXPECT_EQ(densityRule->getLimit(), DensityLimit::Minimum);
     EXPECT_NEAR(densityRule->getRequiredDensity(), 0.30, EPSILON);
     EXPECT_NEAR(densityRule->getWindowSize(), 10.0, EPSILON);
@@ -96,9 +107,11 @@ TEST(RuleFactoryTest, CreatesDensityRule)
 
 TEST(RuleFactoryTest, RejectsMissingMinSpacingValue)
 {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
     RuleParameters params;
 
-    params.layer = Layer::M1;
+    params.layer = M1;
 
     EXPECT_THROW(RuleFactory::create("min_spacing", params), std::invalid_argument);
 }
@@ -113,11 +126,15 @@ TEST(RuleFactoryTest, RejectsUnknownRuleType)
 
 TEST(RuleFactoryTest, CreatesMinEnclosureRuleWithOptions)
 {
+    LayerRegistry registry;
+    const Layer* CO = registry.declare("CO");
+    const Layer* OD = registry.declare("OD");
+    const Layer* PO = registry.declare("PO");
     RuleParameters params;
 
-    params.innerLayer = Layer::CO;
+    params.innerLayer = CO;
 
-    params.enclosureOptions = std::vector<EnclosureOption>{EnclosureOption(Layer::OD, 0.04, 0.00, 0.03), EnclosureOption(Layer::PO, 0.03)};
+    params.enclosureOptions = std::vector<EnclosureOption>{EnclosureOption(OD, 0.04, 0.00, 0.03), EnclosureOption(PO, 0.03)};
 
     auto rule = RuleFactory::create("min_enclosure", params);
 

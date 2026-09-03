@@ -1,11 +1,8 @@
 #pragma once
 
-#include <cmath>
 #include <cstddef>
 #include <vector>
 #include <optional>
-#include <utility>
-#include <cstddef>
 
 #include "drcheck/geometry/Segment.h"
 #include "drcheck/geometry/Point.h"

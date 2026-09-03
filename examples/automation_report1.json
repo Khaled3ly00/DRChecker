@@ -4,7 +4,7 @@
         {
             "type": "MinDensity",
             "shapeIds": [],
-            "message": "Minimum density violation on layer : M1should be 0.300000 actual0.200000",
+            "message": "Minimum density violation on layer : M1 required 0.300000 actual 0.200000",
             "actual": 0.2,
             "required": 0.3,
             "marker": {
@@ -20,7 +20,7 @@
         {
             "type": "MinDensity",
             "shapeIds": [],
-            "message": "Minimum density violation on layer : M1should be 0.300000 actual0.000000",
+            "message": "Minimum density violation on layer : M1 required 0.300000 actual 0.000000",
             "actual": 0.0,
             "required": 0.3,
             "marker": {
@@ -36,7 +36,7 @@
         {
             "type": "MinDensity",
             "shapeIds": [],
-            "message": "Minimum density violation on layer : M1should be 0.300000 actual0.000000",
+            "message": "Minimum density violation on layer : M1 required 0.300000 actual 0.000000",
             "actual": 0.0,
             "required": 0.3,
             "marker": {
@@ -52,7 +52,7 @@
         {
             "type": "MinDensity",
             "shapeIds": [],
-            "message": "Minimum density violation on layer : M1should be 0.300000 actual0.000000",
+            "message": "Minimum density violation on layer : M1 required 0.300000 actual 0.000000",
             "actual": 0.0,
             "required": 0.3,
             "marker": {

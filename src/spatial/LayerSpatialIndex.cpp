@@ -6,7 +6,7 @@ namespace drcheck::spatial {
     LayerSpatialIndex::LayerSpatialIndex(const std::vector<domain::Shape>& shapes, std::size_t capacity, std::size_t maxDepth)
     {
         // A map between each layer and containing shapes
-        std::map<domain::Layer, std::vector<const domain::Shape*>> shapesByLayer;
+        std::unordered_map<const domain::Layer*, std::vector<const domain::Shape*>> shapesByLayer;
 
         // fill map with layer and containing shapes
         for (const auto& shape : shapes)
@@ -38,12 +38,12 @@ namespace drcheck::spatial {
     }
 
     // Does this layer have Quadtree created for it?
-    bool LayerSpatialIndex::hasLayer(domain::Layer layer) const
+    bool LayerSpatialIndex::hasLayer(const domain::Layer* layer) const
     {
         return trees.find(layer) != trees.end();
     }
 
-    std::vector<const domain::Shape*>LayerSpatialIndex::query(domain::Layer layer, const geometry::BoundingBox& region) const
+    std::vector<const domain::Shape*>LayerSpatialIndex::query(const domain::Layer* layer, const geometry::BoundingBox& region) const
     {
         // Check whether a QuadTree exists for this layer.
         const auto it = trees.find(layer);

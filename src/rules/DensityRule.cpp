@@ -8,14 +8,18 @@
 
 namespace drcheck::rules {
     // Delegate constructor for non specified analysis window
-    DensityRule::DensityRule(domain::Layer layer, DensityLimit limit, double requiredDensity, double windowSize, double windowStep)
+    DensityRule::DensityRule(const domain::Layer* layer, DensityLimit limit, double requiredDensity, double windowSize, double windowStep)
         :DensityRule(layer, limit, requiredDensity, windowSize, windowStep, std::nullopt)
     {
     }
 
-    DensityRule::DensityRule(domain::Layer layer, DensityLimit limit, double requiredDensity, double windowSize, double windowStep, std::optional<geometry::BoundingBox> analysisWindow)
+    DensityRule::DensityRule(const domain::Layer* layer, DensityLimit limit, double requiredDensity, double windowSize, double windowStep, std::optional<geometry::BoundingBox> analysisWindow)
         :layer(layer), limit(limit), requiredDensity(requiredDensity), windowSize(windowSize), windowStep(windowStep), analysisWindow(std::move(analysisWindow))
     {
+        if (layer == nullptr)
+        {
+            throw std::invalid_argument("layer cannot be null");
+        }
         if (requiredDensity < 0.0 || requiredDensity > 1.0)
         {
             throw std::invalid_argument("Required density must be between 0 and 1");
@@ -31,7 +35,7 @@ namespace drcheck::rules {
         }
     }
 
-    domain::Layer DensityRule::getLayer() const
+    const domain::Layer* DensityRule::getLayer() const
     {
         return layer;
     }
@@ -121,10 +125,10 @@ namespace drcheck::rules {
         switch (limit)
         {
         case DensityLimit::Minimum:
-            return actualDensity + DRC_LENGTH_TOLERANCE < requiredDensity;
+            return actualDensity < requiredDensity;
 
         case DensityLimit::Maximum:
-            return actualDensity > requiredDensity + DRC_LENGTH_TOLERANCE;
+            return actualDensity > requiredDensity;
         }
 
         throw std::logic_error("Unknown density limit type");
@@ -155,7 +159,7 @@ namespace drcheck::rules {
                 .region = window,
                 .firstLayer = getLayer()
             };
-            const std::string msg = message + " on layer : " + domain::layerToString(layer) + "should be " + std::to_string(requiredDensity) + " actual" + std::to_string(actualDensity);
+            const std::string msg = message + " on layer : " + layer->getName() + " required " + std::to_string(requiredDensity) + " actual " + std::to_string(actualDensity);
             violations.emplace_back(violationType, std::vector<std::size_t>{}, msg, actualDensity, requiredDensity, marker);
         }
         return violations;

@@ -1,16 +1,19 @@
 #include "drcheck/io/SVGReportWriter.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
+#include <cstdint>
 #include <fstream>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
+#include <string_view>
 
 namespace drcheck::io {
     namespace {
 
-        constexpr double SVG_WIDTH = 1200.0;
+        constexpr double SVG_WIDTH = 1600.0;
         constexpr double SVG_HEIGHT = 800.0;
         constexpr double SVG_PADDING = 40.0;
 
@@ -32,7 +35,7 @@ namespace drcheck::io {
         constexpr double PANEL_TEXT_FONT_SIZE = 12.0;
         constexpr double PANEL_BUTTON_WIDTH = 80.0;
         constexpr double PANEL_BUTTON_HEIGHT = 24.0;
-        constexpr std::size_t VIOLATIONS_PER_PAGE = 19;
+        constexpr std::size_t VIOLATIONS_PER_PAGE = 16;
 
         // Converts layout coordinates to SVG coordinates while fitting the
         // complete report inside a fixed SVG viewport.
@@ -97,62 +100,55 @@ namespace drcheck::io {
 
         struct LayerStyle
         {
-            const char* name;
             const char* fillColor;
             const char* strokeColor;
-            int drawPriority;
         };
 
-        // Keep all SVG presentation data for a layer in one place so drawing,
-        // labels, and the legend cannot silently drift apart.
-        constexpr LayerStyle getLayerStyle(domain::Layer layer)
+        constexpr std::array<const char*, 16> LAYER_COLORS{
+            "cyan",
+            "gold",
+            "red",
+            "green",
+            "blue",
+            "magenta",
+            "orange",
+            "limegreen",
+            "mediumpurple",
+            "deepskyblue",
+            "crimson",
+            "darkturquoise",
+            "violet",
+            "coral",
+            "yellowgreen",
+            "slateblue"
+        };
+
+        std::uint64_t hashLayerName(std::string_view name)
         {
-            switch (layer)
+            std::uint64_t hash = 14695981039346656037ULL;
+
+            for (const unsigned char character : name)
             {
-            case domain::Layer::NW:
-                return { "NW", "cream", "cream", 0 };
-
-            case domain::Layer::VTL_N:
-                return { "VTL_N", "blue", "blue", 1 };
-
-            case domain::Layer::VTL_P:
-                return { "VTL_P", "gray", "gray", 2 };
-
-            case domain::Layer::PDK:
-                return { "PDK", "purple", "purple", 3 };
-
-            case domain::Layer::PO:
-                return { "PO", "blue", "blue", 4 };
-
-            case domain::Layer::NP:
-                return { "NP", "gray", "gray", 5 };
-
-            case domain::Layer::PP:
-                return { "PP", "magenta", "magenta", 6 };
-
-            case domain::Layer::OD:
-                return { "OD", "red", "red", 7 };
-
-            case domain::Layer::CO:
-                return { "CO", "green", "green", 8 };
-
-            case domain::Layer::M1:
-                return { "M1", "cyan", "cyan", 9 };
-
-            case domain::Layer::M1_PIN:
-                return { "M1_PIN", "cyan", "cyan", 10 };
-
-            case domain::Layer::VIA1:
-                return { "VIA1", "yellow", "yellow", 11 };
-
-            case domain::Layer::M2:
-                return { "M2", "gold", "gold", 12 };
-
-            case domain::Layer::M2_PIN:
-                return { "M2_PIN", "gold", "gold", 13 };
+                hash ^= character;
+                hash *= 1099511628211ULL;
             }
 
-            return { "Unknown", "lightgray", "black", 100 };
+            return hash;
+        }
+
+        LayerStyle getLayerStyle(const domain::Layer* layer)
+        {
+            const std::size_t colorIndex =
+                hashLayerName(layer->getName()) % LAYER_COLORS.size();
+
+            const char* color = LAYER_COLORS[colorIndex];
+
+            return { color, color };
+        }
+
+        bool isPinLayer(const domain::Layer* layer)
+        {
+            return layer->getName().ends_with("_PIN");
         }
 
         std::vector<domain::Shape> getShapesInDrawOrder(const std::vector<domain::Shape>& shapes)
@@ -164,7 +160,7 @@ namespace drcheck::io {
                 orderedShapes.end(),
                 [](const domain::Shape& first, const domain::Shape& second)
                 {
-                    return getLayerStyle(first.getLayer()).drawPriority < getLayerStyle(second.getLayer()).drawPriority;
+                    return first.getLayer()->getName() < second.getLayer()->getName();
                 });
 
             return orderedShapes;
@@ -240,9 +236,9 @@ namespace drcheck::io {
             return match == shapes.end() ? nullptr : &*match;
         }
 
-        std::string getViolationLayerClasses(const domain::Violation& violation, const std::vector<domain::Shape>& shapes)
+        std::string getViolationLayers(const domain::Violation& violation, const std::vector<domain::Shape>& shapes)
         {
-            std::vector<std::string> classes;
+            std::vector<std::string> layers;
 
             for (std::size_t shapeId : violation.getShapeIds())
             {
@@ -253,25 +249,24 @@ namespace drcheck::io {
                     continue;
                 }
 
-                std::string className = "layer-";
-                className += getLayerStyle(shape->getLayer()).name;
+                const std::string& layerName = shape->getLayer()->getName();
 
-                if (std::find(classes.begin(), classes.end(), className) == classes.end())
+                if (std::find(layers.begin(), layers.end(), layerName) == layers.end())
                 {
-                    classes.push_back(className);
+                    layers.push_back(layerName);
                 }
             }
 
             std::ostringstream result;
 
-            for (std::size_t i = 0; i < classes.size(); ++i)
+            for (std::size_t i = 0; i < layers.size(); ++i)
             {
                 if (i > 0)
                 {
                     result << ' ';
                 }
 
-                result << classes[i];
+                result << layers[i];
             }
 
             return result.str();
@@ -364,17 +359,19 @@ namespace drcheck::io {
 
         void writePolygon(std::ofstream& output, const domain::Shape& shape, const SvgTransform& transform)
         {
-            const LayerStyle layerStyle = getLayerStyle(shape.getLayer());
+            const domain::Layer* layer = shape.getLayer();
+            const std::string& layerName = layer->getName();
+            const LayerStyle layerStyle = getLayerStyle(layer);
 
             output
-                << "  <g class=\"shape layer-"
-                << layerStyle.name
-                << "\">\n";
+                << "  <g "
+                << "class=\"shape\" "
+                << "data-layer=\"" << layerName << "\">\n";
 
             output
                 << "    <title>"
                 << "Shape ID: " << shape.getId()
-                << "&#10;Layer: " << layerStyle.name
+                << "&#10;Layer: " << layerName
                 << "</title>\n";
 
             output << "  <polygon points=\"";
@@ -402,9 +399,9 @@ namespace drcheck::io {
                 << "\""
                 << " />\n";
 
-            // Pin-purpose layers are crossed so they remain distinguishable
+            // Pin layers are crossed so they remain distinguishable
             // from routing geometry that uses the same fill and stroke color.
-            if (shape.getLayer() == domain::Layer::M1_PIN || shape.getLayer() == domain::Layer::M2_PIN)
+            if (isPinLayer(layer))
             {
                 writePinCross(output, shape, transform);
             }
@@ -482,13 +479,13 @@ namespace drcheck::io {
             {
                 output
                     << " "
-                    << getLayerStyle(*marker->firstLayer).name;
+                    << marker->firstLayer->getName();
 
                 if (marker->secondLayer)
                 {
                     output
                         << " With "
-                        << getLayerStyle(*marker->secondLayer).name;
+                        << marker->secondLayer->getName();
                 }
             }
 
@@ -564,15 +561,15 @@ namespace drcheck::io {
             output << "  </g>\n";
         }
 
-        void writeLegendItem(std::ofstream& output, domain::Layer layer, double x, double y)
+        void writeLegendItem(std::ofstream& output, const domain::Layer* layer, double x, double y)
         {
             const LayerStyle layerStyle = getLayerStyle(layer);
-            const std::string className = std::string("layer-") + layerStyle.name;
+            const std::string& layerName = layer->getName();
 
             output
                 << "    <g "
                 << "class=\"legend-item\" "
-                << "data-layer=\"" << className << "\" "
+                << "data-layer=\"" << layerName << "\" "
                 << "onclick=\"toggleLayer(this)\" "
                 << "style=\"cursor: pointer;\">\n";
 
@@ -595,19 +592,19 @@ namespace drcheck::io {
                 << "y=\"" << y + LEGEND_COLOR_SIZE - 3.0 << "\" "
                 << "font-size=\"" << LEGEND_FONT_SIZE << "\" "
                 << "fill=\"black\">"
-                << layerStyle.name
+                << layerName
                 << "</text>\n";
 
             output << "    </g>\n";
         }
 
-        std::vector<domain::Layer> getExistingLayers(const std::vector<domain::Shape>& shapes)
+        std::vector<const domain::Layer*> getExistingLayers(const std::vector<domain::Shape>& shapes)
         {
-            std::vector<domain::Layer> layers;
+            std::vector<const domain::Layer*> layers;
 
             for (const auto& shape : shapes)
             {
-                const domain::Layer layer = shape.getLayer();
+                const domain::Layer* layer = shape.getLayer();
 
                 if (std::find(layers.begin(), layers.end(), layer) == layers.end())
                 {
@@ -615,10 +612,18 @@ namespace drcheck::io {
                 }
             }
 
+            std::sort(
+                layers.begin(),
+                layers.end(),
+                [](const domain::Layer* first, const domain::Layer* second)
+                {
+                    return first->getName() < second->getName();
+                });
+
             return layers;
         }
 
-        void writeLegend(std::ofstream& output, const std::vector<domain::Layer>& layers)
+        void writeLegend(std::ofstream& output, const std::vector<const domain::Layer*>& layers)
         {
             if (layers.empty())
             {
@@ -653,7 +658,7 @@ namespace drcheck::io {
 
             double itemY = y + 25.0;
 
-            for (const domain::Layer layer : layers)
+            for (const domain::Layer* layer : layers)
             {
                 writeLegendItem(output, layer, x, itemY);
                 itemY += LEGEND_ITEM_HEIGHT;
@@ -670,11 +675,11 @@ namespace drcheck::io {
 
             if (const auto& marker = violation.getMarker(); marker && marker->firstLayer)
             {
-                summary << " " << getLayerStyle(*marker->firstLayer).name;
+                summary << " " << marker->firstLayer->getName();
 
                 if (marker->secondLayer)
                 {
-                    summary << "-" << getLayerStyle(*marker->secondLayer).name;
+                    summary << "-" << marker->secondLayer->getName();
                 }
             }
             
@@ -711,7 +716,7 @@ namespace drcheck::io {
                 << "    </g>\n";
         }
 
-        void writeViolationList(std::ofstream& output, const std::vector<domain::Violation>& violations, const std::vector<std::string>& violationLayerClasses, std::size_t totalPages)
+        void writeViolationList(std::ofstream& output, const std::vector<domain::Violation>& violations, const std::vector<std::string>& violationLayers, std::size_t totalPages)
         {
             const double x = SVG_PADDING;
             const double y = SVG_PADDING;
@@ -760,7 +765,7 @@ namespace drcheck::io {
                     << "data-message=\"" << violation.getMessage() << "\" "
                     << "data-page=\"" << page << "\" "
                     << "data-layers=\""
-                    << violationLayerClasses[i]
+                    << violationLayers[i]
                     << "\" "
                     << "onclick=\"toggleViolation(this)\" "
                     << "style=\"cursor: pointer;";
@@ -873,12 +878,11 @@ namespace drcheck::io {
             output
                 << "<svg "
                 << "xmlns=\"http://www.w3.org/2000/svg\" "
-                << "width=\"100%\" "
-                << "height=\"90vh\" "
                 << "viewBox=\"0 0 "
                 << SVG_WIDTH << " "
                 << SVG_HEIGHT << "\" "
-                << "preserveAspectRatio=\"xMidYMid meet\">\n";
+                << "preserveAspectRatio=\"xMidYMid meet\" "
+                << "style=\"width: 100%; height: auto; display: block;\">\n";
         }
 
         void writeStyles(std::ofstream& output)
@@ -1088,15 +1092,8 @@ function hideAllViolations() {
       const hiddenLayers = getHiddenLayers();
 
       document.querySelectorAll('.shape').forEach(function(shape) {
-        let hideShape = false;
-
-        shape.classList.forEach(function(className) {
-          if (className.startsWith('layer-') && hiddenLayers.has(className)) {
-            hideShape = true;
-          }
-        });
-
-        shape.style.display = hideShape ? 'none' : '';
+        const layer = shape.dataset.layer || '';
+        shape.style.display = hiddenLayers.has(layer) ? 'none' : '';
       });
 
       updateViolationListVisibility(hiddenLayers);
@@ -1269,12 +1266,12 @@ function hideAllViolations() {
         const SvgTransform transform(*reportBounds);
         writeStyles(output);
 
-        std::vector<std::string> violationLayerClasses;
-        violationLayerClasses.reserve(violations.size());
+        std::vector<std::string> violationLayers;
+        violationLayers.reserve(violations.size());
 
         for (const auto& violation : violations)
         {
-            violationLayerClasses.push_back(getViolationLayerClasses(violation, shapes));
+            violationLayers.push_back(getViolationLayers(violation, shapes));
         }
 
         const std::size_t violationPageCount = getViolationPageCount(violations.size());
@@ -1301,7 +1298,7 @@ function hideAllViolations() {
                 << "id=\"violation-" << i << "\" "
                 << "class=\"violation-overlay\" "
                 << "data-layers=\""
-                << violationLayerClasses[i]
+                << violationLayers[i]
                 << "\" "
                 << "style=\"display: none;\">\n";
 
@@ -1314,7 +1311,7 @@ function hideAllViolations() {
 
         output << "  </g>\n";
 
-        writeViolationList(output, violations, violationLayerClasses, violationPageCount);
+        writeViolationList(output, violations, violationLayers, violationPageCount);
 
         const auto existingLayers = getExistingLayers(shapes);
         writeLegend(output, existingLayers);

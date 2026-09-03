@@ -14,6 +14,13 @@
 
 namespace drcheck::io {
 namespace {
+
+struct TclParserContext
+{
+    std::vector<std::unique_ptr<rules::Rule>>* parsedRules;
+    domain::LayerRegistry* layerRegistry;
+};
+
 // Make options and their value in a map to enable tcl command without arranging options 
 std::map<std::string, Tcl_Obj*> parseOptions(int objc, Tcl_Obj* const objv[])
 {
@@ -100,7 +107,7 @@ geometry::BoundingBox parseRegion(Tcl_Interp* interpreter, Tcl_Obj* regionObj)
     return geometry::BoundingBox(minX, minY, maxX, maxY);
 }
 
-std::vector<rules::EnclosureOption> parseEnclosureOptions(Tcl_Interp* interpreter, Tcl_Obj* optionsObj)
+std::vector<rules::EnclosureOption> parseEnclosureOptions(Tcl_Interp* interpreter, Tcl_Obj* optionsObj, const domain::LayerRegistry& layerRegistry)
 {
     #if TCL_MAJOR_VERSION >= 9
     Tcl_Size optionCount = 0;
@@ -180,7 +187,7 @@ std::vector<rules::EnclosureOption> parseEnclosureOptions(Tcl_Interp* interprete
             throw std::invalid_argument("Unknown min_enclosure option");
         }
 
-        const domain::Layer outerLayer = domain::layerFromString(Tcl_GetString(optionValues.at("-outer")));
+        const domain::Layer* outerLayer = layerRegistry.resolve(Tcl_GetString(optionValues.at("-outer")));
 
         const double allSidesMinEnclosure = getDoubleOption(interpreter, optionValues.at("-all_sides"));
 
@@ -200,7 +207,7 @@ std::vector<rules::EnclosureOption> parseEnclosureOptions(Tcl_Interp* interprete
 
 int ruleCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Obj* const objv[])
 {
-    auto* rules = static_cast<std::vector<std::unique_ptr<rules::Rule>>*>(clientData);
+    auto* context = static_cast<TclParserContext*>(clientData);
 
     try
     {
@@ -220,7 +227,7 @@ int ruleCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Ob
             {
                 throw std::invalid_argument(type + " requires -layer and -value");
             }
-            params.layer = domain::layerFromString(Tcl_GetString(options.at("-layer")));
+            params.layer = context->layerRegistry->resolve(Tcl_GetString(options.at("-layer")));
             params.value = getDoubleOption(interpreter, options.at("-value"));
         }
         else if (type == "min_enclosure")
@@ -230,7 +237,7 @@ int ruleCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Ob
                 throw std::invalid_argument("min_enclosure requires -inner");
             }
 
-            params.innerLayer = domain::layerFromString(Tcl_GetString(options.at("-inner")));
+            params.innerLayer = context->layerRegistry->resolve(Tcl_GetString(options.at("-inner")));
 
             if (options.contains("-options"))
             {
@@ -239,7 +246,7 @@ int ruleCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Ob
                     throw std::invalid_argument("min_enclosure with -options requires only -inner and -options");
                 }
 
-                params.enclosureOptions = parseEnclosureOptions(interpreter, options.at("-options"));
+                params.enclosureOptions = parseEnclosureOptions(interpreter, options.at("-options"), *context->layerRegistry);
             }
             else
             {
@@ -248,7 +255,7 @@ int ruleCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Ob
                     throw std::invalid_argument("min_enclosure requires either -inner, -outer and -value or -inner and -options");
                 }
 
-                params.outerLayer = domain::layerFromString(Tcl_GetString(options.at("-outer")));
+                params.outerLayer = context->layerRegistry->resolve(Tcl_GetString(options.at("-outer")));
                 params.value = getDoubleOption(interpreter, options.at("-value"));
             }
         }
@@ -262,7 +269,7 @@ int ruleCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Ob
             {
                 throw std::invalid_argument("Unknown density option");
             }
-            params.layer = domain::layerFromString(Tcl_GetString(options.at("-layer")));
+            params.layer = context->layerRegistry->resolve(Tcl_GetString(options.at("-layer")));
             params.densityLimit = parseDensityLimit(Tcl_GetString(options.at("-limit")));
             params.value = getDoubleOption(interpreter, options.at("-value"));
             params.windowSize = getDoubleOption(interpreter, options.at("-window_size"));
@@ -278,7 +285,7 @@ int ruleCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Ob
             throw std::invalid_argument("Unsupported rule type: " + type);
         }
 
-        rules->push_back(rules::RuleFactory::create(type, params));
+        context->parsedRules->push_back(rules::RuleFactory::create(type, params));
     }
     catch (const std::exception& exception)
     {
@@ -288,9 +295,35 @@ int ruleCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Ob
 
     return TCL_OK;
 }
+
+int layerCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Obj* const objv[])
+{
+    auto* context = static_cast<TclParserContext*>(clientData);
+
+    try
+    {
+        if (objc != 2)
+        {
+            throw std::invalid_argument("layer requires exactly one layer name");
+        }
+
+        const std::string layerName = Tcl_GetString(objv[1]);
+
+        context->layerRegistry->declare(layerName);
+    }
+    catch (const std::exception& exception)
+    {
+        Tcl_SetObjResult(interpreter, Tcl_NewStringObj(exception.what(), -1));
+
+        return TCL_ERROR;
+    }
+
+    return TCL_OK;
 }
 
-std::vector<std::unique_ptr<rules::Rule>> TclRuleParser::load(const std::string& filePath)
+}
+
+std::vector<std::unique_ptr<rules::Rule>> TclRuleParser::load(const std::string& filePath, domain::LayerRegistry& registry)
 {
     Tcl_Interp* interpreter = Tcl_CreateInterp();
 
@@ -300,10 +333,16 @@ std::vector<std::unique_ptr<rules::Rule>> TclRuleParser::load(const std::string&
     }
 
     std::vector<std::unique_ptr<rules::Rule>> rules;
+
+    TclParserContext context{
+    .parsedRules = &rules,
+    .layerRegistry = &registry
+    };
     // Tcl_CreateObjCommand
     // (interpreter, Tcl command name, C++ callback function, custom C++ data pointer passed to callback, cleanup callback);
     // Pointer: the callback function will store command args in the pointer to be used after callback ends, otherwise args will be removed after callback ends
-    Tcl_CreateObjCommand(interpreter, "rule", ruleCommand, &rules, nullptr);
+    Tcl_CreateObjCommand(interpreter, "rule", ruleCommand, &context, nullptr);
+    Tcl_CreateObjCommand(interpreter, "layer", layerCommand, &context, nullptr);
 
     const int result = Tcl_EvalFile(interpreter, filePath.c_str());
 

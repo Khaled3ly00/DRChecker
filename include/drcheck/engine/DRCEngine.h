@@ -6,10 +6,6 @@
 #include "drcheck/domain/Shape.h"
 #include "drcheck/domain/Violation.h"
 #include "drcheck/rules/Rule.h"
-#include "drcheck/rules/MinWidthRule.h"
-#include "drcheck/rules/MinSpacingRule.h"
-#include "drcheck/rules/MinEnclosureRule.h"
-#include "drcheck/rules/DensityRule.h"
 
 namespace drcheck::engine {
 

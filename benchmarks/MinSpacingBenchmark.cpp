@@ -8,6 +8,7 @@
 #include <vector>
 #include <stdexcept>
 
+#include "drcheck/domain/LayerRegistry.h"
 #include "drcheck/domain/Shape.h"
 #include "drcheck/geometry/Constants.h"
 #include "drcheck/geometry/Point.h"
@@ -23,10 +24,8 @@ struct BenchmarkResult
 };
 
 // Return a vector of n shapes with specific width, height, spacing
-std::vector<drcheck::domain::Shape> generateGrid(std::size_t count, double width, double height, double gap)
+std::vector<drcheck::domain::Shape> generateGrid(std::size_t count, double width, double height, double gap, const drcheck::domain::Layer* layer)
 {
-    using drcheck::domain::Layer;
-    using drcheck::domain::Purpose;
     using drcheck::domain::Shape;
     using drcheck::geometry::Point;
     using drcheck::geometry::Polygon;
@@ -54,13 +53,13 @@ std::vector<drcheck::domain::Shape> generateGrid(std::size_t count, double width
             Point(x, y + height)
             });
 
-        shapes.emplace_back(i, Layer::M1, Purpose::Drawing, std::move(polygon));
+        shapes.emplace_back(i, layer, std::move(polygon));
     }
 
     return shapes;
 }
 
-BenchmarkResult runBruteForce(const std::vector<drcheck::domain::Shape>& shapes, double minimumSpacing)
+BenchmarkResult runBruteForce(const std::vector<drcheck::domain::Shape>& shapes, const drcheck::domain::Layer* layer, double minimumSpacing)
 {
     using namespace drcheck;
 
@@ -70,14 +69,14 @@ BenchmarkResult runBruteForce(const std::vector<drcheck::domain::Shape>& shapes,
 
     for (std::size_t i = 0; i < shapes.size(); ++i)
     {
-        if (shapes[i].getLayer() != domain::Layer::M1)
+        if (shapes[i].getLayer() != layer)
         {
             continue;
         }
 
         for (std::size_t j = i + 1; j < shapes.size(); ++j)
         {
-            if (shapes[j].getLayer() != domain::Layer::M1)
+            if (shapes[j].getLayer() != layer)
             {
                 continue;
             }
@@ -100,7 +99,7 @@ BenchmarkResult runBruteForce(const std::vector<drcheck::domain::Shape>& shapes,
     return result;
 }
 
-BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, double minimumSpacing, std::size_t capacity, std::size_t maxDepth)
+BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, const drcheck::domain::Layer* layer, double minimumSpacing, std::size_t capacity, std::size_t maxDepth)
 {
     using namespace drcheck;
 
@@ -112,7 +111,7 @@ BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, d
 
     for (const domain::Shape& shape : shapes)
     {
-        if (shape.getLayer() == domain::Layer::M1)
+        if (shape.getLayer() == layer)
         {
             firstShape = &shape;
             break;
@@ -127,7 +126,7 @@ BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, d
 
     for (const domain::Shape& shape : shapes)
     {
-        if (shape.getLayer() != domain::Layer::M1)
+        if (shape.getLayer() != layer)
         {
             continue;
         }
@@ -139,7 +138,7 @@ BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, d
 
     for (const domain::Shape& shape : shapes)
     {
-        if (shape.getLayer() == domain::Layer::M1)
+        if (shape.getLayer() == layer)
         {
             tree.insert(shape);
         }
@@ -147,7 +146,7 @@ BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, d
 
     for (const domain::Shape& shape : shapes)
     {
-        if (shape.getLayer() != domain::Layer::M1)
+        if (shape.getLayer() != layer)
         {
             continue;
         }
@@ -186,7 +185,7 @@ BenchmarkResult runQuadtree(const std::vector<drcheck::domain::Shape>& shapes, d
 }
 
 // Calculates average run time for n repitions of QuadTree
-BenchmarkResult runQuadtreeAverage(const std::vector<drcheck::domain::Shape>& shapes, double minimumSpacing, std::size_t capacity, std::size_t maxDepth, std::size_t repetitions)
+BenchmarkResult runQuadtreeAverage(const std::vector<drcheck::domain::Shape>& shapes, const drcheck::domain::Layer* layer, double minimumSpacing, std::size_t capacity, std::size_t maxDepth, std::size_t repetitions)
 {
     if (repetitions == 0)
     {
@@ -197,13 +196,13 @@ BenchmarkResult runQuadtreeAverage(const std::vector<drcheck::domain::Shape>& sh
 
     // Warm-up run.
     // This result is intentionally not included in the average.
-    runQuadtree(shapes, minimumSpacing, capacity, maxDepth);
+    runQuadtree(shapes, layer, minimumSpacing, capacity, maxDepth);
 
     double totalMilliseconds = 0.0;
 
     for (std::size_t i = 0; i < repetitions; ++i)
     {
-        const BenchmarkResult result = runQuadtree(shapes, minimumSpacing, capacity, maxDepth);
+        const BenchmarkResult result = runQuadtree(shapes, layer, minimumSpacing, capacity, maxDepth);
 
         totalMilliseconds += result.milliseconds;
 
@@ -220,6 +219,9 @@ BenchmarkResult runQuadtreeAverage(const std::vector<drcheck::domain::Shape>& sh
 
 int main()
 {
+    drcheck::domain::LayerRegistry layerRegistry;
+    const drcheck::domain::Layer* metalLayer = layerRegistry.declare("M1");
+
     constexpr double width = 10.0;
     constexpr double height = 10.0;
 
@@ -236,18 +238,18 @@ int main()
     const std::vector<std::size_t> maxDepths{ 4, 6, 8, 10};
 
     // Generate both layouts once.
-    const auto denseShapes = generateGrid(shapeCount, width, height, denseGap);
+    const auto denseShapes = generateGrid(shapeCount, width, height, denseGap, metalLayer);
 
-    const auto sparseShapes = generateGrid(shapeCount, width, height, sparseGap);
+    const auto sparseShapes = generateGrid(shapeCount, width, height, sparseGap, metalLayer);
 
     // Our already-tested configuration is used as
     // the correctness reference.
     constexpr std::size_t referenceCapacity = 4;
     constexpr std::size_t referenceMaxDepth = 8;
 
-    const BenchmarkResult denseReference = runQuadtree(denseShapes, minimumSpacing, referenceCapacity, referenceMaxDepth);
+    const BenchmarkResult denseReference = runQuadtree(denseShapes, metalLayer, minimumSpacing, referenceCapacity, referenceMaxDepth);
 
-    const BenchmarkResult sparseReference =runQuadtree(sparseShapes, minimumSpacing, referenceCapacity, referenceMaxDepth);
+    const BenchmarkResult sparseReference =runQuadtree(sparseShapes, metalLayer, minimumSpacing, referenceCapacity, referenceMaxDepth);
 
     const std::filesystem::path outputPath = std::filesystem::path(DRCHECK_SOURCE_DIR)/"benchmarks"/"results"/"quadtree_parameter_tuning.txt";
     std::filesystem::create_directories(outputPath.parent_path());
@@ -285,8 +287,8 @@ int main()
     {
         for (const std::size_t maxDepth : maxDepths)
         {
-            const BenchmarkResult dense = runQuadtreeAverage(denseShapes, minimumSpacing, capacity, maxDepth, repetitions);
-            const BenchmarkResult sparse = runQuadtreeAverage(sparseShapes, minimumSpacing, capacity, maxDepth, repetitions);
+            const BenchmarkResult dense = runQuadtreeAverage(denseShapes, metalLayer, minimumSpacing, capacity, maxDepth, repetitions);
+            const BenchmarkResult sparse = runQuadtreeAverage(sparseShapes, metalLayer, minimumSpacing, capacity, maxDepth, repetitions);
 
             printLine("Capacity: " + std::to_string(capacity));
             printLine("Max Depth: " + std::to_string(maxDepth));

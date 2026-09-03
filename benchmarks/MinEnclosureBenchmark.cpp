@@ -8,6 +8,7 @@
 #include <vector>
 #include <stdexcept>
 
+#include "drcheck/domain/LayerRegistry.h"
 #include "drcheck/domain/Shape.h"
 #include "drcheck/geometry/Constants.h"
 #include "drcheck/geometry/Point.h"
@@ -15,7 +16,7 @@
 #include "drcheck/spatial/LayerSpatialIndex.h"
 
 using drcheck::domain::Layer;
-using drcheck::domain::Purpose;
+using drcheck::domain::LayerRegistry;
 using drcheck::domain::Shape;
 
 using drcheck::geometry::BoundingBox;
@@ -32,7 +33,7 @@ struct EnclosureBenchmarkResult
     double milliseconds;
 };
 
-std::vector<Shape> generateEnclosureGrid(std::size_t count, double viaSize, double enclosure, double gap)
+std::vector<Shape> generateEnclosureGrid(std::size_t count, double viaSize, double enclosure, double gap, const Layer* metalLayer, const Layer* viaLayer)
 {
     std::vector<Shape> shapes;
     shapes.reserve(count * 2);
@@ -64,14 +65,14 @@ std::vector<Shape> generateEnclosureGrid(std::size_t count, double viaSize, doub
             Point(x + enclosure, y + enclosure + viaSize)
             });
 
-        shapes.emplace_back(2 * i, Layer::M1, Purpose::Drawing, std::move(metalPolygon));
-        shapes.emplace_back(2 * i + 1, Layer::VIA1, Purpose::Drawing, std::move(viaPolygon));
+        shapes.emplace_back(2 * i, metalLayer, std::move(metalPolygon));
+        shapes.emplace_back(2 * i + 1, viaLayer, std::move(viaPolygon));
     }
 
     return shapes;
 }
 
-EnclosureBenchmarkResult runBruteForce(const std::vector<Shape>& shapes, double minimumEnclosure)
+EnclosureBenchmarkResult runBruteForce(const std::vector<Shape>& shapes, const Layer* innerLayer, const Layer* outerLayer, double minimumEnclosure)
 {
     std::size_t containmentChecks = 0;
     std::size_t violationCount = 0;
@@ -80,7 +81,7 @@ EnclosureBenchmarkResult runBruteForce(const std::vector<Shape>& shapes, double 
 
     for (const Shape& innerShape : shapes)
     {
-        if (innerShape.getLayer() != Layer::VIA1)
+        if (innerShape.getLayer() != innerLayer)
         {
             continue;
         }
@@ -89,7 +90,7 @@ EnclosureBenchmarkResult runBruteForce(const std::vector<Shape>& shapes, double 
 
         for (const Shape& outerShape : shapes)
         {
-            if (outerShape.getLayer() != Layer::M1)
+            if (outerShape.getLayer() != outerLayer)
             {
                 continue;
             }
@@ -128,7 +129,7 @@ EnclosureBenchmarkResult runBruteForce(const std::vector<Shape>& shapes, double 
     return {containmentChecks, violationCount, milliseconds};
 }
 
-EnclosureBenchmarkResult runSpatial(const std::vector<Shape>& shapes, const LayerSpatialIndex& spatialIndex, double minimumEnclosure)
+EnclosureBenchmarkResult runSpatial(const std::vector<Shape>& shapes, const LayerSpatialIndex& spatialIndex, const Layer* innerLayer, const Layer* outerLayer, double minimumEnclosure)
 {
     std::size_t containmentChecks = 0;
     std::size_t violationCount = 0;
@@ -137,7 +138,7 @@ EnclosureBenchmarkResult runSpatial(const std::vector<Shape>& shapes, const Laye
 
     for (const Shape& innerShape : shapes)
     {
-        if (innerShape.getLayer() != Layer::VIA1)
+        if (innerShape.getLayer() != innerLayer)
         {
             continue;
         }
@@ -146,7 +147,7 @@ EnclosureBenchmarkResult runSpatial(const std::vector<Shape>& shapes, const Laye
 
         const BoundingBox innerBox = innerShape.getPolygon().getBoundingBox();
 
-        const auto candidates = spatialIndex.query(Layer::M1,innerBox);
+        const auto candidates = spatialIndex.query(outerLayer, innerBox);
 
         for (const Shape* outerShape : candidates)
         {
@@ -190,6 +191,10 @@ int main()
     constexpr double GAP = 10.0;
     constexpr double MINIMUM_ENCLOSURE = 3.0;
 
+    LayerRegistry layerRegistry;
+    const Layer* metalLayer = layerRegistry.declare("M1");
+    const Layer* viaLayer = layerRegistry.declare("VIA1");
+
     const std::vector<std::size_t> counts{100, 500, 1000, 2000};
 
     const std::filesystem::path outputPath = std::filesystem::path(DRCHECK_SOURCE_DIR) / "benchmarks" / "results" / "min_enclosure_benchmark.txt";
@@ -213,16 +218,16 @@ int main()
 
     for (const std::size_t count : counts)
     {
-        const auto shapes = generateEnclosureGrid(count, VIA_SIZE, ACTUAL_ENCLOSURE, GAP);
+        const auto shapes = generateEnclosureGrid(count, VIA_SIZE, ACTUAL_ENCLOSURE, GAP, metalLayer, viaLayer);
 
-        const auto brute = runBruteForce(shapes, MINIMUM_ENCLOSURE);
+        const auto brute = runBruteForce(shapes, viaLayer, metalLayer, MINIMUM_ENCLOSURE);
         // Calculate Index Build Time (Built once for all rules)
         const auto indexStart = std::chrono::steady_clock::now();
         LayerSpatialIndex spatialIndex(shapes);
         const auto indexEnd = std::chrono::steady_clock::now();
         const double indexBuildMilliseconds = std::chrono::duration<double, std::milli> (indexEnd - indexStart).count();
 
-        const auto spatial = runSpatial(shapes, spatialIndex, MINIMUM_ENCLOSURE);
+        const auto spatial = runSpatial(shapes, spatialIndex, viaLayer, metalLayer, MINIMUM_ENCLOSURE);
 
         if (brute.violationCount != spatial.violationCount)
         {
