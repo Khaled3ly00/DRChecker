@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <vector>
 #include <optional>
+#include <cmath>
 
 #include "drcheck/geometry/Segment.h"
 #include "drcheck/geometry/Point.h"
