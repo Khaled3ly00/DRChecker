@@ -1,5 +1,9 @@
-layer M5
-layer M5
+#layer M1 -map { -layer 15 }
+layer M1 -map { -layer 15 -datatype 0 }
+layer M2 -map { -layer 15 -datatype 0 }
+#layer M1
+#layer M5
+#layer M5
 #rule min_spacing -layer M1 -value
 #rule min_spacing -layer M1 -layer M2 -value 0.25
 #rule min_spacing -layer M1 -something 5 -value 0.25
@@ -8,4 +12,4 @@ layer M5
 #rule min_enclosure -inner CO -options {{}}
 #rule min_spacing -layer m1 -value 0.25
 #rule min_enclosure -inner CO -options {{-outer nullptr -all_sides 0.04}}
-#rule min_spacing -layer M5 -value 0.25
+#rule min_width -layer M1 -value 0.25

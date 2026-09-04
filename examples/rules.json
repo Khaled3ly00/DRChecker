@@ -1,5 +1,11 @@
 {
-  "layers": ["M1", "M2", "VIA1", "CO", "PO"],
+  "layers": [
+    {"name": "M1", "gdsMappings": [{"layer": 15, "datatype": 0}, {"layer": 15, "datatype": 5}]},
+    { "name": "M2", "gdsMappings": [{"layer": 16, "datatype": 0}] },
+    { "name": "VIA1", "gdsMappings": [{"layer": 17, "datatype": 0}] },
+    { "name": "CO", "gdsMappings": [{"layer": 18, "datatype": 0}] },
+    { "name": "PO", "gdsMappings": [{"layer": 19, "datatype": 0}] }
+  ],
   "rules": [
     {
       "type": "MinWidth",

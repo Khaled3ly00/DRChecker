@@ -11,9 +11,17 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <utility>
+#include <vector>
 
 namespace drcheck::io {
 namespace {
+
+#if TCL_MAJOR_VERSION >= 9
+    using TclCountType = Tcl_Size;
+#else
+    using TclCountType = int;
+#endif
 
 struct TclParserContext
 {
@@ -82,11 +90,8 @@ rules::DensityLimit parseDensityLimit(const std::string& limit)
 }
 geometry::BoundingBox parseRegion(Tcl_Interp* interpreter, Tcl_Obj* regionObj)
 {
-    #if TCL_MAJOR_VERSION >= 9
-    Tcl_Size elementCount = 0;
-    #else
-    int elementCount = 0;
-    #endif
+    TclCountType elementCount = 0;
+
     Tcl_Obj** elements = nullptr;
 
     if (Tcl_ListObjGetElements(interpreter, regionObj, &elementCount, &elements) != TCL_OK)
@@ -109,11 +114,7 @@ geometry::BoundingBox parseRegion(Tcl_Interp* interpreter, Tcl_Obj* regionObj)
 
 std::vector<rules::EnclosureOption> parseEnclosureOptions(Tcl_Interp* interpreter, Tcl_Obj* optionsObj, const domain::LayerRegistry& layerRegistry)
 {
-    #if TCL_MAJOR_VERSION >= 9
-    Tcl_Size optionCount = 0;
-    #else
-    int optionCount = 0;
-    #endif
+    TclCountType optionCount = 0;
 
     Tcl_Obj** optionObjects = nullptr;
 
@@ -132,11 +133,7 @@ std::vector<rules::EnclosureOption> parseEnclosureOptions(Tcl_Interp* interprete
 
     for (int i = 0; i < optionCount; ++i)
     {
-        #if TCL_MAJOR_VERSION >= 9
-        Tcl_Size elementCount = 0;
-        #else
-        int elementCount = 0;
-        #endif
+        TclCountType elementCount = 0;
 
         Tcl_Obj** elements = nullptr;
 
@@ -300,16 +297,91 @@ int layerCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_O
 {
     auto* context = static_cast<TclParserContext*>(clientData);
 
-    try
+    if (objc < 4 || (objc - 2) % 2 != 0)
     {
-        if (objc != 2)
+        Tcl_SetObjResult(interpreter, Tcl_NewStringObj("Usage: layer <name> -map {-layer <value> -datatype <value>} [-map {-layer <value> -datatype <value>} ...]", -1));
+        
+        return TCL_ERROR;
+    }
+
+    const std::string layerName = Tcl_GetString(objv[1]);
+
+    std::vector<std::pair<int, int>> gdsMappings;
+
+    for (int i = 2; i < objc; i += 2)
+    {
+        const std::string option = Tcl_GetString(objv[i]);
+
+        if (option != "-map")
         {
-            throw std::invalid_argument("layer requires exactly one layer name");
+            Tcl_SetObjResult(interpreter, Tcl_NewStringObj(("Unknown layer option: " + option).c_str(), -1));
+
+            return TCL_ERROR;
         }
 
-        const std::string layerName = Tcl_GetString(objv[1]);
+        TclCountType mapObjc = 0;
+        Tcl_Obj** mapObjv = nullptr;
 
-        context->layerRegistry->declare(layerName);
+        if (Tcl_ListObjGetElements(interpreter, objv[i + 1], &mapObjc, &mapObjv) != TCL_OK)
+        {
+            return TCL_ERROR;
+        }
+
+        if (mapObjc != 4)
+        {
+            Tcl_SetObjResult(interpreter, Tcl_NewStringObj("GDS map must be {-layer <value> -datatype <value>}", -1)
+            );
+
+            return TCL_ERROR;
+        }
+
+        int gdsLayer = -1;
+        int datatype = -1;
+
+        for (TclCountType j = 0; j < mapObjc; j += 2)
+        {
+            const std::string mapOption = Tcl_GetString(mapObjv[j]);
+
+            if (mapOption == "-layer")
+            {
+                if (Tcl_GetIntFromObj(interpreter, mapObjv[j + 1], &gdsLayer) != TCL_OK)
+                {
+                    return TCL_ERROR;
+                }
+            }
+            else if (mapOption == "-datatype")
+            {
+                if (Tcl_GetIntFromObj(interpreter, mapObjv[j + 1], &datatype) != TCL_OK)
+                {
+                    return TCL_ERROR;
+                }
+            }
+            else
+            {
+                Tcl_SetObjResult(interpreter, Tcl_NewStringObj(("Unknown GDS map option: " + mapOption).c_str(), -1)
+                );
+
+                return TCL_ERROR;
+            }
+        }
+
+        if (gdsLayer < 0 || datatype < 0)
+        {
+            Tcl_SetObjResult(interpreter, Tcl_NewStringObj("GDS map requires non-negative -layer and -datatype values", -1));
+
+            return TCL_ERROR;
+        }
+
+        gdsMappings.emplace_back(gdsLayer, datatype);
+    }
+    try
+    {
+        const domain::Layer* layer = context->layerRegistry->declare(layerName);
+
+        for (const auto& [gdsLayer, datatype] : gdsMappings)
+        {
+            context->layerRegistry->mapGDS(layer, gdsLayer, datatype);
+        }
     }
     catch (const std::exception& exception)
     {

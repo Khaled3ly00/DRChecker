@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.26)
 
 project(DRChecker LANGUAGES CXX)
 
@@ -38,6 +38,103 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(clipper2)
+
+# zlib (gdstk dependency)
+set(ZLIB_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(ZLIB_BUILD_STATIC ON CACHE BOOL "" FORCE)
+set(ZLIB_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(ZLIB_INSTALL ON CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    ZLIB
+    GIT_REPOSITORY https://github.com/madler/zlib.git
+    GIT_TAG v1.3.2
+    OVERRIDE_FIND_PACKAGE
+)
+
+FetchContent_MakeAvailable(ZLIB)
+
+if(NOT TARGET ZLIB::ZLIB)
+    add_library(ZLIB::ZLIB ALIAS zlibstatic)
+endif()
+
+# qhull (gdstk dependency)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_STATIC_LIBS ON CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    qhull
+    GIT_REPOSITORY https://github.com/qhull/qhull.git
+    GIT_TAG v8.0.2
+)
+
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+
+function(add_test)
+    # Intentionally empty: swallows Qhull's internal add_test commands
+endfunction()
+
+FetchContent_MakeAvailable(qhull)
+# Qhull 8.0.2 always defines its applications and test/example targets.
+# DRCheck only needs qhullstatic_r through gdstk.
+foreach(qhull_target
+    qconvex
+    qdelaunay
+    qhalf
+    qhull
+    qvoronoi
+    rbox
+    testqset
+    testqset_r
+    user_eg
+    user_eg2
+    user_eg3
+    qhullstatic
+    qhullcpp
+)
+    if(TARGET ${qhull_target})
+        set_target_properties(
+            ${qhull_target}
+            PROPERTIES
+                EXCLUDE_FROM_ALL TRUE
+        )
+    endif()
+endforeach()
+
+macro(add_test)
+    _add_test(${ARGV})
+endmacro()
+
+add_library(drcheck_qhull INTERFACE)
+
+target_link_libraries(
+    drcheck_qhull
+    INTERFACE
+        qhullstatic_r
+)
+
+target_include_directories(
+    drcheck_qhull
+    INTERFACE
+        ${qhull_SOURCE_DIR}/src
+)
+
+add_library(
+    QHULL::QHULL
+    ALIAS
+    drcheck_qhull
+)
+
+# gdstk
+set(GDSTK_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    gdstk
+    GIT_REPOSITORY https://github.com/heitzmann/gdstk.git
+    GIT_TAG v1.0.1
+)
+
+FetchContent_MakeAvailable(gdstk)
 
 # --------------------------------------------------
 # DRChecker library
@@ -98,6 +195,7 @@ target_link_libraries(drchecker
         nlohmann_json::nlohmann_json
         ${TCL_LIBRARY}
         Clipper2
+        gdstk::gdstk
 )
 
 target_compile_features(drchecker PUBLIC cxx_std_20)

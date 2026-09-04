@@ -68,3 +68,58 @@ TEST(LayerRegistryTest, RejectsEmptyLayerName)
 
     EXPECT_THROW(registry.declare(""), std::invalid_argument);
 }
+
+TEST(LayerRegistryTest, ResolvesGDSMapping)
+{
+    LayerRegistry registry;
+
+    const Layer* M1 = registry.declare("M1");
+
+    registry.mapGDS(M1, 15, 0);
+
+    EXPECT_EQ(registry.resolveGDS(15, 0), M1);
+}
+
+TEST(LayerRegistryTest, AllowsMultipleGDSPairsForSameLayer)
+{
+    LayerRegistry registry;
+
+    const Layer* M1 = registry.declare("M1");
+
+    registry.mapGDS(M1, 15, 0);
+    registry.mapGDS(M1, 15, 1);
+
+    EXPECT_EQ(registry.resolveGDS(15, 0), M1);
+    EXPECT_EQ(registry.resolveGDS(15, 1), M1);
+}
+
+TEST(LayerRegistryTest, RejectsMultipleLayersForSameGDSPair)
+{
+    LayerRegistry registry;
+
+    const Layer* M1 = registry.declare("M1");
+    const Layer* M2 = registry.declare("M2");
+
+    registry.mapGDS(M1, 15, 0);
+
+    EXPECT_THROW(registry.mapGDS(M2, 15, 0), std::invalid_argument);
+}
+
+TEST(LayerRegistryTest, RejectsUnmappedGDSPair)
+{
+    LayerRegistry registry;
+
+    EXPECT_THROW(registry.resolveGDS(99, 0), std::invalid_argument);
+}
+
+TEST(LayerRegistryTest, RejectsLayerFromDifferentRegistry)
+{
+    LayerRegistry firstRegistry;
+    LayerRegistry secondRegistry;
+
+    firstRegistry.declare("M1");
+
+    const Layer* otherM1 = secondRegistry.declare("M1");
+
+    EXPECT_THROW(firstRegistry.mapGDS(otherM1, 15, 0), std::invalid_argument);
+}

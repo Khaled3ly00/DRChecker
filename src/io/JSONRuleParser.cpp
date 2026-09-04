@@ -58,12 +58,51 @@ namespace drcheck::io {
 
         for (const auto& layerJson : json["layers"])
         {
-            if (!layerJson.is_string())
+            if (!layerJson.is_object())
             {
-                throw std::invalid_argument("Each layer declaration must be a string");
+                throw std::invalid_argument("Each layer declaration must be a JSON object");
             }
 
-            layerRegistry.declare(layerJson.get<std::string>());
+            if (!layerJson.contains("name")) {
+                throw std::invalid_argument("Each layer must contain a name");
+            }
+
+            if (!layerJson.contains("gdsMappings") || !layerJson["gdsMappings"].is_array() || layerJson["gdsMappings"].empty())
+            {
+                throw std::invalid_argument("Each layer must contain a non-empty gdsMappings array");
+            }
+
+            const std::string name = layerJson.at("name").get<std::string>();
+
+            const auto& mappings = layerJson.at("gdsMappings");
+
+            for (const auto& mappingJson : mappings)
+            {
+                if (!mappingJson.is_object())
+                {
+                    throw std::invalid_argument("Each GDS mapping must be a JSON object");
+                }
+                if (!mappingJson.contains("layer") || !mappingJson["layer"].is_number_integer())
+                {
+                    throw std::invalid_argument("Each GDS mapping must contain an integer layer");
+                }
+
+                if (!mappingJson.contains("datatype") || !mappingJson["datatype"].is_number_integer())
+                {
+                    throw std::invalid_argument("Each GDS mapping must contain an integer datatype");
+                }
+            }
+
+            // Only declare layer after all validations pass
+            const domain::Layer* layer = layerRegistry.declare(name);
+
+            for (const auto& mappingJson : mappings)
+            {
+                const int gdsLayer = mappingJson.at("layer").get<int>();
+                const int datatype = mappingJson.at("datatype").get<int>();
+
+                layerRegistry.mapGDS(layer, gdsLayer, datatype);
+            }
         }
 
         // Check if JSON contains an array "rules"

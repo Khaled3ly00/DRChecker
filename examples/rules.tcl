@@ -1,8 +1,8 @@
-layer M1
-layer M2
-layer VIA1
-layer CO
-layer PO
+layer M1 -map { -layer 15 -datatype 0 } -map { -layer 15 -datatype 1 }
+layer M2 -map { -layer 16 -datatype 1 }
+layer VIA1 -map { -layer 17 -datatype 2 }
+layer CO -map { -layer 18 -datatype 3 }
+layer PO -map { -layer 19 -datatype 4 }
 
 rule min_spacing -layer M1 -value 0.25
 rule min_spacing -value 0.25 -layer M2

@@ -32,6 +32,8 @@ TEST(TclRuleParserTest, ParsesMinSpacingRule)
 
     EXPECT_EQ(minSpacingRule->getLayer(), registry.resolve("M1"));
     EXPECT_NEAR(minSpacingRule->getMinimumSpacing(), 0.25, EPSILON);
+    EXPECT_EQ(registry.resolveGDS(15, 0), registry.resolve("M1"));
+    EXPECT_EQ(registry.resolveGDS(15, 1), registry.resolve("M1"));
 }
 
 
@@ -48,6 +50,7 @@ TEST(TclRuleParserTest, ParsesMinSpacingOptionsInAnyOrder)
 
     EXPECT_EQ(minSpacingRule->getLayer(), registry.resolve("M2"));
     EXPECT_NEAR(minSpacingRule->getMinimumSpacing(), 0.25, EPSILON);
+    EXPECT_EQ(registry.resolveGDS(16, 1), registry.resolve("M2"));
 }
 
 TEST(TclRuleParserTest, ThrowsOnInvalidRuleOrLayer)

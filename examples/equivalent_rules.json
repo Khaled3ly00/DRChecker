@@ -1,5 +1,10 @@
 {
-  "layers": ["M1", "VIA1"],
+   "layers": [ { "name": "M1", 
+                "gdsMappings": [{"layer": 16, "datatype": 0}] },
+              { "name": "VIA1", 
+                "gdsMappings": [{"layer": 17, "datatype": 0}] } 
+
+  ],
   "rules": [
     {
       "type": "MinWidth",

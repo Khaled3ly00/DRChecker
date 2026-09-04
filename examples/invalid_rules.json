@@ -1,10 +1,12 @@
 {
-  "layers": ["M8"],
+  "layers": [
+    {"name": "M1", "gdsMappings": [{"layer": 15, "datatype": 0}, {"layer": 15, "datatype": 0}]}
+  ],
   "rules": [
     {
       "type": "MinWidth",
       "layer": "M1",
-      "value": 2
+      "value": 2.0
     }
   ]
 }

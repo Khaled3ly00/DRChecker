@@ -27,6 +27,8 @@ TEST(JSONRuleParserTest, ParsingRulesFromJSONTestingMinWidthRuleM1) {
     ASSERT_NE(minWidthRule, nullptr);
     EXPECT_DOUBLE_EQ(minWidthRule->getMinimumWidth(), 3.0);
     EXPECT_EQ(minWidthRule->getLayer(), registry.resolve("M1"));
+    EXPECT_EQ(registry.resolveGDS(15, 0), registry.resolve("M1"));
+    EXPECT_EQ(registry.resolveGDS(15, 5), registry.resolve("M1"));
 }
 
 TEST(JSONRuleParserTest, ParsingRulesFromJSONTestingMinWidthRuleM2) {

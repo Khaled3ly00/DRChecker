@@ -1,5 +1,5 @@
-layer M1
-layer VIA1
+layer M1 -map { -layer 15 -datatype 0 }
+layer VIA1 -map { -layer 17 -datatype 2 }
 
 rule min_width -layer M1 -value 3
 rule min_spacing -layer M1 -value 2
