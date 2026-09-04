@@ -172,6 +172,7 @@ add_library(drchecker
     src/io/SVGReportWriter.cpp
     src/io/TclRuleParser.cpp
     src/io/TclAutomationRunner.cpp
+    src/io/GDSLayoutParser.cpp
 
     # Spatial
     src/spatial/QuadTree.cpp
@@ -254,6 +255,8 @@ if(DRCHECK_BUILD_TESTS)
         tests/io/SVGReportWriterTest.cpp
         tests/io/TclRuleParserTest.cpp
         tests/io/TclAutomationRunnerTest.cpp
+        tests/io/GDSTKIntegrationTest.cpp
+        tests/io/GDSLayoutParserTest.cpp
 
         # EndToEnd Tests
         tests/integration/EndtoEndTest.cpp
@@ -272,6 +275,7 @@ if(DRCHECK_BUILD_TESTS)
             drchecker
             GTest::gtest_main
             nlohmann_json::nlohmann_json
+            gdstk::gdstk
     )
 
     target_compile_definitions(
