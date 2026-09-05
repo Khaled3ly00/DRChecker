@@ -14,6 +14,7 @@ struct DRCRunConfig
     std::string rulesPath;
     std::string reportPath;
     std::optional<std::string> svgPath;
+	std::optional<std::string> topCellName;
 };
 
 class DRCRunner

@@ -15,11 +15,3 @@ rule min_enclosure -inner CO -options {{-outer M1 -all_sides 0.04}}
 rule min_enclosure -inner CO -options {{-outer M1 -all_sides 0.04} {-outer PO -all_sides 0.03}}
 rule min_enclosure -inner CO -options {{-outer M1 -all_sides 0.04 -first_pair 0.00 -second_pair 0.06} {-outer PO -all_sides 0.04 -first_pair 0.00 -second_pair 0.08}}
 rule min_enclosure -inner CO -options {{-outer M1 -all_sides 0.04 -first_pair 0.00 -second_pair 0.06} {-outer PO -all_sides 0.04}}
-
-
-#foreach layer_name {M1 M2} {
-#   set spacing_value 2
-#   rule "min_spacing" \
-#        -layer $layer_name \
-#        -value $spacing_value
-#}

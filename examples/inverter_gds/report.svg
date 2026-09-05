@@ -1,0 +1,645 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: auto; display: block;">
+  <style>
+    .violation-label {
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .violation-overlay:hover .violation-label {
+      visibility: visible;
+    }
+    .violation-overlay {
+      cursor: pointer;
+    }
+    .legend-item.disabled .legend-label {
+      fill: darkgray;
+    }
+    .legend-item.disabled rect {
+      opacity: 0.35;
+    }
+    .violation-list-item.active rect {
+      fill: #ffeaea;
+      stroke: #cc0000;
+    }
+    .violation-list-item.active text {
+      fill: #990000;
+    }
+  </style>
+  <g id="layout">
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 1&#10;Layer: CO</title>
+  <polygon points="750.437,713.46 775.076,713.46 775.076,688.821 750.437,688.821 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 2&#10;Layer: CO</title>
+  <polygon points="806.559,713.46 831.198,713.46 831.198,688.821 806.559,688.821 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 3&#10;Layer: CO</title>
+  <polygon points="862.681,713.46 887.319,713.46 887.319,688.821 862.681,688.821 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 4&#10;Layer: CO</title>
+  <polygon points="918.802,713.46 943.441,713.46 943.441,688.821 918.802,688.821 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 5&#10;Layer: CO</title>
+  <polygon points="974.924,713.46 999.563,713.46 999.563,688.821 974.924,688.821 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 6&#10;Layer: CO</title>
+  <polygon points="750.437,157.719 775.076,157.719 775.076,133.08 750.437,133.08 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 7&#10;Layer: CO</title>
+  <polygon points="806.559,157.719 831.198,157.719 831.198,133.08 806.559,133.08 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 8&#10;Layer: CO</title>
+  <polygon points="862.681,157.719 887.319,157.719 887.319,133.08 862.681,133.08 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 9&#10;Layer: CO</title>
+  <polygon points="918.802,157.719 943.441,157.719 943.441,133.08 918.802,133.08 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 10&#10;Layer: CO</title>
+  <polygon points="974.924,157.719 999.563,157.719 999.563,133.08 974.924,133.08 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 24&#10;Layer: CO</title>
+  <polygon points="750.437,545.095 775.076,545.095 775.076,520.456 750.437,520.456 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 31&#10;Layer: CO</title>
+  <polygon points="862.681,326.084 887.319,326.084 887.319,301.445 862.681,301.445 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 32&#10;Layer: CO</title>
+  <polygon points="974.924,326.084 999.563,326.084 999.563,301.445 974.924,301.445 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 33&#10;Layer: CO</title>
+  <polygon points="750.437,326.084 775.076,326.084 775.076,301.445 750.437,301.445 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 37&#10;Layer: CO</title>
+  <polygon points="887.319,545.095 862.681,545.095 862.681,520.456 887.319,520.456 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 38&#10;Layer: CO</title>
+  <polygon points="999.563,545.095 974.924,545.095 974.924,520.456 999.563,520.456 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 39&#10;Layer: CO</title>
+  <polygon points="918.802,599.848 943.441,599.848 943.441,575.209 918.802,575.209 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 40&#10;Layer: CO</title>
+  <polygon points="806.559,490.342 831.198,490.342 831.198,465.703 806.559,465.703 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 41&#10;Layer: CO</title>
+  <polygon points="918.802,380.837 943.441,380.837 943.441,356.198 918.802,356.198 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="CO">
+    <title>Shape ID: 42&#10;Layer: CO</title>
+  <polygon points="806.559,380.837 831.198,380.837 831.198,356.198 806.559,356.198 " fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="M1">
+    <title>Shape ID: 11&#10;Layer: M1</title>
+  <polygon points="1025.57,675.133 1000.93,675.133 1000.93,612.167 1000.93,587.529 1000.93,521.825 1000.93,508.137 998.194,508.137 987.243,508.137 973.555,508.137 973.555,521.825 973.555,562.89 943.441,562.89 918.802,562.89 916.065,562.89 916.065,612.167 973.555,612.167 973.555,675.133 776.445,675.133 776.445,521.825 776.445,508.137 773.707,508.137 762.757,508.137 749.068,508.137 749.068,521.825 749.068,675.133 724.43,675.133 724.43,727.148 750.437,727.148 999.563,727.148 1025.57,727.148 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="M1">
+    <title>Shape ID: 12&#10;Layer: M1</title>
+  <polygon points="776.445,171.407 973.555,171.407 973.555,337.034 1000.93,337.034 1000.93,171.407 1025.57,171.407 1025.57,119.392 1000.93,119.392 973.555,119.392 776.445,119.392 749.068,119.392 724.43,119.392 724.43,171.407 749.068,171.407 749.068,337.034 776.445,337.034 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="M1">
+    <title>Shape ID: 13&#10;Layer: M1</title>
+  <polygon points="888.688,290.494 887.319,290.494 862.681,290.494 861.312,290.494 861.312,556.046 888.688,556.046 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="M1">
+    <title>Shape ID: 18&#10;Layer: M1</title>
+  <polygon points="944.81,343.878 943.441,343.878 918.802,343.878 917.433,343.878 917.433,447.909 944.81,447.909 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="M1">
+    <title>Shape ID: 19&#10;Layer: M1</title>
+  <polygon points="832.567,343.878 831.198,343.878 806.559,343.878 805.19,343.878 805.19,502.662 832.567,502.662 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="M2">
+    <title>Shape ID: 14&#10;Layer: M2</title>
+  <polygon points="843.517,436.958 955.76,436.958 955.76,409.582 906.483,409.582 843.517,409.582 794.24,409.582 794.24,436.958 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="NP">
+    <title>Shape ID: 20&#10;Layer: NP</title>
+  <polygon points="750.437,86.5399 691.578,86.5399 691.578,204.259 750.437,204.259 999.563,204.259 1058.42,204.259 1058.42,86.5399 999.563,86.5399 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="NP">
+    <title>Shape ID: 25&#10;Layer: NP</title>
+  <polygon points="890.057,642.281 1043.37,642.281 1043.37,423.27 818.878,423.27 706.635,423.27 706.635,642.281 " fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="NW">
+    <title>Shape ID: 22&#10;Layer: NW</title>
+  <polygon points="1068,250.798 1104.96,250.798 1104.96,40 999.563,40 750.437,40 645.038,40 645.038,250.798 681.996,250.798 681.996,394.525 1068,394.525 " fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="OD">
+    <title>Shape ID: 16&#10;Layer: OD</title>
+  <polygon points="750.437,677.871 727.167,677.871 727.167,724.411 750.437,724.411 999.563,724.411 1022.83,724.411 1022.83,677.871 999.563,677.871 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="OD">
+    <title>Shape ID: 17&#10;Layer: OD</title>
+  <polygon points="750.437,122.129 727.167,122.129 727.167,168.669 750.437,168.669 999.563,168.669 1022.83,168.669 1022.83,122.129 999.563,122.129 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="OD">
+    <title>Shape ID: 23&#10;Layer: OD</title>
+  <polygon points="783.289,549.202 810.665,549.202 827.091,549.202 854.468,549.202 854.468,553.308 895.532,553.308 895.532,549.202 922.909,549.202 939.335,549.202 966.711,549.202 966.711,553.308 1007.78,553.308 1007.78,512.243 966.711,512.243 966.711,516.35 939.335,516.35 922.909,516.35 895.532,516.35 895.532,512.243 854.468,512.243 854.468,516.35 827.091,516.35 810.665,516.35 783.289,516.35 783.289,512.243 742.224,512.243 742.224,553.308 783.289,553.308 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="OD">
+    <title>Shape ID: 30&#10;Layer: OD</title>
+  <polygon points="783.289,330.19 810.665,330.19 827.091,330.19 854.468,330.19 854.468,334.297 895.532,334.297 895.532,330.19 939.335,330.19 966.711,330.19 966.711,334.297 1007.78,334.297 1007.78,293.232 966.711,293.232 966.711,297.338 939.335,297.338 895.532,297.338 895.532,293.232 854.468,293.232 854.468,297.338 827.091,297.338 810.665,297.338 783.289,297.338 783.289,293.232 742.224,293.232 742.224,334.297 783.289,334.297 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PDK">
+    <title>Shape ID: 26&#10;Layer: PDK</title>
+  <polygon points="914.696,613.536 1068,613.536 1068,452.015 794.24,452.015 681.996,452.015 681.996,613.536 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PO">
+    <title>Shape ID: 15&#10;Layer: PO</title>
+  <polygon points="827.091,502.662 833.935,502.662 833.935,453.384 803.821,453.384 803.821,502.662 810.665,502.662 810.665,516.35 810.665,549.202 810.665,587.529 827.091,587.529 827.091,549.202 827.091,516.35 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PO">
+    <title>Shape ID: 28&#10;Layer: PO</title>
+  <polygon points="827.091,259.011 810.665,259.011 810.665,297.338 810.665,330.19 810.665,343.878 803.821,343.878 803.821,393.156 833.935,393.156 833.935,343.878 827.091,343.878 827.091,330.19 827.091,297.338 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PO">
+    <title>Shape ID: 29&#10;Layer: PO</title>
+  <polygon points="939.335,259.011 922.909,259.011 922.909,297.338 922.909,330.19 922.909,343.878 916.065,343.878 916.065,393.156 946.179,393.156 946.179,343.878 939.335,343.878 939.335,330.19 939.335,297.338 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PO">
+    <title>Shape ID: 36&#10;Layer: PO</title>
+  <polygon points="939.335,478.023 922.909,478.023 922.909,516.35 922.909,549.202 922.909,562.89 916.065,562.89 916.065,612.167 946.179,612.167 946.179,562.89 939.335,562.89 939.335,549.202 939.335,516.35 " fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PP">
+    <title>Shape ID: 21&#10;Layer: PP</title>
+  <polygon points="750.437,642.281 691.578,642.281 691.578,760 750.437,760 999.563,760 1058.42,760 1058.42,642.281 999.563,642.281 " fill="coral" fill-opacity="0.35" stroke="coral" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="PP">
+    <title>Shape ID: 34&#10;Layer: PP</title>
+  <polygon points="706.635,423.27 1043.37,423.27 1043.37,204.259 706.635,204.259 " fill="coral" fill-opacity="0.35" stroke="coral" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="VIA1">
+    <title>Shape ID: 43&#10;Layer: VIA1</title>
+  <polygon points="805.19,436.958 832.567,436.958 832.567,409.582 805.19,409.582 " fill="orange" fill-opacity="0.35" stroke="orange" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="VIA1">
+    <title>Shape ID: 44&#10;Layer: VIA1</title>
+  <polygon points="917.433,436.958 944.81,436.958 944.81,409.582 917.433,409.582 " fill="orange" fill-opacity="0.35" stroke="orange" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="VTL_N">
+    <title>Shape ID: 27&#10;Layer: VTL_N</title>
+  <polygon points="877.738,593.004 989.981,593.004 989.981,472.548 872.262,472.548 760.019,472.548 760.019,593.004 " fill="violet" fill-opacity="0.35" stroke="violet" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="VTL_P">
+    <title>Shape ID: 35&#10;Layer: VTL_P</title>
+  <polygon points="760.019,373.992 989.981,373.992 989.981,253.536 760.019,253.536 " fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+  </g>
+  </g>
+  <g id="violations">
+    <g id="violation-0" class="violation-overlay" data-layers="PO NP" style="display: none;">
+  <g>
+    <line class="violation-marker" x1="818.878" y1="453.384" x2="818.878" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="818.878" cy="453.384" r="4" fill="red" />
+    <circle class="violation-point" cx="818.878" cy="423.27" r="4" fill="red" />
+    <text class="violation-label" x="818.878" y="431.327" font-size="14" text-anchor="middle" fill="red"><tspan x="818.878">Enclosure PO With NP</tspan><tspan x="818.878" dy="16">0.11/0.15</tspan></text>
+  </g>
+    </g>
+    <g id="violation-1" class="violation-overlay" data-layers="PO PP" style="display: none;">
+  <g>
+    <line class="violation-marker" x1="803.821" y1="393.156" x2="803.821" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="803.821" cy="393.156" r="4" fill="red" />
+    <circle class="violation-point" cx="803.821" cy="423.27" r="4" fill="red" />
+    <text class="violation-label" x="803.821" y="401.213" font-size="14" text-anchor="middle" fill="red"><tspan x="803.821">Enclosure PO With PP</tspan><tspan x="803.821" dy="16">0.11/0.15</tspan></text>
+  </g>
+    </g>
+    <g id="violation-2" class="violation-overlay" data-layers="PO PP" style="display: none;">
+  <g>
+    <line class="violation-marker" x1="916.065" y1="393.156" x2="916.065" y2="423.27" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="916.065" cy="393.156" r="4" fill="red" />
+    <circle class="violation-point" cx="916.065" cy="423.27" r="4" fill="red" />
+    <text class="violation-label" x="916.065" y="401.213" font-size="14" text-anchor="middle" fill="red"><tspan x="916.065">Enclosure PO With PP</tspan><tspan x="916.065" dy="16">0.11/0.15</tspan></text>
+  </g>
+    </g>
+    <g id="violation-3" class="violation-overlay" data-layers="PO NP" style="display: none;">
+  <g>
+    <line class="violation-marker" x1="916.065" y1="612.167" x2="916.065" y2="642.281" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="916.065" cy="612.167" r="4" fill="red" />
+    <circle class="violation-point" cx="916.065" cy="642.281" r="4" fill="red" />
+    <text class="violation-label" x="916.065" y="620.224" font-size="14" text-anchor="middle" fill="red"><tspan x="916.065">Enclosure PO With NP</tspan><tspan x="916.065" dy="16">0.11/0.15</tspan></text>
+  </g>
+    </g>
+  </g>
+  <g id="violation-list">
+    <rect x="40" y="40" width="300" height="720" fill="#fafafa" stroke="#cccccc" stroke-width="1" />
+    <text x="50" y="60" font-size="20" font-weight="bold" fill="black">Violations: 4</text>
+    <g class="panel-button" onclick="showAllViolations()" style="cursor: pointer;">
+      <rect x="50" y="70" width="80" height="24" fill="#eeeeee" stroke="#999999" stroke-width="1" />
+      <text x="90" y="86" font-size="12" text-anchor="middle" fill="black">Show All</text>
+    </g>
+    <g class="panel-button" onclick="hideAllViolations()" style="cursor: pointer;">
+      <rect x="140" y="70" width="80" height="24" fill="#eeeeee" stroke="#999999" stroke-width="1" />
+      <text x="180" y="86" font-size="12" text-anchor="middle" fill="black">Hide All</text>
+    </g>
+    <g id="violation-item-0" class="violation-list-item" data-violation-id="violation-0" data-message="Minimum Enclosure violation: PO enclosed by NP required 0.150000 actual 0.110000" data-page="0" data-layers="PO NP" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="96" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="114" font-size="12" fill="black">1. Enclosure PO-NP 0.11/0.15</text>
+    </g>
+    <g id="violation-item-1" class="violation-list-item" data-violation-id="violation-1" data-message="Minimum Enclosure violation: PO enclosed by PP required 0.150000 actual 0.110000" data-page="0" data-layers="PO PP" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="128" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="146" font-size="12" fill="black">2. Enclosure PO-PP 0.11/0.15</text>
+    </g>
+    <g id="violation-item-2" class="violation-list-item" data-violation-id="violation-2" data-message="Minimum Enclosure violation: PO enclosed by PP required 0.150000 actual 0.110000" data-page="0" data-layers="PO PP" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="160" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="178" font-size="12" fill="black">3. Enclosure PO-PP 0.11/0.15</text>
+    </g>
+    <g id="violation-item-3" class="violation-list-item" data-violation-id="violation-3" data-message="Minimum Enclosure violation: PO enclosed by NP required 0.150000 actual 0.110000" data-page="0" data-layers="PO NP" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="192" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="210" font-size="12" fill="black">4. Enclosure PO-NP 0.11/0.15</text>
+    </g>
+    <text x="60" y="740" font-size="13" fill="#555555" style="cursor: pointer;" onclick="previousViolationPage()">Prev</text>
+    <text id="violation-page-indicator" x="190" y="740" font-size="13" text-anchor="middle" fill="black">1 / 1</text>
+    <text x="295" y="740" font-size="13" fill="#555555" style="cursor: pointer;" onclick="nextViolationPage()">Next</text>
+    <rect x="50" y="630" width="280" height="80" fill="#fafafa" stroke="#cccccc" stroke-width="1" rx="4" />
+    <text x="58" y="648" font-size="13" font-weight="bold" fill="black">Violation Details</text>
+    <text id="violation-details-text" x="58" y="670" font-size="13" fill="#555555">Select a violation</text>
+  </g>
+  <g id="layer-legend">
+    <text x="1450" y="40" font-size="20" font-weight="bold" fill="black">Layers</text>
+    <text id="toggle-all-layers" x="1515" y="40" font-size="15" fill="#555555" text-decoration="underline" style="cursor: pointer;" onclick="toggleAllLayers()">Hide All</text>
+    <g class="legend-item" data-layer="CO" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="65" width="18" height="18" fill="limegreen" fill-opacity="0.35" stroke="limegreen" stroke-width="2" />
+      <text class="legend-label" x="1478" y="80" font-size="14" fill="black">CO</text>
+    </g>
+    <g class="legend-item" data-layer="M1" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="95" width="18" height="18" fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+      <text class="legend-label" x="1478" y="110" font-size="14" fill="black">M1</text>
+    </g>
+    <g class="legend-item" data-layer="M2" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="125" width="18" height="18" fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+      <text class="legend-label" x="1478" y="140" font-size="14" fill="black">M2</text>
+    </g>
+    <g class="legend-item" data-layer="NP" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="155" width="18" height="18" fill="green" fill-opacity="0.35" stroke="green" stroke-width="2" />
+      <text class="legend-label" x="1478" y="170" font-size="14" fill="black">NP</text>
+    </g>
+    <g class="legend-item" data-layer="NW" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="185" width="18" height="18" fill="red" fill-opacity="0.35" stroke="red" stroke-width="2" />
+      <text class="legend-label" x="1478" y="200" font-size="14" fill="black">NW</text>
+    </g>
+    <g class="legend-item" data-layer="OD" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="215" width="18" height="18" fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+      <text class="legend-label" x="1478" y="230" font-size="14" fill="black">OD</text>
+    </g>
+    <g class="legend-item" data-layer="PDK" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="245" width="18" height="18" fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+      <text class="legend-label" x="1478" y="260" font-size="14" fill="black">PDK</text>
+    </g>
+    <g class="legend-item" data-layer="PO" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="275" width="18" height="18" fill="cyan" fill-opacity="0.35" stroke="cyan" stroke-width="2" />
+      <text class="legend-label" x="1478" y="290" font-size="14" fill="black">PO</text>
+    </g>
+    <g class="legend-item" data-layer="PP" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="305" width="18" height="18" fill="coral" fill-opacity="0.35" stroke="coral" stroke-width="2" />
+      <text class="legend-label" x="1478" y="320" font-size="14" fill="black">PP</text>
+    </g>
+    <g class="legend-item" data-layer="VIA1" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="335" width="18" height="18" fill="orange" fill-opacity="0.35" stroke="orange" stroke-width="2" />
+      <text class="legend-label" x="1478" y="350" font-size="14" fill="black">VIA1</text>
+    </g>
+    <g class="legend-item" data-layer="VTL_N" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="365" width="18" height="18" fill="violet" fill-opacity="0.35" stroke="violet" stroke-width="2" />
+      <text class="legend-label" x="1478" y="380" font-size="14" fill="black">VTL_N</text>
+    </g>
+    <g class="legend-item" data-layer="VTL_P" onclick="toggleLayer(this)" style="cursor: pointer;">
+    <rect x="1450" y="395" width="18" height="18" fill="yellowgreen" fill-opacity="0.35" stroke="yellowgreen" stroke-width="2" />
+      <text class="legend-label" x="1478" y="410" font-size="14" fill="black">VTL_P</text>
+    </g>
+  </g>
+  <script><![CDATA[
+    let currentViolationPage = 0;
+    const totalViolationPages = 1;
+
+function setWrappedSvgText(textElement, message, maxWidth, lineHeight, maxLines) {
+    while (textElement.firstChild) {
+        textElement.removeChild(textElement.firstChild);
+    }
+
+    const x = textElement.getAttribute('x');
+    const words = message.split(/\s+/);
+
+    let line = '';
+    let lineCount = 0;
+    let tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+
+    tspan.setAttribute('x', x);
+    tspan.setAttribute('dy', '0');
+    textElement.appendChild(tspan);
+
+    for (let i = 0; i < words.length; ++i) {
+        const testLine = line === '' ? words[i] : line + ' ' + words[i];
+        tspan.textContent = testLine;
+
+        if (tspan.getComputedTextLength() > maxWidth && line !== '') {
+            tspan.textContent = line;
+            lineCount++;
+
+            if (lineCount >= maxLines) {
+                let truncated = line;
+
+                while (truncated.length > 0) {
+                    tspan.textContent = truncated + '...';
+
+                    if (tspan.getComputedTextLength() <= maxWidth) {
+                        break;
+                    }
+
+                    truncated = truncated.slice(0, -1);
+                }
+
+                return;
+            }
+
+            line = words[i];
+
+            tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+            tspan.setAttribute('x', x);
+            tspan.setAttribute('dy', lineHeight);
+            tspan.textContent = line;
+            textElement.appendChild(tspan);
+        }
+        else {
+            line = testLine;
+        }
+    }
+
+    tspan.textContent = line;
+}
+
+function setViolationDetails(message) {
+    const details = document.getElementById('violation-details-text');
+
+    if (!details) {
+        return;
+    }
+
+    const text = message && message.trim() !== ''
+        ? message
+        : 'Select a violation';
+
+    setWrappedSvgText(details, text, 260, 14, 4);
+}
+
+function toggleViolation(item) {
+    const violationId = item.dataset.violationId;
+    const overlay = document.getElementById(violationId);
+
+    if (!overlay) {
+        return;
+    }
+
+    const isActive = item.classList.toggle('active');
+
+    overlay.style.display = isActive ? '' : 'none';
+
+    if (isActive) {
+        setViolationDetails(item.dataset.message);
+    }
+    else {
+        const activeItems =
+            document.querySelectorAll('.violation-list-item.active');
+
+        if (activeItems.length === 0) {
+            setViolationDetails('Select a violation');
+        }
+        else {
+            setViolationDetails('Multiple violations selected');
+        }
+    }
+}
+
+function showAllViolations() {
+    document.querySelectorAll('.violation-list-item').forEach(function(item) {
+        item.classList.add('active');
+
+        const overlay = document.getElementById(item.dataset.violationId);
+
+        if (overlay && item.style.display !== 'none') {
+            overlay.style.display = '';
+        }
+    });
+
+    setViolationDetails('All violations are shown');
+}
+
+function hideAllViolations() {
+    document.querySelectorAll('.violation-list-item').forEach(function(item) {
+        item.classList.remove('active');
+
+        const overlay = document.getElementById(item.dataset.violationId);
+
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+    });
+
+    setViolationDetails('Select a violation');
+}
+    function getHiddenLayers() {
+      const hiddenLayers = new Set();
+
+      document.querySelectorAll('.legend-item.disabled').forEach(function(item) {
+        hiddenLayers.add(item.dataset.layer);
+      });
+
+      return hiddenLayers;
+    }
+
+    function itemUsesHiddenLayer(item, hiddenLayers) {
+      const layersText = item.dataset.layers || '';
+      const layers = layersText === '' ? [] : layersText.split(' ');
+
+      return layers.some(function(layer) {
+        return hiddenLayers.has(layer);
+      });
+    }
+
+    function updateViolationListVisibility(hiddenLayers) {
+      document.querySelectorAll('.violation-list-item').forEach(function(item) {
+        const hiddenByLayer = itemUsesHiddenLayer(item, hiddenLayers);
+        const onCurrentPage = Number(item.dataset.page) === currentViolationPage;
+
+        item.style.display = !hiddenByLayer && onCurrentPage ? '' : 'none';
+
+        if (hiddenByLayer) {
+          item.classList.remove('active');
+        }
+
+        // Pagination only changes the list; selected overlays stay visible
+        // across pages unless their layer is hidden.
+        const overlay = document.getElementById(item.dataset.violationId);
+        if (overlay) {
+          const showOverlay = !hiddenByLayer && item.classList.contains('active');
+          overlay.style.display = showOverlay ? '' : 'none';
+        }
+      });
+    }
+
+    function updateLayerVisibility() {
+      const hiddenLayers = getHiddenLayers();
+
+      document.querySelectorAll('.shape').forEach(function(shape) {
+        const layer = shape.dataset.layer || '';
+        shape.style.display = hiddenLayers.has(layer) ? 'none' : '';
+      });
+
+      updateViolationListVisibility(hiddenLayers);
+    }
+
+    function updateViolationPage() {
+      updateViolationListVisibility(getHiddenLayers());
+
+      const indicator = document.getElementById('violation-page-indicator');
+      if (indicator) {
+        indicator.textContent =
+          (currentViolationPage + 1) + ' / ' + totalViolationPages;
+      }
+    }
+
+    function nextViolationPage() {
+      if (currentViolationPage + 1 < totalViolationPages) {
+        currentViolationPage++;
+        updateViolationPage();
+      }
+    }
+
+    function previousViolationPage() {
+      if (currentViolationPage > 0) {
+        currentViolationPage--;
+        updateViolationPage();
+      }
+    }
+
+    function updateToggleAllText() {
+      const legendItems = document.querySelectorAll('.legend-item');
+      const toggleText = document.getElementById('toggle-all-layers');
+
+      if (!toggleText || legendItems.length === 0) {
+        return;
+      }
+
+      const allHidden = Array.from(legendItems).every(function(item) {
+        return item.classList.contains('disabled');
+      });
+
+      toggleText.textContent = allHidden ? 'Show All' : 'Hide All';
+    }
+
+    function toggleAllLayers() {
+      const legendItems = document.querySelectorAll('.legend-item');
+
+      const allHidden = Array.from(legendItems).every(function(item) {
+        return item.classList.contains('disabled');
+      });
+
+      legendItems.forEach(function(item) {
+        if (allHidden) {
+          item.classList.remove('disabled');
+        }
+        else {
+          item.classList.add('disabled');
+        }
+      });
+
+      updateLayerVisibility();
+      updateToggleAllText();
+    }
+
+    function toggleLayer(legendItem) {
+      legendItem.classList.toggle('disabled');
+      updateLayerVisibility();
+      updateToggleAllText();
+    }
+
+    const svg = document.documentElement;
+
+    const originalWidth = 1600;
+    const originalHeight = 800;
+
+    let viewX = 0;
+    let viewY = 0;
+    let viewWidth = originalWidth;
+    let viewHeight = originalHeight;
+
+    const MIN_ZOOM_FACTOR = 0.1;
+
+    svg.addEventListener('wheel', function(event) {
+      event.preventDefault();
+
+      const rect = svg.getBoundingClientRect();
+
+      const mouseX = viewX +
+        ((event.clientX - rect.left) / rect.width) * viewWidth;
+
+      const mouseY = viewY +
+        ((event.clientY - rect.top) / rect.height) * viewHeight;
+
+      let zoomFactor = event.deltaY < 0 ? 0.9 : 1.1;
+      let newWidth = viewWidth * zoomFactor;
+      const minWidth = originalWidth * MIN_ZOOM_FACTOR;
+
+      if (newWidth < minWidth) {
+        newWidth = minWidth;
+      }
+
+      if (newWidth > originalWidth) {
+        newWidth = originalWidth;
+      }
+
+      zoomFactor = newWidth / viewWidth;
+
+      const newHeight = viewHeight * zoomFactor;
+
+      viewX = mouseX - (mouseX - viewX) * zoomFactor;
+      viewY = mouseY - (mouseY - viewY) * zoomFactor;
+
+      viewWidth = newWidth;
+      viewHeight = newHeight;
+
+      if (viewWidth == originalWidth) {
+        viewX = 0;
+        viewY = 0;
+        viewHeight = originalHeight;
+      }
+
+      svg.setAttribute(
+        'viewBox',
+        viewX + ' ' + viewY + ' ' + viewWidth + ' ' + viewHeight
+      );
+    }, { passive: false });
+
+    function resetView() {
+      viewX = 0;
+      viewY = 0;
+      viewWidth = originalWidth;
+      viewHeight = originalHeight;
+
+      svg.setAttribute(
+        'viewBox',
+        '0 0 ' + originalWidth + ' ' + originalHeight
+      );
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'f' || event.key === 'F') {
+        resetView();
+      }
+    });
+  ]]></script>
+</svg>

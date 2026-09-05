@@ -1,25 +1,25 @@
 #Layer definitions
-layer NW
-layer NP
-layer PP
-layer M1
-layer M1_PIN
-layer VIA1
-layer M2
-layer M2_PIN
-layer VIA2
-layer M3
-layer M3_PIN
-layer VIA3
-layer M4
-layer M4_PIN
-layer PO
-layer OD
-layer CO
-layer PDK
-layer VTL_N
-layer VTL_P
-layer prBoundary
+layer NW        -map {-layer 1  -datatype 0}
+layer NP        -map {-layer 2  -datatype 0}
+layer PP        -map {-layer 3  -datatype 0}
+layer M1        -map {-layer 4  -datatype 0}
+layer M1_PIN    -map {-layer 5  -datatype 0}
+layer VIA1      -map {-layer 6  -datatype 0}
+layer M2        -map {-layer 7  -datatype 0}
+layer M2_PIN    -map {-layer 8  -datatype 0}
+layer VIA2      -map {-layer 9  -datatype 0}
+layer M3        -map {-layer 10 -datatype 0}
+layer M3_PIN    -map {-layer 11 -datatype 0}
+layer VIA3      -map {-layer 12 -datatype 0}
+layer M4        -map {-layer 13 -datatype 0}
+layer M4_PIN    -map {-layer 14 -datatype 0}
+layer PO        -map {-layer 15 -datatype 0}
+layer OD        -map {-layer 16 -datatype 0}
+layer CO        -map {-layer 17 -datatype 0}
+layer PDK       -map {-layer 18 -datatype 0}
+layer VTL_N     -map {-layer 19 -datatype 0}
+layer VTL_P     -map {-layer 20 -datatype 0}
+layer prBoundary -map {-layer 21 -datatype 0}
 
 #Rule definitions
 rule min_spacing -layer NW -value 0.47

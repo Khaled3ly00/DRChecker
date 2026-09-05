@@ -1,5 +1,6 @@
 #include "drcheck/layout/LayoutNormalizer.h"
 #include <clipper2/clipper.h>
+#include "drcheck/geometry/Constants.h"
 
 #include <queue>
 #include <stdexcept>
@@ -104,8 +105,11 @@ namespace drcheck::layout {
 
             // Query only spatially nearby shapes on the same layer.
             // Shapes that touch or overlap current must have overlapping
-            // bounding boxes, so no expansion is required here.
-            const auto candidates = spatialIndex.query(current->getLayer(), current->getPolygon().getBoundingBox());
+            // bounding boxes, 
+            // Expand the broad-phase search region by the geometry tolerance.
+            // GDS transformations can produce mathematically identical coordinates
+            // with tiny floating-point differences.
+            const auto candidates = spatialIndex.query(current->getLayer(), current->getPolygon().getBoundingBox().expanded(geometry::EPSILON));
 
             for (const domain::Shape* candidate : candidates)
             {

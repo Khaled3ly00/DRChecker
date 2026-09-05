@@ -7,6 +7,7 @@
 #include "drcheck/io/TclRuleParser.h"
 #include "drcheck/layout/LayoutNormalizer.h"
 #include "drcheck/domain/LayerRegistry.h"
+#include "drcheck/io/GDSLayoutParser.h"
 
 #include <filesystem>
 
@@ -18,22 +19,42 @@ std::vector<domain::Violation> DRCRunner::run(const DRCRunConfig& config)
 
     std::vector<std::unique_ptr<rules::Rule>> rules;
 
-    const std::string extension = std::filesystem::path(config.rulesPath).extension().string();
+    const std::string rulesExtension = std::filesystem::path(config.rulesPath).extension().string();
 
-    if (extension == ".json")
+    if (rulesExtension == ".json")
     {
         rules = io::JSONRuleParser::load(config.rulesPath, layerRegistry);
     }
-    else if (extension == ".tcl")
+    else if (rulesExtension == ".tcl")
     {
         rules = io::TclRuleParser::load(config.rulesPath, layerRegistry);
     }
     else
     {
-        throw std::invalid_argument("Unsupported rule file format: " + extension);
+        throw std::invalid_argument("Unsupported rule file format: " + rulesExtension);
     }
 
-    const auto rawShapes = io::JSONLayoutParser::load(config.layoutPath, layerRegistry);
+    std::vector<domain::Shape> rawShapes;
+
+    const std::string layoutExtension = std::filesystem::path(config.layoutPath).extension().string();
+
+    if (layoutExtension == ".gds" || layoutExtension == ".gdsii")
+    {
+        rawShapes = io::GDSLayoutParser::load(config.layoutPath, layerRegistry, config.topCellName);
+    }
+    else if (layoutExtension == ".json")
+    {
+        if (config.topCellName.has_value())
+        {
+            throw std::invalid_argument("Top-level cell selection is only supported for GDSII layouts");
+        }
+
+        rawShapes = io::JSONLayoutParser::load(config.layoutPath, layerRegistry);
+    } 
+    else
+    {
+        throw std::invalid_argument("Unsupported layout file format: " + layoutExtension);
+    }
 
     const auto shapes = layout::LayoutNormalizer::normalize(rawShapes);
 

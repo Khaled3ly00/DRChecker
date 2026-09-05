@@ -60,7 +60,7 @@ namespace drcheck::domain {
 
         if (gdsMappings.contains(key))
         {
-            throw std::invalid_argument("GDS layer/datatype pair is already mapped");
+            throw std::invalid_argument("GDS layer/datatype pair is already mapped" + std::to_string(gdsLayer) + "/" + std::to_string(datatype));
         }
 
         gdsMappings.emplace(key, layer);

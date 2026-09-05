@@ -292,14 +292,14 @@ int ruleCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Ob
 
     return TCL_OK;
 }
-
+// Usage: layer <name> -map {-layer <value> -datatype <value>} [-map {-layer <value> -datatype <value>}]
 int layerCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Obj* const objv[])
 {
     auto* context = static_cast<TclParserContext*>(clientData);
 
     if (objc < 4 || (objc - 2) % 2 != 0)
     {
-        Tcl_SetObjResult(interpreter, Tcl_NewStringObj("Usage: layer <name> -map {-layer <value> -datatype <value>} [-map {-layer <value> -datatype <value>} ...]", -1));
+        Tcl_SetObjResult(interpreter, Tcl_NewStringObj("Usage: layer <name> -map {-layer <value> -datatype <value>} [-map {-layer <value> -datatype <value>}] ...", -1));
         
         return TCL_ERROR;
     }

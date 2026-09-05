@@ -5,7 +5,7 @@
 using drcheck::engine::DRCRunner;
 using drcheck::engine::DRCRunConfig;
 
-TEST(DRCRunnerTest, RunsDRCAndWritesReport)
+TEST(DRCRunnerTest, RunsDRCAndWritesReportJSONLayout)
 {
     DRCRunConfig config;
 
@@ -13,9 +13,42 @@ TEST(DRCRunnerTest, RunsDRCAndWritesReport)
 
     config.rulesPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/rules.tcl";
 
-    config.reportPath = std::string(DRCHECK_SOURCE_DIR) + "/build/test_report.json";
+    config.reportPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/test_report.json";
 
     const auto violations = DRCRunner::run(config);
 
     EXPECT_FALSE(violations.empty());
+}
+
+TEST(DRCRunnerTest, RunsDRCAndWritesReportGDSLayout)
+{
+    DRCRunConfig config;
+
+    config.layoutPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/basic_layout.gds";
+
+    config.rulesPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/rules.tcl";
+
+    config.reportPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/gds_report.json";
+
+    const auto violations = DRCRunner::run(config);
+
+    EXPECT_TRUE(violations.empty());
+}
+
+
+TEST(DRCRunnerTest, RunsDRCAndWritesReportGDSLayoutMultipleTopCells)
+{
+    DRCRunConfig config;
+
+    config.layoutPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/multiple_top_cells_layout.gds";
+
+	config.topCellName = "TOP_A";
+
+    config.rulesPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/rules.tcl";
+
+    config.reportPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/gds_report.json";
+
+    const auto violations = DRCRunner::run(config);
+
+    EXPECT_TRUE(violations.empty());
 }

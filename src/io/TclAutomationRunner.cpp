@@ -17,7 +17,7 @@ struct AutomationContext
     std::vector<domain::Violation> violations;
 };
 
-// drc_run -layout layoutPath -rules rulesPath -report reportPath -svg svgPath
+// drc_run -layout layoutPath -rules rulesPath -report reportPath [-svg svgPath] [-top topCellName]
 int drcRunCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_Obj* const objv[])
 {
     auto* context = static_cast<AutomationContext*>(clientData);
@@ -66,7 +66,7 @@ int drcRunCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_
 
         for (const auto& [option, value] : options)
         {
-            if (option != "-layout" && option != "-rules" && option != "-report" && option != "-svg")
+            if (option != "-layout" && option != "-rules" && option != "-report" && option != "-svg" && option != "-top")
             {
                 throw std::invalid_argument("Unknown drc_run option: " + option);
             }
@@ -81,7 +81,10 @@ int drcRunCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_
         {
             config.svgPath = options.at("-svg");
         }
-
+        if (options.contains("-top"))
+        {
+            config.topCellName = options.at("-top");
+        }
         context->violations = engine::DRCRunner::run(config);
 
         return TCL_OK;

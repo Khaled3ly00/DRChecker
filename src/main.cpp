@@ -9,7 +9,7 @@
 
 int main(int argc, char* argv[])
 {
-    // Usage: drcheck --layout layout.json --rules rules.tcl --report report.json [--svg report.svg]
+    // Usage: drcheck --layout <layout.json|layout.gds> --rules <rules.json|rules.tcl> --report <report.json> [--svg <report.svg>] [--top <topCellName>]"
     try
     {
         if (argc >= 2 && std::string(argv[1]) == "--script" && argc != 3)
@@ -31,6 +31,7 @@ int main(int argc, char* argv[])
         std::string rulesPath;
         std::string reportPath;
         std::string svgPath;
+        std::string topCellName;
 
         for (int i = 1; i < argc; i += 2)
         {
@@ -58,10 +59,29 @@ int main(int argc, char* argv[])
             {
                 svgPath = value;
             }
+            else if (argument == "--top")
+            {
+                topCellName = value;
+            }
             else
             {
-                throw std::invalid_argument("Usage: drcheck --layout layout.json --rules rules.tcl --report report.json [--svg report.svg]");
+                throw std::invalid_argument("Usage: drcheck --layout <layout.json|layout.gds> --rules <rules.json|rules.tcl> --report <report.json> [--svg <report.svg>] [--top <topCellName>]");
             }
+        }
+
+        if (layoutPath.empty())
+        {
+            throw std::invalid_argument("Missing required argument: --layout");
+        }
+
+        if (rulesPath.empty())
+        {
+            throw std::invalid_argument("Missing required argument: --rules");
+        }
+
+        if (reportPath.empty())
+        {
+            throw std::invalid_argument("Missing required argument: --report");
         }
 
         drcheck::engine::DRCRunConfig config;
@@ -73,7 +93,10 @@ int main(int argc, char* argv[])
         {
             config.svgPath = svgPath;
         }
-
+        if (!topCellName.empty())
+        {
+            config.topCellName = topCellName;
+        }
         const auto violations = drcheck::engine::DRCRunner::run(config);
 
         std::cout

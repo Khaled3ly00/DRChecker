@@ -1,18 +1,18 @@
 #Layer definitions
-layer NW
-layer NP
-layer PP
-layer M1
-layer M1_PIN
-layer VIA1
-layer M2
-layer M2_PIN
-layer PO
-layer OD
-layer CO
-layer PDK
-layer VTL_N
-layer VTL_P
+layer NW        -map {-layer 1  -datatype 0}
+layer NP        -map {-layer 2  -datatype 0}
+layer PP        -map {-layer 3  -datatype 0}
+layer M1        -map {-layer 4  -datatype 0}
+layer M1_PIN    -map {-layer 5  -datatype 0}
+layer VIA1      -map {-layer 6  -datatype 0}
+layer M2        -map {-layer 7  -datatype 0}
+layer M2_PIN    -map {-layer 8  -datatype 0}
+layer PO        -map {-layer 15 -datatype 0}
+layer OD        -map {-layer 16 -datatype 0}
+layer CO        -map {-layer 17 -datatype 0}
+layer PDK       -map {-layer 18 -datatype 0}
+layer VTL_N     -map {-layer 19 -datatype 0}
+layer VTL_P     -map {-layer 20 -datatype 0}
 
 
 #Rule definitions
