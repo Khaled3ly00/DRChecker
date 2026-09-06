@@ -215,8 +215,8 @@ namespace drcheck::io {
 
             reference->get_polygons(
                 true,   // Expand repetitions / AREFs
-                false,  // Do not include paths yet
-                -1,      // Depth: include all nested reference levels
+                true,   // Include paths yet
+                -1,     // Depth: include all nested reference levels
                 false,  // No layer filter
                 0,      // Ignored because filter == false
                 referencedPolygons

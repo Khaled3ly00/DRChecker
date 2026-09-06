@@ -706,3 +706,212 @@ TEST(GDSLayoutParserTest, RejectsUnknownRequestedTopLevelCell)
 
     std::filesystem::remove(filePath);
 }
+
+TEST(GDSLayoutParserTest, ImportsPathInsideReferencedCell)
+{
+    const std::string filePath = "gds_unknown_top_cell_test.gds";
+    gdstk::Library library{};
+    library.init("TEST_LIBRARY", 1e-6, 1e-9);
+
+    auto* child = static_cast<gdstk::Cell*>(gdstk::allocate_clear(sizeof(gdstk::Cell)));
+    child->init("CHILD");
+
+    auto* top = static_cast<gdstk::Cell*>(gdstk::allocate_clear(sizeof(gdstk::Cell)));
+    top->init("TOP");
+
+    auto* path = static_cast<gdstk::FlexPath*>(gdstk::allocate_clear(sizeof(gdstk::FlexPath)));
+
+    path->init(
+        { 0.0, 0.0 },
+        1, 2.0, 0.0, 1e-3,
+        gdstk::make_tag(15, 0)
+    );
+    path->simple_path = true;
+    path->elements[0].end_type = gdstk::EndType::Flush;
+    path->segment(
+        gdstk::Vec2{ 10.0, 0.0 },
+        nullptr, nullptr, false);
+
+    child->flexpath_array.append(path);
+
+    auto* reference = static_cast<gdstk::Reference*>(gdstk::allocate_clear(sizeof(gdstk::Reference)));
+    reference->init(child);
+    reference->origin = { 20.0, 30.0 };
+
+    top->reference_array.append(reference);
+
+    library.cell_array.append(child);
+    library.cell_array.append(top);
+
+    library.write_gds(filePath.c_str(), 0, nullptr);
+
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
+    registry.mapGDS(M1, 15, 0);
+
+    const auto shapes = GDSLayoutParser::load(filePath, registry, "TOP");
+
+    ASSERT_EQ(shapes.size(), 1);
+
+    const auto box = shapes[0].getPolygon().getBoundingBox();
+
+    EXPECT_NEAR(box.getMinX(), 20.0, EPSILON);
+    EXPECT_NEAR(box.getMaxX(), 30.0, EPSILON);
+
+    EXPECT_NEAR(box.getMinY(), 29.0, EPSILON);
+    EXPECT_NEAR(box.getMaxY(), 31.0, EPSILON);
+
+    library.free_all();
+    std::filesystem::remove(filePath);
+}
+
+TEST(GDSLayoutParserTest, ImportsPathInsideNestedReferencedCell)
+{
+    const std::string filePath = "gds_nested_referenced_path_test.gds";
+
+    gdstk::Library library{};
+    library.init("TEST_LIBRARY", 1e-6, 1e-9);
+
+    auto* child = static_cast<gdstk::Cell*>(gdstk::allocate_clear(sizeof(gdstk::Cell)));
+    child->init("CHILD");
+
+    auto* middle = static_cast<gdstk::Cell*>(gdstk::allocate_clear(sizeof(gdstk::Cell)));
+    middle->init("MIDDLE");
+
+    auto* top = static_cast<gdstk::Cell*>(gdstk::allocate_clear(sizeof(gdstk::Cell)));
+    top->init("TOP");
+
+    auto* path = static_cast<gdstk::FlexPath*>(gdstk::allocate_clear(sizeof(gdstk::FlexPath)));
+
+    path->init(
+        { 0.0, 0.0 },
+        1, 2.0, 0.0, 1e-3,
+        gdstk::make_tag(15, 0)
+    );
+
+    path->simple_path = true;
+    path->elements[0].end_type = gdstk::EndType::Flush;
+
+    path->segment(
+        gdstk::Vec2{ 10.0, 0.0 },
+        nullptr, nullptr, false
+    );
+
+    child->flexpath_array.append(path);
+
+    auto* childReference = static_cast<gdstk::Reference*>(gdstk::allocate_clear(sizeof(gdstk::Reference)));
+    childReference->init(child);
+    childReference->origin = { 10.0, 0.0 };
+
+    middle->reference_array.append(childReference);
+
+    auto* middleReference = static_cast<gdstk::Reference*>(gdstk::allocate_clear(sizeof(gdstk::Reference)));
+
+    middleReference->init(middle);
+    middleReference->origin = { 20.0, 30.0 };
+
+    top->reference_array.append(middleReference);
+
+    library.cell_array.append(child);
+    library.cell_array.append(middle);
+    library.cell_array.append(top);
+
+    ASSERT_EQ(library.write_gds(filePath.c_str(), 0, nullptr), gdstk::ErrorCode::NoError);
+
+    library.free_all();
+
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
+    registry.mapGDS(M1, 15, 0);
+
+    const auto shapes = GDSLayoutParser::load(filePath, registry, "TOP");
+
+    ASSERT_EQ(shapes.size(), 1);
+
+    const auto box = shapes[0].getPolygon().getBoundingBox();
+
+    EXPECT_NEAR(box.getMinX(), 30.0, EPSILON);
+    EXPECT_NEAR(box.getMaxX(), 40.0, EPSILON);
+
+    EXPECT_NEAR(box.getMinY(), 29.0, EPSILON);
+    EXPECT_NEAR(box.getMaxY(), 31.0, EPSILON);
+
+    std::filesystem::remove(filePath);
+}
+
+TEST(GDSLayoutParserTest, ImportsPathInsideArrayReference)
+{
+    const std::string filePath = "gds_array_referenced_path_test.gds";
+
+    gdstk::Library library{};
+    library.init("TEST_LIBRARY", 1e-6, 1e-9);
+
+    auto* child = static_cast<gdstk::Cell*>(gdstk::allocate_clear(sizeof(gdstk::Cell)));
+    child->init("CHILD");
+
+    auto* top = static_cast<gdstk::Cell*>(gdstk::allocate_clear(sizeof(gdstk::Cell)));
+    top->init("TOP");
+
+    auto* path = static_cast<gdstk::FlexPath*>(gdstk::allocate_clear(sizeof(gdstk::FlexPath)));
+
+    path->init(
+        { 0.0, 0.0 },
+        1, 2.0, 0.0, 1e-3,
+        gdstk::make_tag(15, 0)
+    );
+    path->simple_path = true;
+    path->elements[0].end_type = gdstk::EndType::Flush;
+    path->segment(
+        gdstk::Vec2{ 10.0, 0.0 },
+        nullptr, nullptr, false
+    );
+
+    child->flexpath_array.append(path);
+
+    auto* reference =
+        static_cast<gdstk::Reference*>(gdstk::allocate_clear(sizeof(gdstk::Reference)));
+
+    reference->init(child);
+    reference->origin = { 0.0, 0.0 };
+    reference->repetition.type = gdstk::RepetitionType::Rectangular;
+    reference->repetition.columns = 2;
+    reference->repetition.rows = 1;
+    reference->repetition.spacing = { 20.0, 0.0 };
+
+    top->reference_array.append(reference);
+
+    library.cell_array.append(child);
+    library.cell_array.append(top);
+
+    ASSERT_EQ(library.write_gds(filePath.c_str(), 0, nullptr), gdstk::ErrorCode::NoError);
+
+    library.free_all();
+
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+
+    registry.mapGDS(M1, 15, 0);
+
+    const auto shapes = GDSLayoutParser::load(filePath, registry, "TOP");
+
+    ASSERT_EQ(shapes.size(), 2);
+
+    const auto firstBox = shapes[0].getPolygon().getBoundingBox();
+    const auto secondBox = shapes[1].getPolygon().getBoundingBox();
+
+    EXPECT_NEAR(firstBox.getMinX(), 0.0, EPSILON);
+    EXPECT_NEAR(firstBox.getMaxX(), 10.0, EPSILON);
+
+    EXPECT_NEAR(firstBox.getMinY(), -1.0, EPSILON);
+    EXPECT_NEAR(firstBox.getMaxY(), 1.0, EPSILON);
+
+    EXPECT_NEAR(secondBox.getMinX(), 20.0, EPSILON);
+    EXPECT_NEAR(secondBox.getMaxX(), 30.0, EPSILON);
+
+    EXPECT_NEAR(secondBox.getMinY(), -1.0, EPSILON);
+    EXPECT_NEAR(secondBox.getMaxY(), 1.0, EPSILON);
+
+    std::filesystem::remove(filePath);
+}
