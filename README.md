@@ -10,7 +10,7 @@ DRCheck is a C++ Design Rule Checker for IC layouts. The project focuses on mode
 
 The current end-to-end application and integration tooling can:
 
-- load polygon layout geometry from DRCheck GDSII files or JSON files;
+- load octilinear polygon layout geometry from GDSII or JSON files;
 - load rule and logical-layer definitions from JSON or Tcl decks;
 - map exact GDSII layer/datatype pairs to runtime logical layers;
 - convert GDSII paths to polygons at the top level and throughout nested SREF/AREF hierarchy, applying translation, rotation, reflection, and magnification;
@@ -19,7 +19,7 @@ The current end-to-end application and integration tooling can:
 - normalize connected same-layer polygons before DRC execution;
 - translate parsed rule parameters into validated polymorphic rules through a central factory;
 - run the complete DRC/report workflow directly or from Tcl automation scripts;
-- run minimum-width, minimum-spacing, minimum-enclosure, and per-layer minimum/maximum density rules;
+- run minimum-width, minimum-spacing, minimum-enclosure, and per-layer minimum/maximum density rules, including width and spacing checks on 45-degree geometry;
 - check missing enclosure and configure alternative outer layers with all-sides or opposite-pair requirements from C++, JSON, or Tcl;
 - build one shared, layer-aware spatial index for a rule run;
 - report actual and required rule values;
@@ -38,6 +38,8 @@ The geometry core, shape model, runtime `Layer`/`LayerRegistry` domain, direct G
 
 Before the engine sees a layout, `DRCRunner` passes the parsed shapes through `LayoutNormalizer`. Overlapping or boundary-connected polygons on the same layer are combined into physical connected components, preventing artificial spacing, width, and enclosure results at seams between source figures.
 
+The accepted layout domain is now explicitly octilinear: every `Shape` polygon may use horizontal, vertical, and positive or negative 45-degree edges. `Polygon::minWidth()` evaluates parallel edge pairs in their own projected coordinate system, extending minimum-width DRC beyond Manhattan geometry while retaining the boundary witness points and edge indices used by reports. The existing closest-point spacing calculation is orientation-independent and is now covered by 45-degree vertex-to-vertex and parallel-edge cases.
+
 Rule construction is separated from rule-deck decoding. `JSONRuleParser` and `TclRuleParser` validate and convert their input fields into `RuleParameters`, then delegate concrete rule creation and required-parameter validation to `RuleFactory`.
 
 Minimum-enclosure configuration now supports both the legacy single-layer form and a list of `EnclosureOption` alternatives. Each alternative can require a scalar all-boundary minimum or accept all-sides enclosure OR either orientation of an opposite-pair requirement. Inner shapes with no relevant allowed outer geometry are reported again rather than silently ignored.
@@ -49,35 +51,40 @@ Detailed benchmark methodology, results, and QuadTree tuning data have moved to 
 ## Architecture
 
 ```text
-rules.json / rules.tcl
-        |
-        v
-JSONRuleParser / TclRuleParser
-        |                     \
-        |                      +--> RuleParameters --> RuleFactory --> vector<Rule> --+
-        v                                                                             |
-LayerRegistry                                                                         |
-logical identities + exact GDS layer/datatype mappings                                |
-        |                                                                             |
-        +-------------------------------+                                             |
-        |                               |                                             |
-        v                               v                                             |
-JSONLayoutParser                 GDSLayoutParser (gdstk)                              |
-layout.json                      layout.gds / layout.gdsii                            |
-named-layer resolution           hierarchy expansion + stream mapping                 |
-        |                               |                                             |
-        +---------------+---------------+                                             |
-                        |                                                             |
-                        v                                                             |
-                LayoutNormalizer                                                      |
-                Clipper2 polygon union                                                |
-                        |                                                             |
-                        +---------------------> DRCEngine <----------------------------+
+                                         rules.json / rules.tcl
+                                                    |
+                                                    v
+                                     JSONRuleParser / TclRuleParser
+                                                    |
+                                                    v
+                                               LayerRegistry
+                               logical layers + exact GDS layer/datatype mappings
+                                                    |
+                                                    v
+                        +--------------------------------------------------------+
+                        |                                                        |
+                        |                                                        v
+                        |                                                  RuleParameters
+                        |                                                        |
+        +--------------OR---------------+                                        |
+        |                               |                                        v
+        v                               v                                   RuleFactory
+JSONLayoutParser                GDSLayoutParser (gdstk)                          |
+  layout.json                      layout.gds / layout.gdsii                     |
+named-layer resolution           hierarchy expansion + stream mapping            v
+        |                               |                                   vector<Rule>
+        +---------------+---------------+                                        |
+                        |                                                        |
+                        v                                                        |
+                LayoutNormalizer                                                 |
+                 vector<Shape>                                                   |
+                        |                                                        |
+                        +---------------------> DRCEngine <----------------------+
                                                    |
                                                    | builds once per run
                                                    v
                                            LayerSpatialIndex
-                                           one QuadTree per populated layer
+                                    one QuadTree per populated layer
                                                    |
                                                    | shared read-only access
                                   +----------------+------------+-------------+
@@ -142,7 +149,7 @@ There is no compiled-in layer vocabulary. The selected JSON or Tcl rule deck def
 
 `Shape` stores its ID, a non-owning pointer to its canonical registered `Layer`, and its `Polygon`. Two shapes are considered to share a layer when they reference the same registry-owned object, not because each carries an independently copied string or enum value.
 
-Undeclared layer names, missing required shape fields, non-numeric vertices, unsupported units, and invalid polygons are rejected with exceptions rather than silently normalized.
+Undeclared layer names, missing required shape fields, non-numeric vertices, unsupported units, invalid polygons, and polygons containing edges outside the supported 0/45/90-degree directions are rejected with exceptions rather than silently normalized. This `Shape`-level check applies consistently to geometry originating from either JSON or GDSII.
 
 ### GDSII layouts
 
@@ -569,7 +576,8 @@ The geometry layer is isolated under `drcheck::geometry` and contains no rule or
 - coordinate and vector storage;
 - vector construction between points;
 - orientation tests;
-- length, dot product, and cross product.
+- length, dot product, and cross product; and
+- unit-vector normalization, with explicit rejection of zero-length vectors.
 
 ### `BoundingBox`
 
@@ -583,7 +591,9 @@ The geometry layer is isolated under `drcheck::geometry` and contains no rule or
 - constructor rejection of degenerate segments;
 - point containment and segment intersection;
 - point-to-segment and segment-to-segment distance;
-- closest-point witness calculation.
+- closest-point witness calculation;
+- tolerance-aware horizontal and vertical classification; and
+- scale-aware parallelism detection for same-direction and opposite-direction segments.
 
 ### `Polygon`
 
@@ -594,12 +604,15 @@ The geometry layer is isolated under `drcheck::geometry` and contains no rule or
 - polygon intersection and polygon-to-polygon distance;
 - positive-area polygon overlap detection through `overlaps()`;
 - positive-length shared-boundary detection through `sharesBoundarySegment()` without treating vertex-only contact as an edge connection;
-- minimum width for orthogonal polygons;
+- orthogonal and octilinear classification;
+- minimum width for orthogonal, 45-degree, mixed-edge, and concave octilinear polygons;
 - rectangular-inner/orthogonal-outer directional enclosure through `pairwiseEnclosure()`;
 - polygon area clipped to an axis-aligned bounding box through `areaInsideWindow()`; and
 - detailed edge-pair and closest-point results.
 
 Detailed measurements preserve the geometry that produced them. `DistanceResult` stores the distance and closest points, while `PolygonEdgePairResult` also identifies the corresponding polygon edges. Rules select only the witness data needed by their reports: width violations retain points and edge indices, while spacing and enclosure violations retain the closest-point pair without edge indices.
+
+`isOctilinear()` accepts polygon edges that are horizontal, vertical, or have equal absolute X and Y changes within `geometry::EPSILON`; this covers both 45-degree diagonal directions. For minimum width, `minWidth()` considers parallel edges with positive projected overlap, measures their perpendicular separation, and keeps only candidates whose midpoint lies inside the polygon. The smallest valid separation is returned with its two witness points and edge indices. If no valid edge pair can be found, the calculation throws `std::logic_error`.
 
 `contains(const Polygon&, bool includeBoundary = false)` now defaults to strict containment. Passing `true` allows boundary touching or shared boundary segments while still rejecting proper crossings. The point overload retains its boundary-inclusive default. `MinEnclosureRule` explicitly requests boundary-inclusive polygon containment so touching geometry can be measured and evaluated against the configured requirement.
 
@@ -611,7 +624,7 @@ The calculation considers outer edges with positive projected overlap against th
 
 `Layer` is now a runtime domain object identified by its name rather than a compile-time enum. A `LayerRegistry` owns every layer declared by one rule deck, rejects empty and duplicate declarations, and resolves a name to the same canonical `const Layer*` on every lookup. It also maps validated exact GDSII layer/datatype pairs to those canonical objects, allowing several stream pairs to select one logical layer while rejecting a pair assigned more than once. Its heap-owned layer objects retain stable addresses even if the registry's internal map grows. The registry is deliberately non-copyable and non-movable so those identities cannot be invalidated accidentally.
 
-`Shape` combines a unique ID, a non-null layer pointer, and a polygon. Rules, enclosure options, violation markers, and `LayerSpatialIndex` use the same pointer identity. These pointers are non-owning, so the `LayerRegistry` must outlive every object produced from it; `DRCRunner` enforces that lifetime for a complete application run.
+`Shape` combines a unique ID, a non-null layer pointer, and an octilinear polygon. Construction rejects a null layer or any polygon edge outside the supported horizontal, vertical, and 45-degree directions. Rules, enclosure options, violation markers, and `LayerSpatialIndex` use the same pointer identity. These pointers are non-owning, so the `LayerRegistry` must outlive every object produced from it; `DRCRunner` enforces that lifetime for a complete application run.
 
 A `Violation` records:
 
@@ -665,7 +678,7 @@ For pairwise enclosure, small negative side clearances in `[-DRC_LENGTH_TOLERANC
 
 ### `MinWidthRule`
 
-Checks shapes on one target layer using the orthogonal-polygon minimum-width calculation. When a violation is found, the detailed width result supplies the two boundary witnesses used by its marker.
+Checks shapes on one target layer using the octilinear minimum-width calculation. Parallel edge pairs are compared through vector projection rather than separate horizontal and vertical cases, so the same rule supports Manhattan polygons, 45-degree polygons, and polygons mixing both edge families. When a violation is found, the detailed width result supplies the two boundary witnesses and edge indices used by its marker.
 
 ### `MinSpacingRule`
 
@@ -675,6 +688,8 @@ For every shape on the target layer, the rule:
 2. queries that layer through the shared `LayerSpatialIndex`;
 3. removes self-pairs and duplicate A-B/B-A pairs; and
 4. calls `Polygon::distanceTo()` for exact spacing and the closest-point witness pair.
+
+Because the narrow-phase distance calculation operates on general segments rather than axis-specific cases, the same rule also handles octilinear polygons separated vertex-to-vertex, vertex-to-edge, or along parallel 45-degree edges.
 
 ```text
 target-layer shape
@@ -865,13 +880,13 @@ Run the full suite through CTest:
 ctest --test-dir build --output-on-failure
 ```
 
-The test suite covers geometry invariants and algorithms, JSON, GDSII, and Tcl parser validation, factory construction and validation, rule behavior, report serialization, SVG output, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end rule-deck processing. `LayerRegistryTest` verifies declaration, canonical repeated resolution, distinct identity for different names, exact GDSII mapping resolution, several stream pairs selecting one logical layer, and rejection of empty, duplicate, undeclared, foreign-registry, unmapped, or conflicting mappings. Domain coverage verifies `Shape` ID, registered layer pointer, and polygon storage, while JSON layout-parser coverage verifies caller-supplied shape IDs and resolution through a caller-provided registry. The runtime layer model is exercised throughout the engine, rules, parsers, spatial index, reports, benchmarks, and end-to-end inputs. `RuleFactoryTest` verifies construction of every supported rule type, representative missing-parameter rejection, and unknown-type rejection. `JSONRuleParserTest` verifies logical-layer declarations with GDSII mappings and the JSON parser-to-factory path for width, spacing, enclosure, minimum/maximum density, and density with an explicit analysis window. Density coverage also includes target-layer filtering, inferred analysis bounds, empty-layout behavior, partial edge windows, region markers, report integration, SVG highlighting, and execution through `DRCEngine` alongside existing rules.
+The test suite covers geometry invariants and algorithms, JSON, GDSII, and Tcl parser validation, factory construction and validation, rule behavior, report serialization, SVG output, QuadTree operations, layer isolation in `LayerSpatialIndex`, engine orchestration, violation-marker consistency, and end-to-end rule-deck processing. `LayerRegistryTest` verifies declaration, canonical repeated resolution, distinct identity for different names, exact GDSII mapping resolution, several stream pairs selecting one logical layer, and rejection of empty, duplicate, undeclared, foreign-registry, unmapped, or conflicting mappings. Domain coverage verifies `Shape` ID, registered layer pointer, polygon storage, and rejection of non-octilinear geometry, while JSON layout-parser coverage verifies caller-supplied shape IDs and resolution through a caller-provided registry. The runtime layer model is exercised throughout the engine, rules, parsers, spatial index, reports, benchmarks, and end-to-end inputs. `RuleFactoryTest` verifies construction of every supported rule type, representative missing-parameter rejection, and unknown-type rejection. `JSONRuleParserTest` verifies logical-layer declarations with GDSII mappings and the JSON parser-to-factory path for width, spacing, enclosure, minimum/maximum density, and density with an explicit analysis window. Density coverage also includes target-layer filtering, inferred analysis bounds, empty-layout behavior, partial edge windows, region markers, report integration, SVG highlighting, and execution through `DRCEngine` alongside existing rules.
 
 `TclRuleParserTest` covers deck-defined layers with repeatable exact GDSII mappings, all supported Tcl rule families, option-order independence, minimum and maximum density, optional density regions, and invalid rule/layer rejection. The end-to-end suite loads equivalent JSON and Tcl decks, resolves their layouts and rules through each deck's registry, runs each through `DRCEngine`, and compares rule counts, violation counts, violation types, participating shape IDs, and actual/required values.
 
-`GDSTKIntegrationTest` confirms that the linked library can read and write GDSII metadata and identify top-level cells. `GDSLayoutParserTest` covers mapped and unmapped stream pairs, polygon and path import, paths inside direct and nested SREFs and AREFs, deterministic IDs, automatic and explicit top-level selection, transformed SREFs, nested references, AREF repetition, and recursive-hierarchy rejection. `DRCRunnerTest` exercises the shared end-to-end workflow with both JSON and GDSII layouts, including a selected top-level cell. `TclAutomationRunnerTest` verifies a complete `drc_run`, the latest-run result returned to C++, multiple independent runs in one script, `drc_error_count` checks inside Tcl, and generation of both reports from a two-run script.
+`GDSTKIntegrationTest` confirms that the linked library can read and write GDSII metadata and identify top-level cells. `GDSLayoutParserTest` covers mapped and unmapped stream pairs, polygon and supported path import under the octilinear shape restriction, paths inside direct and nested SREFs and AREFs, deterministic IDs, automatic and explicit top-level selection, transformed SREFs, nested references, AREF repetition, and recursive-hierarchy rejection. `DRCRunnerTest` exercises the shared end-to-end workflow with both JSON and GDSII layouts, including a selected top-level cell. `TclAutomationRunnerTest` verifies a complete `drc_run`, the latest-run result returned to C++, multiple independent runs in one script, `drc_error_count` checks inside Tcl, and generation of both reports from a two-run script.
 
-`PolygonTest` now distinguishes positive-area overlap, shared boundary segments, vertex-only contact, strict/boundary-inclusive polygon containment, four directional enclosure values, zero clearance on an opposite pair, and rectangular geometry with extra collinear vertices. `LayoutNormalizerTest` covers overlapping polygons, full and partial shared boundaries, rejected vertex-only contact, separated and cross-layer shapes, transitive three-shape merging, and tolerance-expanded broad-phase queries for tiny floating-point differences introduced by GDSII transformations.
+`VectorTest` covers normalization and zero-length rejection. `SegmentTest` covers tolerance-aware orientation, parallelism across horizontal, vertical, positive/negative 45-degree, and opposite-direction segments, plus 45-degree closest-point distances. `PolygonTest` now covers octilinear classification; width for positive and negative 45-degree rectangles, mixed orthogonal/diagonal geometry, and a concave octilinear polygon; 45-degree vertex-to-vertex and edge-to-edge distance; positive-area overlap; shared boundary segments; vertex-only contact; strict/boundary-inclusive polygon containment; four directional enclosure values; zero clearance on an opposite pair; and rectangular geometry with extra collinear vertices. `MinSpacingRuleTest` includes a parallel 45-degree polygon violation. `LayoutNormalizerTest` covers overlapping polygons, full and partial shared boundaries, rejected vertex-only contact, separated and cross-layer shapes, transitive three-shape merging, and tolerance-expanded broad-phase queries for tiny floating-point differences introduced by GDSII transformations.
 
 `MinEnclosureRuleTest` covers zero-distance intersecting candidates, restored missing/outside enclosure violations, acceptance through either outer-layer `OR` alternative, and a failed first option superseded by a passing second option. Pairwise coverage includes the all-sides alternative, both opposite-pair orientations, touching-side acceptance, below-threshold rejection, failure when no alternative passes, and selection of the all-sides or pairwise failure closest to passing.
 
@@ -988,7 +1003,7 @@ See `examples/` for sample inputs.
 
 ### GDSII inverter example
 
-`examples/inverter_gds/` contains a GDSII inverter layout, its Tcl layer/rule deck, and checked-in JSON and interactive SVG reports. Run the source GDSII directly with:
+`examples/inverter_gds/` contains a GDSII inverter layout, its Tcl layer/rule deck, and checked-in JSON and interactive SVG reports. The deck maps routing and pin-purpose stream pairs separately: `M1_PIN` through `M9_PIN` use their own logical layers instead of being folded into `M1` through `M9`, allowing the report's existing `_PIN` visualization to distinguish pin geometry. Run the source GDSII directly with:
 
 ```bash
 drcheck --layout examples/inverter_gds/inverter.gds --rules examples/inverter_gds/rules.tcl --report inverter_gds_report.json --svg inverter_gds_report.svg
@@ -1051,7 +1066,7 @@ This section lists user-facing capabilities that are reasonable to expect from a
 - GDSII mappings support exact layer/datatype pairs only. One logical layer can select multiple pairs, but datatype ranges and mapping one source pair to multiple logical layers are not supported. Every rule-deck layer currently requires at least one mapping, including runs that use a JSON layout, and encountering an unmapped imported GDSII pair stops the import rather than skipping it.
 - GDSII references are flattened into shapes before normalization and DRC; hierarchical checking and source-cell provenance in reports are not retained.
 - The implemented rule-deck families are minimum width, same-layer minimum spacing, minimum enclosure, and density. Other foundry checks are not accepted as rule types, and minimum spacing cannot compare two different layers.
-- Minimum-width checking supports Manhattan/orthogonal polygons only; non-Manhattan width is not implemented.
+- Layout shapes are limited to octilinear polygons: edges may be horizontal, vertical, or at positive/negative 45 degrees. Arbitrary-angle edges and curved boundaries, including polygons generated by round-ended GDSII paths, are rejected rather than approximated as supported geometry.
 - Pairwise enclosure requires an axis-aligned rectangular inner polygon and an orthogonal outer polygon. Its options support all-sides requirements and orientation-independent opposite-pair alternatives, but not arbitrary Boolean combinations or requirements permanently assigned to horizontal versus vertical sides.
 - Density rules use square, axis-aligned windows on a fixed grid. Rectangular or rotated windows, explicit grid offsets, and adaptive or multiscale sampling are not supported.
 - Layout normalization cannot represent holes or a multi-contour union result in one `Shape`; such a union is rejected. It also replaces input IDs with sequential normalized IDs, and reports do not provide a mapping back to the source-shape IDs.
@@ -1065,7 +1080,6 @@ This section lists user-facing capabilities that are reasonable to expect from a
 - richer logical GDSII layer selection, including datatype ranges, one source pair feeding multiple logical layers, and configurable handling of unmapped geometry;
 - broader GDSII element coverage beyond polygons and paths;
 - AI-assisted translation from natural-language requirements into executable design rules;
-- minimum-width support for non-Manhattan polygons;
 - sweep-line optimization for geometry-intensive rule checks;
 - richer Tcl result queries, filtering, and run-history support as concrete workflows require them;
 
@@ -1081,6 +1095,7 @@ DRCheck is intended to demonstrate strong C++ design and EDA-oriented problem so
 - JSON and Tcl rule-deck front ends sharing the same registry, factory, and engine;
 - reusable end-to-end DRC execution shared by direct CLI and Tcl automation;
 - direct JSON and GDSII layout inputs that share the same normalization, rule, and report pipeline;
+- an explicit octilinear geometry domain with 45-degree minimum-width and spacing support;
 - a practical optional Cadence Virtuoso-to-JSON integration path;
 - connected-component polygon normalization before rule evaluation;
 - explicit layer context in violation markers;

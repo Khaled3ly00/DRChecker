@@ -440,3 +440,40 @@ TEST(MinSpacingRuleTest, DetectsContainedPolygon)
 	// Distance can be retrieved as we calculate distance between 2 points
 	EXPECT_NEAR(Point::vectorBetween(marker.firstPoint.value(), marker.secondPoint.value()).length(), 2.0, EPSILON);
 }
+
+TEST(MinSpacingRuleTest, DetectsViolationBetweenFortyFiveDegreePolygons)
+{
+	LayerRegistry registry;
+	const Layer* M1 = registry.declare("M1");
+
+	const double offset = std::sqrt(2.0);
+
+	Polygon firstPolygon({
+		Point(0.0, 0.0),
+		Point(4.0, 4.0),
+		Point(3.0, 5.0),
+		Point(-1.0, 1.0)
+		});
+
+	Polygon secondPolygon({
+		Point(0.0, 2.0 + offset),
+		Point(4.0, 6.0 + offset),
+		Point(3.0, 7.0 + offset),
+		Point(-1.0, 3.0 + offset)
+		});
+
+	Shape first(1, M1, std::move(firstPolygon));
+	Shape second(2, M1, std::move(secondPolygon));
+
+	const std::vector<Shape> shapes{first, second};
+
+	LayerSpatialIndex spatialIndex(shapes);
+	MinSpacingRule rule(M1, 2.0);
+
+	const auto violations = rule.check(shapes, spatialIndex);
+
+	ASSERT_EQ(violations.size(), 1);
+	EXPECT_EQ(violations[0].getType(), ViolationType::MinSpacing);
+	EXPECT_NEAR(violations[0].getActualValue(), 1.0, EPSILON);
+	EXPECT_NEAR(violations[0].getRequiredValue(), 2.0, EPSILON);
+}

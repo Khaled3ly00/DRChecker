@@ -484,3 +484,72 @@ TEST(SegmentTest, NearlyParallelSegmentsWithinToleranceAreParallel)
 
     EXPECT_TRUE(first.isParallelTo(second));
 }
+
+TEST(SegmentTest, DistanceBetweenFortyFiveDegreeSegmentsVertexToVertex)
+{
+    Segment first(
+        Point(0.0, 0.0),
+        Point(2.0, 2.0)
+    );
+
+    Segment second(
+        Point(3.0, 3.0),
+        Point(5.0, 5.0)
+    );
+
+    const DistanceResult result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, std::sqrt(2.0), EPSILON);
+
+    EXPECT_NEAR(result.firstPoint.getX(), 2.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 2.0, EPSILON);
+
+    EXPECT_NEAR(result.secondPoint.getX(), 3.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 3.0, EPSILON);
+}
+
+TEST(SegmentTest, DistanceBetweenFortyFiveDegreeSegmentsVertexToEdge)
+{
+    Segment first(
+        Point(0.0, 0.0),
+        Point(2.0, 2.0)
+    );
+
+    Segment second(
+        Point(2.0, 4.0),
+        Point(6.0, 0.0)
+    );
+
+    const DistanceResult result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, std::sqrt(2.0), EPSILON);
+
+    EXPECT_NEAR(result.firstPoint.getX(), 2.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 2.0, EPSILON);
+
+    EXPECT_NEAR(result.secondPoint.getX(), 3.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 3.0, EPSILON);
+}
+
+TEST(SegmentTest, DistanceBetweenParallelFortyFiveDegreeSegments)
+{
+    Segment first(
+        Point(0.0, 0.0),
+        Point(4.0, 4.0)
+    );
+
+    Segment second(
+        Point(0.0, 2.0),
+        Point(4.0, 6.0)
+    );
+
+    const DistanceResult result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, std::sqrt(2.0), EPSILON);
+
+    EXPECT_NEAR(result.firstPoint.getX(), 1.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 1.0, EPSILON);
+
+    EXPECT_NEAR(result.secondPoint.getX(), 0.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 2.0, EPSILON);
+}

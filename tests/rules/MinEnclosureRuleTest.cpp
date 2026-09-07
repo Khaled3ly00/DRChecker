@@ -866,3 +866,38 @@ TEST(MinEnclosureRuleTest, ExactlyEquallToPairwiseMinEnclosurePasses)
 
     ASSERT_EQ(violations.size(), 0);
 }
+
+TEST(MinEnclosureRuleTest, PairwiseMinEnclosureRequiresInnerRectangularPolygon) {
+    LayerRegistry registry;
+    const Layer* M1 = registry.declare("M1");
+    const Layer* VIA1 = registry.declare("VIA1");
+
+    const double offset = std::sqrt(2.0) / 2.0;
+
+    Polygon firstPolygon({
+        Point(0.0, 0.0),
+        Point(4.0, 4.0),
+        Point(3.0, 5.0),
+        Point(-1.0, 1.0)
+        });
+
+    Polygon secondPolygon({
+        Point(0.0 - offset, 0.0 + offset), 
+        Point(4.0 - offset, 4.0 + offset),
+        Point(3.0 - offset, 5.0 + offset),
+        Point(-1.0 - offset, 1.0 + offset)
+        });
+
+
+    Shape first(1, VIA1, std::move(firstPolygon));
+    Shape second(2, M1, std::move(secondPolygon));
+    // NO THROW EXPECTED HERE, AS THE RULE SHOULD BE CONSTRUCTED SUCCESSFULLY
+    //MinEnclosureRule rule(VIA1, M1, 2.0);
+    //MinEnclosureRule rule(VIA1, { EnclosureOption(M1, 2.0) });
+
+    // THROWS
+    MinEnclosureRule rule(VIA1, { EnclosureOption(M1, 2.0, 0.0, 4.0) });
+    const std::vector<Shape> shapes{ first, second };
+    LayerSpatialIndex spatialIndex(shapes);
+    EXPECT_THROW(rule.check(shapes, spatialIndex), std::invalid_argument);
+}

@@ -1283,3 +1283,51 @@ TEST(PolygonTest, MinWidthOfConcaveOctilinearPolygon)
 
     EXPECT_NEAR(result.distance, 3.0, EPSILON);
 }
+
+TEST(PolygonTest, DistanceBetweenFortyFiveDegreePolygonsVertexToVertex)
+{
+    Polygon first({
+        Point(0.0, 2.0),
+        Point(2.0, 0.0),
+        Point(4.0, 2.0),
+        Point(2.0, 4.0)
+        });
+
+    Polygon second({
+        Point(5.0, 2.0),
+        Point(7.0, 0.0),
+        Point(9.0, 2.0),
+        Point(7.0, 4.0)
+        });
+
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, 1.0, EPSILON);
+
+    EXPECT_NEAR(result.firstPoint.getX(), 4.0, EPSILON);
+    EXPECT_NEAR(result.firstPoint.getY(), 2.0, EPSILON);
+
+    EXPECT_NEAR(result.secondPoint.getX(), 5.0, EPSILON);
+    EXPECT_NEAR(result.secondPoint.getY(), 2.0, EPSILON);
+}
+
+TEST(PolygonTest, DistanceBetweenFortyFiveDegreePolygonsEdgeToEdge)
+{
+    Polygon first({
+        Point(0.0, 0.0),
+        Point(4.0, 4.0),
+        Point(3.0, 5.0),
+        Point(-1.0, 1.0)
+        });
+
+    Polygon second({
+        Point(-2.0, 2.0),
+        Point(2.0, 6.0),
+        Point(1.0, 7.0),
+        Point(-3.0, 3.0)
+        });
+
+    const auto result = first.distanceTo(second);
+
+    EXPECT_NEAR(result.distance, std::sqrt(2.0), EPSILON);
+}
