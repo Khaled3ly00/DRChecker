@@ -9,6 +9,7 @@ namespace drcheck::geometry {
 		double getY() const;
 
 		double length() const;
+		Vector normalized() const;
 		double dot(const Vector& other) const;
 		double cross(const Vector& other) const;
 	private:

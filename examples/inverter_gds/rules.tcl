@@ -22,15 +22,24 @@ layer OD1T -map {-layer 27 -datatype 0} -map {-layer 27 -datatype 1} -map {-laye
 layer SOI_MKR -map {-layer 28 -datatype 0} -map {-layer 28 -datatype 1} -map {-layer 28 -datatype 2} -map {-layer 28 -datatype 11}
 layer RPO -map {-layer 29 -datatype 0}
 layer CO -map {-layer 30 -datatype 0} -map {-layer 30 -datatype 11} -map {-layer 30 -datatype 12} -map {-layer 30 -datatype 13} -map {-layer 142 -datatype 11} -map {-layer 142 -datatype 51} -map {-layer 142 -datatype 155}
-layer M1 -map {-layer 31 -datatype 0} -map {-layer 31 -datatype 1} -map {-layer 31 -datatype 7} -map {-layer 31 -datatype 100} -map {-layer 31 -datatype 101} -map {-layer 75 -datatype 1} -map {-layer 131 -datatype 0} -map {-layer 131 -datatype 100} -map {-layer 171 -datatype 0} -map {-layer 131 -datatype 83}
-layer M2 -map {-layer 32 -datatype 0} -map {-layer 32 -datatype 1} -map {-layer 32 -datatype 7} -map {-layer 75 -datatype 2} -map {-layer 132 -datatype 0} -map {-layer 172 -datatype 0} -map {-layer 132 -datatype 83}
-layer M3 -map {-layer 33 -datatype 0} -map {-layer 33 -datatype 1} -map {-layer 33 -datatype 7} -map {-layer 75 -datatype 3} -map {-layer 133 -datatype 0} -map {-layer 173 -datatype 0} -map {-layer 133 -datatype 83}
-layer M4 -map {-layer 34 -datatype 0} -map {-layer 34 -datatype 1} -map {-layer 34 -datatype 7} -map {-layer 75 -datatype 4} -map {-layer 134 -datatype 0} -map {-layer 174 -datatype 0} -map {-layer 134 -datatype 83}
-layer M5 -map {-layer 35 -datatype 0} -map {-layer 35 -datatype 1} -map {-layer 35 -datatype 7} -map {-layer 75 -datatype 5} -map {-layer 135 -datatype 0} -map {-layer 175 -datatype 0} -map {-layer 135 -datatype 83}
-layer M6 -map {-layer 36 -datatype 0} -map {-layer 36 -datatype 1} -map {-layer 36 -datatype 7} -map {-layer 75 -datatype 6} -map {-layer 136 -datatype 0} -map {-layer 176 -datatype 0} -map {-layer 136 -datatype 83}
-layer M7 -map {-layer 37 -datatype 0} -map {-layer 37 -datatype 1} -map {-layer 37 -datatype 7} -map {-layer 75 -datatype 7} -map {-layer 137 -datatype 0} -map {-layer 177 -datatype 0} -map {-layer 137 -datatype 83}
-layer M8 -map {-layer 38 -datatype 40} -map {-layer 38 -datatype 41} -map {-layer 75 -datatype 8} -map {-layer 138 -datatype 0} -map {-layer 178 -datatype 0} -map {-layer 138 -datatype 83}
-layer M9 -map {-layer 39 -datatype 60} -map {-layer 39 -datatype 61} -map {-layer 75 -datatype 9} -map {-layer 139 -datatype 0} -map {-layer 179 -datatype 0} -map {-layer 139 -datatype 83}
+layer M1 -map {-layer 31 -datatype 0} -map {-layer 31 -datatype 1} -map {-layer 31 -datatype 7} -map {-layer 31 -datatype 100} -map {-layer 31 -datatype 101} -map {-layer 75 -datatype 1} -map {-layer 131 -datatype 100} -map {-layer 171 -datatype 0} -map {-layer 131 -datatype 83}
+layer M2 -map {-layer 32 -datatype 0} -map {-layer 32 -datatype 1} -map {-layer 32 -datatype 7} -map {-layer 75 -datatype 2} -map {-layer 172 -datatype 0} -map {-layer 132 -datatype 83}
+layer M3 -map {-layer 33 -datatype 0} -map {-layer 33 -datatype 1} -map {-layer 33 -datatype 7} -map {-layer 75 -datatype 3} -map {-layer 173 -datatype 0} -map {-layer 133 -datatype 83}
+layer M4 -map {-layer 34 -datatype 0} -map {-layer 34 -datatype 1} -map {-layer 34 -datatype 7} -map {-layer 75 -datatype 4} -map {-layer 174 -datatype 0} -map {-layer 134 -datatype 83}
+layer M5 -map {-layer 35 -datatype 0} -map {-layer 35 -datatype 1} -map {-layer 35 -datatype 7} -map {-layer 75 -datatype 5} -map {-layer 175 -datatype 0} -map {-layer 135 -datatype 83}
+layer M6 -map {-layer 36 -datatype 0} -map {-layer 36 -datatype 1} -map {-layer 36 -datatype 7} -map {-layer 75 -datatype 6} -map {-layer 176 -datatype 0} -map {-layer 136 -datatype 83}
+layer M7 -map {-layer 37 -datatype 0} -map {-layer 37 -datatype 1} -map {-layer 37 -datatype 7} -map {-layer 75 -datatype 7} -map {-layer 177 -datatype 0} -map {-layer 137 -datatype 83}
+layer M8 -map {-layer 38 -datatype 40} -map {-layer 38 -datatype 41} -map {-layer 75 -datatype 8} -map {-layer 178 -datatype 0} -map {-layer 138 -datatype 83}
+layer M9 -map {-layer 39 -datatype 60} -map {-layer 39 -datatype 61} -map {-layer 75 -datatype 9} -map {-layer 179 -datatype 0} -map {-layer 139 -datatype 83}
+layer M1_PIN -map {-layer 131 -datatype 0}
+layer M2_PIN -map {-layer 132 -datatype 0}
+layer M3_PIN -map {-layer 133 -datatype 0}
+layer M4_PIN -map {-layer 134 -datatype 0}
+layer M5_PIN -map {-layer 135 -datatype 0}
+layer M6_PIN -map {-layer 136 -datatype 0}
+layer M7_PIN -map {-layer 137 -datatype 0}
+layer M8_PIN -map {-layer 138 -datatype 0}
+layer M9_PIN -map {-layer 139 -datatype 0}
 layer REDUNDMY -map {-layer 47 -datatype 1} -map {-layer 47 -datatype 2}
 layer HVTSRM -map {-layer 48 -datatype 0}
 layer RODMY -map {-layer 49 -datatype 0}

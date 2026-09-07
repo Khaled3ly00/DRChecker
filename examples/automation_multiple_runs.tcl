@@ -11,7 +11,7 @@ drc_run -layout $layout1 \
         -rules $rules \
         -report $report1
 
-if {[drc_error_count] != 4} {
+if {[drc_error_count] != 7} {
     error "Unexpected violation count after first DRC run"
 }
 

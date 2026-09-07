@@ -155,23 +155,8 @@ TEST(GDSLayoutParserTest, ImportsStraightPath)
         gdstk::Vec2{ 10.0, 0.0 },
         nullptr, nullptr, false);
 
-
-    auto* roundEndPath = static_cast<gdstk::FlexPath*>(gdstk::allocate_clear(sizeof(gdstk::FlexPath)));
-    roundEndPath->init(
-        gdstk::Vec2{ 0.0, 0.0 },
-        1, 2.0, 0.0, 1e-3,
-        gdstk::make_tag(15, 0));
-    roundEndPath->simple_path = true;
-    roundEndPath->elements[0].end_type = gdstk::EndType::Round;
-    extendedEndPath->elements[0].end_extensions =
-        gdstk::Vec2{ 2.0, 3.0 };
-    roundEndPath->segment(
-        gdstk::Vec2{ 10.0, 0.0 },
-        nullptr, nullptr, false);
-
     top->flexpath_array.append(flushEndPath);
     top->flexpath_array.append(extendedEndPath);
-    top->flexpath_array.append(roundEndPath);
     library.cell_array.append(top);
 
     ASSERT_EQ(library.write_gds(filePath.c_str(), 0, nullptr), gdstk::ErrorCode::NoError);
@@ -185,15 +170,13 @@ TEST(GDSLayoutParserTest, ImportsStraightPath)
 
     const auto shapes = GDSLayoutParser::load(filePath, registry);
 
-    ASSERT_EQ(shapes.size(), 3);
+    ASSERT_EQ(shapes.size(), 2);
 
     EXPECT_EQ(shapes[0].getLayer(), m1);
     EXPECT_EQ(shapes[1].getLayer(), m1);
-    EXPECT_EQ(shapes[2].getLayer(), m1);
 
     const auto bounds0 = shapes[0].getPolygon().getBoundingBox();
     const auto bounds1 = shapes[1].getPolygon().getBoundingBox();
-    const auto bounds2 = shapes[2].getPolygon().getBoundingBox();
 
     EXPECT_NEAR(bounds0.getMinX(), 0.0, EPSILON);
     EXPECT_NEAR(bounds0.getMaxX(), 10.0, EPSILON);
@@ -204,13 +187,6 @@ TEST(GDSLayoutParserTest, ImportsStraightPath)
     EXPECT_NEAR(bounds1.getMaxX(), 13.0, EPSILON);
     EXPECT_NEAR(bounds1.getMinY(), -1.0, EPSILON);
     EXPECT_NEAR(bounds1.getMaxY(), 1.0, EPSILON);
-
-    constexpr double PATH_TOLERANCE = 0.002;
-
-    EXPECT_NEAR(bounds2.getMinX(), -1.0, PATH_TOLERANCE);
-    EXPECT_NEAR(bounds2.getMaxX(), 11.0, PATH_TOLERANCE);
-    EXPECT_NEAR(bounds2.getMinY(), -1.0, PATH_TOLERANCE);
-    EXPECT_NEAR(bounds2.getMaxY(), 1.0, PATH_TOLERANCE);
 
     std::filesystem::remove(filePath);
 }

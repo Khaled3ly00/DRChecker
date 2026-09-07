@@ -11,7 +11,7 @@ TEST(TclAutomationRunnerTest, ExecutesDRCRunCommand)
 
     const auto violations = TclAutomationRunner::run(scriptPath);
 
-    EXPECT_EQ(violations.size(), 5);
+    EXPECT_EQ(violations.size(), 8);
 }
 
 TEST(TclAutomationRunnerTest, ExecutesMultipleDRCRuns)

@@ -46,3 +46,17 @@ TEST(ShapeTest, ThrowsOnNullPointerLayer)
 
     EXPECT_THROW(Shape(1, nullptr, std::move(polygon)), std::invalid_argument);
 }
+
+TEST(ShapeTest, RejectsNonOctilinearPolygon)
+{
+    LayerRegistry registry;
+    const Layer* m1 = registry.declare("M1");
+
+    Polygon polygon({
+        Point(0, 0),
+        Point(4, 0),
+        Point(1, 3)
+        });
+
+    EXPECT_THROW(Shape(1, m1, std::move(polygon)), std::invalid_argument);
+}

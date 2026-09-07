@@ -23,6 +23,16 @@ namespace drcheck::geometry {
 		return end;
 	}
 
+	bool Segment::isHorizontal() const
+	{
+		return std::abs(start.getY() - end.getY()) <= EPSILON;
+	}
+
+	bool Segment::isVertical() const
+	{
+		return std::abs(start.getX() - end.getX()) <= EPSILON;
+	}
+
 	BoundingBox Segment::getBoundingBox() const
 	{
 		double minX = std::min(start.getX(), end.getX());
@@ -160,5 +170,14 @@ namespace drcheck::geometry {
 		}
 
 		return result;
+	}
+
+	bool Segment::isParallelTo(const Segment& other) const
+	{
+		const Vector thisVector = Point::vectorBetween(start, end);
+		const Vector otherVector = Point::vectorBetween(other.start, other.end);
+		// |A|*|B| = |A||B|sin(theta)
+		// Two vectors are parallel if their cross product is zero (or very close to zero)
+		return std::abs(thisVector.cross(otherVector)) <= EPSILON * thisVector.length() * otherVector.length();
 	}
 }

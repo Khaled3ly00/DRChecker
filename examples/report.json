@@ -1,5 +1,5 @@
 {
-    "violationCount": 5,
+    "violationCount": 10,
     "violations": [
         {
             "type": "MinWidth",
@@ -17,6 +17,28 @@
                 "secondPoint": {
                     "x": 0.0,
                     "y": 5.0
+                },
+                "firstEdgeIndex": 1,
+                "secondEdgeIndex": 3,
+                "firstLayer": "M1"
+            }
+        },
+        {
+            "type": "MinWidth",
+            "shapeIds": [
+                5
+            ],
+            "message": "Minimum width violation on layer: M1 required 3.000000 actual 1.414214",
+            "actual": 1.4142,
+            "required": 3.0,
+            "marker": {
+                "firstPoint": {
+                    "x": 4.5,
+                    "y": 6.5
+                },
+                "secondPoint": {
+                    "x": 5.5,
+                    "y": 5.5
                 },
                 "firstEdgeIndex": 1,
                 "secondEdgeIndex": 3,
@@ -47,6 +69,27 @@
         {
             "type": "MinSpacing",
             "shapeIds": [
+                1,
+                5
+            ],
+            "message": "Minimum spacing violation on layer: M1 required 3.000000, actual 0.000000",
+            "actual": 0.0,
+            "required": 3.0,
+            "marker": {
+                "firstPoint": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "secondPoint": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "firstLayer": "M1"
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
                 2,
                 4
             ],
@@ -60,6 +103,27 @@
                 },
                 "secondPoint": {
                     "x": 12.0,
+                    "y": 5.0
+                },
+                "firstLayer": "M1"
+            }
+        },
+        {
+            "type": "MinSpacing",
+            "shapeIds": [
+                2,
+                5
+            ],
+            "message": "Minimum spacing violation on layer: M1 required 3.000000, actual 0.000000",
+            "actual": 0.0,
+            "required": 3.0,
+            "marker": {
+                "firstPoint": {
+                    "x": 5.0,
+                    "y": 5.0
+                },
+                "secondPoint": {
+                    "x": 5.0,
                     "y": 5.0
                 },
                 "firstLayer": "M1"
@@ -99,6 +163,38 @@
                     "minY": 0.0,
                     "maxX": 20.0,
                     "maxY": 10.0
+                },
+                "firstLayer": "M1"
+            }
+        },
+        {
+            "type": "MinDensity",
+            "shapeIds": [],
+            "message": "Minimum density violation on layer : M1 required 0.500000 actual 0.100000",
+            "actual": 0.1,
+            "required": 0.5,
+            "marker": {
+                "region": {
+                    "minX": 0.0,
+                    "minY": 10.0,
+                    "maxX": 10.0,
+                    "maxY": 12.0
+                },
+                "firstLayer": "M1"
+            }
+        },
+        {
+            "type": "MinDensity",
+            "shapeIds": [],
+            "message": "Minimum density violation on layer : M1 required 0.500000 actual 0.000000",
+            "actual": 0.0,
+            "required": 0.5,
+            "marker": {
+                "region": {
+                    "minX": 10.0,
+                    "minY": 10.0,
+                    "maxX": 20.0,
+                    "maxY": 12.0
                 },
                 "firstLayer": "M1"
             }

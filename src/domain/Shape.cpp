@@ -9,6 +9,9 @@ Shape::Shape(std::size_t id, const Layer* layer, geometry::Polygon polygon)
 	{
 		throw std::invalid_argument("Shape layer cannot be null");
 	}
+	if (!getPolygon().isOctilinear()) {
+		throw std::invalid_argument("DRCheck supports only orthogonal and 45-degree polygons");
+	}
 }
 
 std::size_t Shape::getId() const

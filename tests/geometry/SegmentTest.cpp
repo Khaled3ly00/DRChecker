@@ -421,3 +421,66 @@ TEST(SegmentTest, DistanceToTouchingSegmentsReturnsTouchPoint)
     EXPECT_NEAR(result.secondPoint.getX(), 5.0, EPSILON);
     EXPECT_NEAR(result.secondPoint.getY(), 0.0, EPSILON);
 }
+
+TEST(SegmentTest, HorizontalSegmentsAreParallel)
+{
+    Segment first(Point(0, 0), Point(5, 0));
+    Segment second(Point(2, 3), Point(8, 3));
+
+    EXPECT_TRUE(first.isParallelTo(second));
+}
+
+TEST(SegmentTest, VerticalSegmentsAreParallel)
+{
+    Segment first(Point(0, 0), Point(0, 5));
+    Segment second(Point(3, 2), Point(3, 8));
+
+    EXPECT_TRUE(first.isParallelTo(second));
+}
+
+TEST(SegmentTest, PositiveFortyFiveDegreeSegmentsAreParallel)
+{
+    Segment first(Point(0, 0), Point(4, 4));
+    Segment second(Point(1, 3), Point(5, 7));
+
+    EXPECT_TRUE(first.isParallelTo(second));
+}
+
+TEST(SegmentTest, NegativeFortyFiveDegreeSegmentsAreParallel)
+{
+    Segment first(Point(0, 4), Point(4, 0));
+    Segment second(Point(2, 8), Point(6, 4));
+
+    EXPECT_TRUE(first.isParallelTo(second));
+}
+
+TEST(SegmentTest, OppositeDirectionSegmentsCanStillBeParallel)
+{
+    Segment first(Point(0, 0), Point(4, 4));
+    Segment second(Point(8, 8), Point(5, 5));
+
+    EXPECT_TRUE(first.isParallelTo(second));
+}
+
+TEST(SegmentTest, DifferentDirectionSegmentsAreNotParallel)
+{
+    Segment first(Point(0, 0), Point(5, 0));
+    Segment second(Point(0, 0), Point(4, 4));
+
+    EXPECT_FALSE(first.isParallelTo(second));
+}
+
+TEST(SegmentTest, NearlyParallelSegmentsWithinToleranceAreParallel)
+{
+    Segment first(
+        Point(0.0, 0.0),
+        Point(4.0, 4.0)
+    );
+
+    Segment second(
+        Point(0.0, 2.0),
+        Point(4.0, 6.0 + EPSILON / 2.0)
+    );
+
+    EXPECT_TRUE(first.isParallelTo(second));
+}

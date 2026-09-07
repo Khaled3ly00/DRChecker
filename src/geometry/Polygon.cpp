@@ -406,21 +406,16 @@ namespace drcheck::geometry {
 		}
 		return false;
 	}
-	// Calculate the minimum local width of the polygon.
-	// Temporary restriction: This implementation is only valid for orthogonal polygons (polygons with edges aligned to the axes).
-	// Will be extended to handle non-orthogonal polygons (45 degrees) in the future.
-	PolygonEdgePairResult Polygon::minWidth() const
-	{
-		if (isOrthogonal()) {
-			return orthogonalMinWidth();
-		}
 
-		throw std::logic_error(
-			"Minimum width for non-orthogonal "
-			"polygons is not implemented yet"
-		);
+	double Polygon::projectPointOntoDirection(const Point& point, const Vector& direction) const
+	{
+		return point.getX() * direction.getX() + point.getY() * direction.getY();
 	}
-	PolygonEdgePairResult Polygon::orthogonalMinWidth() const
+
+	// Calculate the minimum local width of the polygon.
+	// width is defined as the distance between two parallel edges of the polygon, 
+	// where the region between the two edges is contained within the polygon.
+	PolygonEdgePairResult Polygon::minWidth() const
 	{
 		const auto polygonEdges = getEdges();
 
@@ -432,93 +427,64 @@ namespace drcheck::geometry {
 			{
 				const Segment& first = polygonEdges[i];
 				const Segment& second = polygonEdges[j];
-				// Horizontal edge pair
-				if (first.isHorizontal() && second.isHorizontal()) {
-					const double firstMinX = std::min(first.getStart().getX(), first.getEnd().getX());
-					const double firstMaxX = std::max(first.getStart().getX(), first.getEnd().getX());
-					const double secondMinX = std::min(second.getStart().getX(), second.getEnd().getX());
-					const double secondMaxX = std::max(second.getStart().getX(), second.getEnd().getX());
+				// minimum width is only defined for parallel edges, so skip non-parallel edges
+				if (!first.isParallelTo(second)) {
+					continue;
+				}
+				
+				const Vector direction = Point::vectorBetween(first.getStart(),first.getEnd()).normalized();
 
-					const auto overlap = positiveOverlapInterval(firstMinX, firstMaxX, secondMinX, secondMaxX);
-					// Is there a positive overlap interval between the two horizontal edges? If not, skip this pair.
-					if (!overlap) {
-						continue;
-					}
+				// Project the endpoints of both edges onto the direction vector of the first edge
+				const double firstStartProjection = projectPointOntoDirection(first.getStart(), direction);
+				const double firstEndProjection = projectPointOntoDirection(first.getEnd(), direction);
+				const double secondStartProjection = projectPointOntoDirection(second.getStart(), direction);
+				const double secondEndProjection = projectPointOntoDirection(second.getEnd(), direction);
 
-					const double firstY = first.getStart().getY();
-					const double secondY = second.getStart().getY();
-					const double width = std::abs(firstY - secondY);
+				// Determine the min and max projections for both edges to find their intervals along the direction vector
+				const double firstMin = std::min(firstStartProjection, firstEndProjection);
+				const double firstMax = std::max(firstStartProjection, firstEndProjection);
+				const double secondMin = std::min(secondStartProjection, secondEndProjection);
+				const double secondMax = std::max(secondStartProjection, secondEndProjection);
 
-					// Ignore coincident or tolerance-close boundaries.
+				const auto overlap = positiveOverlapInterval(firstMin, firstMax, secondMin, secondMax);
 
-					if (width <= EPSILON) {
-						continue;
-					}
+				if (!overlap) {
+					continue;
+				}
+				// normal vector is perpendicular to the direction vector of the firstedge, used to measure the distance between the two edges
+				const Vector normal(-direction.getY(), direction.getX());
 
-					const double sampleX = (overlap->first + overlap->second) / 2.0;
-					const double sampleY = (firstY + secondY) / 2.0;
+				const double firstNormalProjection = projectPointOntoDirection(first.getStart(), normal);
+				const double secondNormalProjection = projectPointOntoDirection(second.getStart(), normal);
 
-					const Point samplePoint(sampleX, sampleY);
+				// The width is the absolute difference between the normal projections of the two edges, which represents the distance between them along the normal direction
+				const double width = std::abs(firstNormalProjection - secondNormalProjection);
 
-					// The region between the two boundaries
-					// must lie inside the polygon.
-					if (!contains(samplePoint)) {
-						continue;
-					}
-					// Points lying on violating edges
-					const Point firstPoint(sampleX, firstY);
-					const Point secondPoint(sampleX, secondY);
-
-					if (!bestResult.has_value() || width < bestResult->distance)
-					{
-						bestResult = PolygonEdgePairResult{width, firstPoint, secondPoint, i, j};
-					}
+				if (width <= EPSILON) {
+					continue;
 				}
 
-				// Vertical edge pair
-				else if (first.isVertical() && second.isVertical()) {
-					const double firstMinY = std::min(first.getStart().getY(), first.getEnd().getY());
-					const double firstMaxY = std::max(first.getStart().getY(), first.getEnd().getY());
-					const double secondMinY = std::min(second.getStart().getY(), second.getEnd().getY());
-					const double secondMaxY = std::max(second.getStart().getY(), second.getEnd().getY());
+				const double sampleProjection = (overlap->first + overlap->second) / 2.0;
+				// Point = direction * projection along edge direction + normal * projection along normal
+				const Point firstPoint(direction.getX() * sampleProjection + normal.getX() * firstNormalProjection, direction.getY() * sampleProjection + normal.getY() * firstNormalProjection);
+				const Point secondPoint(direction.getX() * sampleProjection + normal.getX() * secondNormalProjection, direction.getY() * sampleProjection + normal.getY() * secondNormalProjection);
+				
+				// check if the midpoint between the two edges is inside the polygon, which ensures that the region between the two edges is contained within the polygon
+				const Point samplePoint((firstPoint.getX() + secondPoint.getX()) / 2.0, (firstPoint.getY() + secondPoint.getY()) / 2.0);
+				if (!contains(samplePoint)) {
+					continue;
+				}
 
-					const auto overlap = positiveOverlapInterval(firstMinY, firstMaxY, secondMinY, secondMaxY);
-
-					if (!overlap) {
-						continue;
-					}
-
-					const double firstX = first.getStart().getX();
-					const double secondX = second.getStart().getX();
-					const double width = std::abs(firstX - secondX);
-
-					if (width <= EPSILON) {
-						continue;
-					}
-
-					const double sampleY = (overlap->first + overlap->second) / 2.0;
-					const double sampleX = (firstX + secondX) / 2.0;
-					const Point samplePoint(sampleX, sampleY);
-
-					if (!contains(samplePoint)) {
-						continue;
-					}
-					const Point firstPoint(firstX, sampleY);
-					const Point secondPoint(secondX, sampleY);
-
-					if (!bestResult.has_value() || width < bestResult->distance)
-					{
-						bestResult = PolygonEdgePairResult{width, firstPoint, secondPoint, i, j};
-					}
+				if (!bestResult.has_value() || width < bestResult->distance)
+				{
+					bestResult = PolygonEdgePairResult{width, firstPoint, secondPoint, i, j};
 				}
 			}
 		}
 
 		if (!bestResult.has_value())
 		{
-			throw std::logic_error(
-				"Unable to determine polygon minimum width"
-			);
+			throw std::logic_error("Unable to determine polygon minimum width");
 		}
 
 		return bestResult.value();
@@ -538,6 +504,29 @@ namespace drcheck::geometry {
 		}
 		return true;
 	}
+	// Check if the polygon is octilinear (all edges are either horizontal, vertical, or at 45 degrees)
+	bool Polygon::isOctilinear() const
+	{
+		const auto polygonEdges = getEdges();
+
+		for (const Segment& edge : polygonEdges)
+		{
+			const double dx = edge.getEnd().getX() - edge.getStart().getX();
+			const double dy = edge.getEnd().getY() - edge.getStart().getY();
+
+			const bool horizontal = edge.isHorizontal();
+			const bool vertical = edge.isVertical();
+
+			const bool diagonal45 = std::abs(std::abs(dx) - std::abs(dy)) <= EPSILON;
+
+			if (!horizontal && !vertical && !diagonal45) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	// Calculate the positive overlap interval between two ranges [minA, maxA] and [minB, maxB].
 	std::optional<std::pair<double, double>>Polygon::positiveOverlapInterval(double minA, double maxA, double minB, double maxB)
 	{

@@ -690,19 +690,6 @@ TEST(PolygonTest, CalculatesComplexOrthogonalPolygonMinimumWidth)
 	EXPECT_NEAR(polygon.minWidth().distance, 3.0, EPSILON);
 }
 
-TEST(PolygonTest, MinimumWidthRejectsNonOrthogonalPolygon)
-{
-	Polygon polygon({
-        Point(1.0, 1.0),
-        Point(5.0, 0.0),
-        Point(8.0, 3.0),
-        Point(6.0, 7.0),
-        Point(3.0, 6.0),
-        Point(0.0, 3.0)
-		});
-	EXPECT_THROW(polygon.minWidth().distance, std::logic_error);
-}
-
 TEST(PolygonTest, MinmumWidthPolygonWithANotch) {
 	Polygon polygon({
         Point(0.0, 0.0),
@@ -1235,4 +1222,64 @@ TEST(PolygonTest, PairwiseEnclosureAcceptsRectangleWithCollinearVertices)
     EXPECT_NEAR(result.right, 2.0, EPSILON);
     EXPECT_NEAR(result.bottom, 2.0, EPSILON);
     EXPECT_NEAR(result.top, 2.0, EPSILON);
+}
+
+TEST(PolygonTest, MinWidthOfFortyFiveDegreeRectangle)
+{
+    Polygon polygon({
+        Point(0, 2),
+        Point(2, 0),
+        Point(6, 4),
+        Point(4, 6)
+        });
+
+    const auto result = polygon.minWidth();
+
+    EXPECT_NEAR(result.distance, 2.0 * std::sqrt(2.0), EPSILON);
+}
+
+TEST(PolygonTest, MinWidthOfNegativeFortyFiveDegreeRectangle)
+{
+    Polygon polygon({
+        Point(0, 4),
+        Point(4, 0),
+        Point(6, 2),
+        Point(2, 6)
+        });
+
+    const auto result = polygon.minWidth();
+
+    EXPECT_NEAR(result.distance, 2.0 * std::sqrt(2.0), EPSILON);
+}
+
+TEST(PolygonTest, MinWidthOfMixedOrthogonalAndFortyFiveDegreePolygon)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(6, 0),
+        Point(8, 2),
+        Point(8, 6),
+        Point(0, 6)
+        });
+
+    const auto result = polygon.minWidth();
+
+    EXPECT_NEAR(result.distance, 6.0, EPSILON);
+}
+
+TEST(PolygonTest, MinWidthOfConcaveOctilinearPolygon)
+{
+    Polygon polygon({
+        Point(0, 0),
+        Point(8, 0),
+        Point(8, 6),
+        Point(6, 8),
+        Point(4, 6),
+        Point(4, 3),
+        Point(0, 3)
+        });
+
+    const auto result = polygon.minWidth();
+
+    EXPECT_NEAR(result.distance, 3.0, EPSILON);
 }

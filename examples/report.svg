@@ -27,66 +27,108 @@
   <g id="layout">
   <g class="shape" data-layer="M1">
     <title>Shape ID: 1&#10;Layer: M1</title>
-  <polygon points="360,657.5 463,657.5 463,142.5 360,142.5 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+  <polygon points="360,709 463,709 463,194 360,194 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
   </g>
   <g class="shape" data-layer="M1">
     <title>Shape ID: 2&#10;Layer: M1</title>
-  <polygon points="566,657.5 875,657.5 875,400 566,400 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+  <polygon points="566,709 875,709 875,451.5 566,451.5 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
   </g>
   <g class="shape" data-layer="M1">
     <title>Shape ID: 4&#10;Layer: M1</title>
-  <polygon points="978,657.5 1390,657.5 1390,400 978,400 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+  <polygon points="978,709 1390,709 1390,451.5 978,451.5 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
+  </g>
+  <g class="shape" data-layer="M1">
+    <title>Shape ID: 5&#10;Layer: M1</title>
+  <polygon points="360,709 360,606 875,91 875,194 " fill="darkturquoise" fill-opacity="0.35" stroke="darkturquoise" stroke-width="2" />
   </g>
   <g class="shape" data-layer="VIA1">
     <title>Shape ID: 3&#10;Layer: VIA1</title>
-  <polygon points="617.5,554.5 669,554.5 669,503 617.5,503 " fill="orange" fill-opacity="0.35" stroke="orange" stroke-width="2" />
+  <polygon points="617.5,606 669,606 669,554.5 617.5,554.5 " fill="orange" fill-opacity="0.35" stroke="orange" stroke-width="2" />
   </g>
   </g>
   <g id="violations">
     <g id="violation-0" class="violation-overlay" data-layers="M1" style="display: none;">
-    <line class="violation-edge" x1="463" y1="657.5" x2="463" y2="142.5" stroke="red" stroke-width="3" stroke-linecap="round" />
-    <line class="violation-edge" x1="360" y1="142.5" x2="360" y2="657.5" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="463" y1="709" x2="463" y2="194" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="360" y1="194" x2="360" y2="709" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="463" y1="400" x2="360" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="463" cy="400" r="4" fill="red" />
-    <circle class="violation-point" cx="360" cy="400" r="4" fill="red" />
-    <text class="violation-label" x="411.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="411.5">MinWidth M1</tspan><tspan x="411.5" dy="16">2/3</tspan></text>
+    <line class="violation-marker" x1="463" y1="451.5" x2="360" y2="451.5" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="463" cy="451.5" r="4" fill="red" />
+    <circle class="violation-point" cx="360" cy="451.5" r="4" fill="red" />
+    <text class="violation-label" x="411.5" y="444.5" font-size="14" text-anchor="middle" fill="red"><tspan x="411.5">MinWidth M1</tspan><tspan x="411.5" dy="16">2/3</tspan></text>
   </g>
     </g>
     <g id="violation-1" class="violation-overlay" data-layers="M1" style="display: none;">
+    <line class="violation-edge" x1="360" y1="606" x2="875" y2="91" stroke="red" stroke-width="3" stroke-linecap="round" />
+    <line class="violation-edge" x1="875" y1="194" x2="360" y2="709" stroke="red" stroke-width="3" stroke-linecap="round" />
   <g>
-    <line class="violation-marker" x1="463" y1="400" x2="566" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="463" cy="400" r="4" fill="red" />
-    <circle class="violation-point" cx="566" cy="400" r="4" fill="red" />
-    <text class="violation-label" x="514.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="514.5">MinSpacing M1</tspan><tspan x="514.5" dy="16">2/3</tspan></text>
+    <line class="violation-marker" x1="591.75" y1="374.25" x2="643.25" y2="425.75" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="591.75" cy="374.25" r="4" fill="red" />
+    <circle class="violation-point" cx="643.25" cy="425.75" r="4" fill="red" />
+    <text class="violation-label" x="617.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="617.5">MinWidth M1</tspan><tspan x="617.5" dy="16">1.4142/3</tspan></text>
   </g>
     </g>
     <g id="violation-2" class="violation-overlay" data-layers="M1" style="display: none;">
   <g>
-    <line class="violation-marker" x1="875" y1="400" x2="978" y2="400" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="875" cy="400" r="4" fill="red" />
-    <circle class="violation-point" cx="978" cy="400" r="4" fill="red" />
-    <text class="violation-label" x="926.5" y="393" font-size="14" text-anchor="middle" fill="red"><tspan x="926.5">MinSpacing M1</tspan><tspan x="926.5" dy="16">2/3</tspan></text>
+    <line class="violation-marker" x1="463" y1="451.5" x2="566" y2="451.5" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="463" cy="451.5" r="4" fill="red" />
+    <circle class="violation-point" cx="566" cy="451.5" r="4" fill="red" />
+    <text class="violation-label" x="514.5" y="444.5" font-size="14" text-anchor="middle" fill="red"><tspan x="514.5">MinSpacing M1</tspan><tspan x="514.5" dy="16">2/3</tspan></text>
   </g>
     </g>
-    <g id="violation-3" class="violation-overlay" data-layers="VIA1 M1" style="display: none;">
+    <g id="violation-3" class="violation-overlay" data-layers="M1" style="display: none;">
   <g>
-    <line class="violation-marker" x1="617.5" y1="503" x2="566" y2="503" stroke="red" stroke-width="2" stroke-linecap="round" />
-    <circle class="violation-point" cx="617.5" cy="503" r="4" fill="red" />
-    <circle class="violation-point" cx="566" cy="503" r="4" fill="red" />
-    <text class="violation-label" x="591.75" y="496" font-size="14" text-anchor="middle" fill="red"><tspan x="591.75">Enclosure VIA1 With M1</tspan><tspan x="591.75" dy="16">1/2</tspan></text>
+    <line class="violation-marker" x1="360" y1="709" x2="360" y2="709" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="360" cy="709" r="4" fill="red" />
+    <circle class="violation-point" cx="360" cy="709" r="4" fill="red" />
+    <text class="violation-label" x="360" y="702" font-size="14" text-anchor="middle" fill="red"><tspan x="360">MinSpacing M1</tspan><tspan x="360" dy="16">0/3</tspan></text>
   </g>
     </g>
-    <g id="violation-4" class="violation-overlay" data-layers="" style="display: none;">
+    <g id="violation-4" class="violation-overlay" data-layers="M1" style="display: none;">
   <g>
-    <rect class="violation-region" x="875" y="142.5" width="515" height="515" fill="red" fill-opacity="0.08" stroke="red" stroke-width="2" />
-    <text class="violation-label" x="1132.5" y="160.5" font-size="14" text-anchor="middle" fill="red">MinDensity 0.4/0.5</text>
+    <line class="violation-marker" x1="875" y1="451.5" x2="978" y2="451.5" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="875" cy="451.5" r="4" fill="red" />
+    <circle class="violation-point" cx="978" cy="451.5" r="4" fill="red" />
+    <text class="violation-label" x="926.5" y="444.5" font-size="14" text-anchor="middle" fill="red"><tspan x="926.5">MinSpacing M1</tspan><tspan x="926.5" dy="16">2/3</tspan></text>
+  </g>
+    </g>
+    <g id="violation-5" class="violation-overlay" data-layers="M1" style="display: none;">
+  <g>
+    <line class="violation-marker" x1="617.5" y1="451.5" x2="617.5" y2="451.5" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="617.5" cy="451.5" r="4" fill="red" />
+    <circle class="violation-point" cx="617.5" cy="451.5" r="4" fill="red" />
+    <text class="violation-label" x="617.5" y="444.5" font-size="14" text-anchor="middle" fill="red"><tspan x="617.5">MinSpacing M1</tspan><tspan x="617.5" dy="16">0/3</tspan></text>
+  </g>
+    </g>
+    <g id="violation-6" class="violation-overlay" data-layers="VIA1 M1" style="display: none;">
+  <g>
+    <line class="violation-marker" x1="617.5" y1="554.5" x2="566" y2="554.5" stroke="red" stroke-width="2" stroke-linecap="round" />
+    <circle class="violation-point" cx="617.5" cy="554.5" r="4" fill="red" />
+    <circle class="violation-point" cx="566" cy="554.5" r="4" fill="red" />
+    <text class="violation-label" x="591.75" y="547.5" font-size="14" text-anchor="middle" fill="red"><tspan x="591.75">Enclosure VIA1 With M1</tspan><tspan x="591.75" dy="16">1/2</tspan></text>
+  </g>
+    </g>
+    <g id="violation-7" class="violation-overlay" data-layers="" style="display: none;">
+  <g>
+    <rect class="violation-region" x="875" y="194" width="515" height="515" fill="red" fill-opacity="0.08" stroke="red" stroke-width="2" />
+    <text class="violation-label" x="1132.5" y="212" font-size="14" text-anchor="middle" fill="red">MinDensity 0.4/0.5</text>
+  </g>
+    </g>
+    <g id="violation-8" class="violation-overlay" data-layers="" style="display: none;">
+  <g>
+    <rect class="violation-region" x="360" y="91" width="515" height="103" fill="red" fill-opacity="0.08" stroke="red" stroke-width="2" />
+    <text class="violation-label" x="617.5" y="109" font-size="14" text-anchor="middle" fill="red">MinDensity 0.1/0.5</text>
+  </g>
+    </g>
+    <g id="violation-9" class="violation-overlay" data-layers="" style="display: none;">
+  <g>
+    <rect class="violation-region" x="875" y="91" width="515" height="103" fill="red" fill-opacity="0.08" stroke="red" stroke-width="2" />
+    <text class="violation-label" x="1132.5" y="109" font-size="14" text-anchor="middle" fill="red">MinDensity 0/0.5</text>
   </g>
     </g>
   </g>
   <g id="violation-list">
     <rect x="40" y="40" width="300" height="720" fill="#fafafa" stroke="#cccccc" stroke-width="1" />
-    <text x="50" y="60" font-size="20" font-weight="bold" fill="black">Violations: 5</text>
+    <text x="50" y="60" font-size="20" font-weight="bold" fill="black">Violations: 10</text>
     <g class="panel-button" onclick="showAllViolations()" style="cursor: pointer;">
       <rect x="50" y="70" width="80" height="24" fill="#eeeeee" stroke="#999999" stroke-width="1" />
       <text x="90" y="86" font-size="12" text-anchor="middle" fill="black">Show All</text>
@@ -99,21 +141,41 @@
       <rect x="50" y="96" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
       <text x="58" y="114" font-size="12" fill="black">1. MinWidth M1 2/3</text>
     </g>
-    <g id="violation-item-1" class="violation-list-item" data-violation-id="violation-1" data-message="Minimum spacing violation on layer: M1 required 3.000000, actual 2.000000" data-page="0" data-layers="M1" onclick="toggleViolation(this)" style="cursor: pointer;">
+    <g id="violation-item-1" class="violation-list-item" data-violation-id="violation-1" data-message="Minimum width violation on layer: M1 required 3.000000 actual 1.414214" data-page="0" data-layers="M1" onclick="toggleViolation(this)" style="cursor: pointer;">
       <rect x="50" y="128" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
-      <text x="58" y="146" font-size="12" fill="black">2. MinSpacing M1 2/3</text>
+      <text x="58" y="146" font-size="12" fill="black">2. MinWidth M1 1.4142/3</text>
     </g>
     <g id="violation-item-2" class="violation-list-item" data-violation-id="violation-2" data-message="Minimum spacing violation on layer: M1 required 3.000000, actual 2.000000" data-page="0" data-layers="M1" onclick="toggleViolation(this)" style="cursor: pointer;">
       <rect x="50" y="160" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
       <text x="58" y="178" font-size="12" fill="black">3. MinSpacing M1 2/3</text>
     </g>
-    <g id="violation-item-3" class="violation-list-item" data-violation-id="violation-3" data-message="Minimum Enclosure violation: VIA1 enclosed by M1 required 2.000000 actual 1.000000" data-page="0" data-layers="VIA1 M1" onclick="toggleViolation(this)" style="cursor: pointer;">
+    <g id="violation-item-3" class="violation-list-item" data-violation-id="violation-3" data-message="Minimum spacing violation on layer: M1 required 3.000000, actual 0.000000" data-page="0" data-layers="M1" onclick="toggleViolation(this)" style="cursor: pointer;">
       <rect x="50" y="192" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
-      <text x="58" y="210" font-size="12" fill="black">4. Enclosure VIA1-M1 1/2</text>
+      <text x="58" y="210" font-size="12" fill="black">4. MinSpacing M1 0/3</text>
     </g>
-    <g id="violation-item-4" class="violation-list-item" data-violation-id="violation-4" data-message="Minimum density violation on layer : M1 required 0.500000 actual 0.400000" data-page="0" data-layers="" onclick="toggleViolation(this)" style="cursor: pointer;">
+    <g id="violation-item-4" class="violation-list-item" data-violation-id="violation-4" data-message="Minimum spacing violation on layer: M1 required 3.000000, actual 2.000000" data-page="0" data-layers="M1" onclick="toggleViolation(this)" style="cursor: pointer;">
       <rect x="50" y="224" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
-      <text x="58" y="242" font-size="12" fill="black">5. MinDensity M1 0.4/0.5</text>
+      <text x="58" y="242" font-size="12" fill="black">5. MinSpacing M1 2/3</text>
+    </g>
+    <g id="violation-item-5" class="violation-list-item" data-violation-id="violation-5" data-message="Minimum spacing violation on layer: M1 required 3.000000, actual 0.000000" data-page="0" data-layers="M1" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="256" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="274" font-size="12" fill="black">6. MinSpacing M1 0/3</text>
+    </g>
+    <g id="violation-item-6" class="violation-list-item" data-violation-id="violation-6" data-message="Minimum Enclosure violation: VIA1 enclosed by M1 required 2.000000 actual 1.000000" data-page="0" data-layers="VIA1 M1" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="288" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="306" font-size="12" fill="black">7. Enclosure VIA1-M1 1/2</text>
+    </g>
+    <g id="violation-item-7" class="violation-list-item" data-violation-id="violation-7" data-message="Minimum density violation on layer : M1 required 0.500000 actual 0.400000" data-page="0" data-layers="" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="320" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="338" font-size="12" fill="black">8. MinDensity M1 0.4/0.5</text>
+    </g>
+    <g id="violation-item-8" class="violation-list-item" data-violation-id="violation-8" data-message="Minimum density violation on layer : M1 required 0.500000 actual 0.100000" data-page="0" data-layers="" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="352" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="370" font-size="12" fill="black">9. MinDensity M1 0.1/0.5</text>
+    </g>
+    <g id="violation-item-9" class="violation-list-item" data-violation-id="violation-9" data-message="Minimum density violation on layer : M1 required 0.500000 actual 0.000000" data-page="0" data-layers="" onclick="toggleViolation(this)" style="cursor: pointer;">
+      <rect x="50" y="384" width="280" height="28" fill="white" stroke="#dddddd" stroke-width="1" />
+      <text x="58" y="402" font-size="12" fill="black">10. MinDensity M1 0/0.5</text>
     </g>
     <text x="60" y="740" font-size="13" fill="#555555" style="cursor: pointer;" onclick="previousViolationPage()">Prev</text>
     <text id="violation-page-indicator" x="190" y="740" font-size="13" text-anchor="middle" fill="black">1 / 1</text>

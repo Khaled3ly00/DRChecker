@@ -55,11 +55,14 @@ namespace drcheck::geometry {
 		PolygonEdgePairResult distanceTo(const Polygon& other, bool treatIntersectionAsZero = true) const;
 
 		PolygonEdgePairResult minWidth() const;
-		PolygonEdgePairResult orthogonalMinWidth() const;
 
 		double areaInsideWindow(const BoundingBox& region) const;
 
 		PairwiseEnclosureResult pairwiseEnclosure(const Polygon& outerPolygon) const;
+
+		bool isOctilinear() const;
+		bool isOrthogonal() const;
+
 	private:
 		enum class ClipBoundary
 		{
@@ -70,8 +73,8 @@ namespace drcheck::geometry {
 		};
 		std::vector<Point> vertices;
 		bool hasSelfIntersection() const;
-		bool isOrthogonal() const;
 		bool isAxisAlignedRectangle() const;
+		double projectPointOntoDirection(const Point& point, const Vector& direction) const;
 		static std::optional<std::pair<double, double>>positiveOverlapInterval(double minA, double maxA, double minB, double maxB);
 		double edgePairFacingScore(const Segment& firstEdge, const Segment& secondEdge, const Point& firstPoint, const Point& secondPoint) const;
 		bool isPointInsideWindow(const Point& point, const BoundingBox& window, ClipBoundary boundary) const;

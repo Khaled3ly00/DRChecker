@@ -22,11 +22,14 @@ namespace drcheck::geometry {
 		double length() const { return Point::vectorBetween(start, end).length(); }
 
 		BoundingBox getBoundingBox() const;
-		bool isHorizontal() const { return start.getY() == end.getY(); }
-		bool isVertical() const { return start.getX() == end.getX(); }
+		bool isHorizontal() const;
+		bool isVertical() const;
 
 		bool contains(const Point& point) const;
 		bool intersects(const Segment& other, bool includeBoundaryContact = true) const;
+
+		bool isParallelTo(const Segment& other) const;
+
 		DistanceResult distanceTo(const Point& point) const;
 		DistanceResult distanceTo(const Segment& other) const;
 	private:
