@@ -334,3 +334,37 @@ target_compile_definitions(
         DRCHECK_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
 )
 
+# --------------------------------------------------
+# GUI
+# --------------------------------------------------
+
+option(DRCHECK_BUILD_GUI "Build the Qt/QML GUI" OFF)
+
+if(DRCHECK_BUILD_GUI)
+    find_package(Qt6 REQUIRED COMPONENTS
+        Quick
+        QuickControls2
+    )
+
+    qt_standard_project_setup(REQUIRES 6.8)
+
+    qt_add_executable(drcheck_gui
+        src/gui/main_gui.cpp
+        src/gui/AppController.cpp
+        include/drcheck/gui/AppController.h
+    )
+
+    target_link_libraries(drcheck_gui
+        PRIVATE
+            drchecker
+            Qt6::Quick
+            Qt6::QuickControls2
+    )
+
+    qt_add_qml_module(drcheck_gui
+        URI DRCheck
+        VERSION 1.0
+        QML_FILES
+            qml/Main.qml
+    )
+endif()
