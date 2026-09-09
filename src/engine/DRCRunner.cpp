@@ -13,9 +13,13 @@
 
 namespace drcheck::engine {
 
-std::vector<domain::Violation> DRCRunner::run(const DRCRunConfig& config)
+DRCRunResult DRCRunner::run(const DRCRunConfig& config)
 {
-    domain::LayerRegistry layerRegistry;
+    DRCRunResult result;
+
+    result.layerRegistry = std::make_unique<domain::LayerRegistry>();
+
+    domain::LayerRegistry& layerRegistry = *result.layerRegistry;
 
     std::vector<std::unique_ptr<rules::Rule>> rules;
 
@@ -56,18 +60,18 @@ std::vector<domain::Violation> DRCRunner::run(const DRCRunConfig& config)
         throw std::invalid_argument("Unsupported layout file format: " + layoutExtension);
     }
 
-    const auto shapes = layout::LayoutNormalizer::normalize(rawShapes);
+    result.shapes = layout::LayoutNormalizer::normalize(rawShapes);
 
-    const auto violations = DRCEngine::run(shapes, rules);
+    result.violations = DRCEngine::run(result.shapes, rules);
 
-    io::JSONReportWriter::write(violations, config.reportPath);
+    io::JSONReportWriter::write(result.violations, config.reportPath);
 
     if (config.svgPath.has_value())
     {
-        io::SVGReportWriter::write(shapes, violations, config.svgPath.value());
+        io::SVGReportWriter::write(result.shapes, result.violations, config.svgPath.value());
     }
 
-    return violations;
+    return result;
 }
 
 }

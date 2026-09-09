@@ -3,10 +3,20 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <memory>
 
+#include "drcheck/domain/LayerRegistry.h"
+#include "drcheck/domain/Shape.h"
 #include "drcheck/domain/Violation.h"
 
 namespace drcheck::engine {
+
+struct DRCRunResult
+{
+    std::unique_ptr<domain::LayerRegistry> layerRegistry;
+    std::vector<domain::Shape> shapes;
+    std::vector<domain::Violation> violations;
+};
 
 struct DRCRunConfig
 {
@@ -20,7 +30,7 @@ struct DRCRunConfig
 class DRCRunner
 {
 public:
-    static std::vector<domain::Violation> run(const DRCRunConfig& config);
+    static DRCRunResult run(const DRCRunConfig& config);
 };
 
 }

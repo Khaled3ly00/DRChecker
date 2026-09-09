@@ -1,12 +1,11 @@
 #include "drcheck/gui/AppController.h"
-#include "drcheck/engine/DRCRunner.h"
 
 #include <QDir>
 
 namespace drcheck::gui {
 
-AppController::AppController(QObject* parent)
-    : QObject{ parent }
+AppController::AppController(ViolationListModel& violationModel, LayoutViewModel& layoutViewModel, LayerListModel& layerModel, QObject* parent)
+    : QObject{ parent }, violationModel{ violationModel }, layoutViewModel{ layoutViewModel }, layerModel{layerModel}
 {
 }
 
@@ -61,24 +60,9 @@ QString AppController::getJsonReportDirectory() const
     return jsonReportDirectory;
 }
 
-int AppController::getViolationCount() const
-{
-    return violationCount;
-}
-
 QString AppController::getStatus() const
 {
     return status;
-}
-
-void AppController::setViolationCount(int count)
-{
-    if (violationCount == count) {
-        return;
-    }
-
-    violationCount = count;
-    emit violationCountChanged();
 }
 
 void AppController::setStatus(const QString& newStatus)
@@ -91,19 +75,36 @@ void AppController::setStatus(const QString& newStatus)
     emit statusChanged();
 }
 
+void AppController::selectViolation(int row)
+{
+    if (!currentResult.has_value() || row < 0 || static_cast<std::size_t>(row) >= currentResult->violations.size())
+    {
+        layoutViewModel.clearSelectedViolation();
+        return;
+    }
+
+    layoutViewModel.setSelectedViolation(currentResult->violations[row]);
+}
+
 void AppController::runDRC()
 {
-    if (layoutPath.isEmpty() ||
-        rulePath.isEmpty() ||
-        jsonReportDirectory.isEmpty())
+    if (layoutPath.isEmpty() || rulePath.isEmpty() || jsonReportDirectory.isEmpty())
     {
-        setViolationCount(0);
+        violationModel.clear();
+        layoutViewModel.clear();
+        layoutViewModel.clearSelectedViolation();
+        layerModel.clear();
+        currentResult.reset();
         setStatus("Layout, rule deck, and JSON report directory are required");
         return;
     }
 
     // Clear results from the previous run before starting a new DRC run.
-    setViolationCount(0);
+    violationModel.clear();
+    layoutViewModel.clear();
+    layoutViewModel.clearSelectedViolation();
+    layerModel.clear();
+    currentResult.reset();
     setStatus("Running DRC...");
 
     try
@@ -113,22 +114,27 @@ void AppController::runDRC()
         config.layoutPath = layoutPath.toStdString();
         config.rulesPath = rulePath.toStdString();
 
-        const QString reportPath =
-            QDir(jsonReportDirectory).filePath("report.json");
+        const QString reportPath = QDir(jsonReportDirectory).filePath("report.json");
 
         config.reportPath = reportPath.toStdString();
         config.svgPath = std::nullopt;
         config.topCellName = std::nullopt;
 
-        const auto violations = engine::DRCRunner::run(config);
+        currentResult = engine::DRCRunner::run(config);
 
-        setViolationCount(static_cast<int>(violations.size()));
+        layerModel.setLayers(currentResult->shapes);
+        layoutViewModel.setShapes(currentResult->shapes);
+        violationModel.setViolations(currentResult->violations);
 
         setStatus("DRC completed successfully");
     }
     catch (const std::exception& exception)
     {
-        setViolationCount(0);
+        violationModel.clear();
+        layoutViewModel.clear();
+        layoutViewModel.clearSelectedViolation();
+        layerModel.clear();
+        currentResult.reset();
 
         setStatus("Error: " + QString::fromUtf8(exception.what()));
     }

@@ -359,7 +359,7 @@ std::vector<domain::Violation> MinEnclosureRule::check(const std::vector<domain:
             continue;
         }
 
-        domain::ViolationMarker marker{ .firstLayer = getInnerLayer() };
+        domain::ViolationMarker marker{ .region = innerShape.getPolygon().getBoundingBox(), .firstLayer = getInnerLayer() };
         const std::string msg = getInnerLayer()->getName()+ " is not enclosed by any allowed outer layer";
 
         violations.emplace_back(domain::ViolationType::Enclosure, std::vector<std::size_t>{ innerShape.getId() },

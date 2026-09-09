@@ -85,7 +85,7 @@ int drcRunCommand(ClientData clientData, Tcl_Interp* interpreter, int objc, Tcl_
         {
             config.topCellName = options.at("-top");
         }
-        context->violations = engine::DRCRunner::run(config);
+        context->violations = engine::DRCRunner::run(config).violations;
 
         return TCL_OK;
     }

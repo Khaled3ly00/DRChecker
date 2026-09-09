@@ -351,7 +351,13 @@ if(DRCHECK_BUILD_GUI)
     qt_add_executable(drcheck_gui
         src/gui/main_gui.cpp
         src/gui/AppController.cpp
+        src/gui/ViolationListModel.cpp
+        src/gui/LayoutViewModel.cpp
+        src/gui/LayerListModel.cpp
         include/drcheck/gui/AppController.h
+        include/drcheck/gui/ViolationListModel.h
+        include/drcheck/gui/LayoutViewModel.h
+        include/drcheck/gui/LayerListModel.h
     )
 
     target_link_libraries(drcheck_gui
@@ -366,5 +372,8 @@ if(DRCHECK_BUILD_GUI)
         VERSION 1.0
         QML_FILES
             qml/Main.qml
+            qml/ViolationItem.qml
+            qml/LayoutView.qml
+            qml/LayerItem.qml
     )
 endif()

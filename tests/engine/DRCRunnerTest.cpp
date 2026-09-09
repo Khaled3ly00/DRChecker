@@ -15,7 +15,7 @@ TEST(DRCRunnerTest, RunsDRCAndWritesReportJSONLayout)
 
     config.reportPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/test_report.json";
 
-    const auto violations = DRCRunner::run(config);
+    const auto violations = DRCRunner::run(config).violations;
 
     EXPECT_FALSE(violations.empty());
 }
@@ -30,7 +30,7 @@ TEST(DRCRunnerTest, RunsDRCAndWritesReportGDSLayout)
 
     config.reportPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/gds_report.json";
 
-    const auto violations = DRCRunner::run(config);
+    const auto violations = DRCRunner::run(config).violations;
 
     EXPECT_TRUE(violations.empty());
 }
@@ -48,7 +48,7 @@ TEST(DRCRunnerTest, RunsDRCAndWritesReportGDSLayoutMultipleTopCells)
 
     config.reportPath = std::string(DRCHECK_SOURCE_DIR) + "/examples/gds_report.json";
 
-    const auto violations = DRCRunner::run(config);
+    const auto violations = DRCRunner::run(config).violations;
 
     EXPECT_TRUE(violations.empty());
 }

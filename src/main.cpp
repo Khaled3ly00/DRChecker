@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <memory>
 #include <stdexcept>
 
 #include "drcheck/engine/DRCRunner.h"
@@ -12,6 +11,9 @@ int main(int argc, char* argv[])
     // Usage: drcheck --layout <layout.json|layout.gds> --rules <rules.json|rules.tcl> --report <report.json> [--svg <report.svg>] [--top <topCellName>]"
     try
     {
+        if (argc <= 1){
+            throw std::invalid_argument("Usage: drcheck --layout <layout.json|layout.gds> --rules <rules.json|rules.tcl> --report <report.json> [--svg <report.svg>] [--top <topCellName>]");
+        }
         if (argc >= 2 && std::string(argv[1]) == "--script" && argc != 3)
         {
             throw std::invalid_argument("Usage: drcheck --script <automation.tcl>");
@@ -97,7 +99,7 @@ int main(int argc, char* argv[])
         {
             config.topCellName = topCellName;
         }
-        const auto violations = drcheck::engine::DRCRunner::run(config);
+        const auto violations = drcheck::engine::DRCRunner::run(config).violations;
 
         std::cout
             << "DRC completed.\n"
