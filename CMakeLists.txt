@@ -354,10 +354,13 @@ if(DRCHECK_BUILD_GUI)
         src/gui/ViolationListModel.cpp
         src/gui/LayoutViewModel.cpp
         src/gui/LayerListModel.cpp
+        src/gui/LayoutRenderItem.cpp
         include/drcheck/gui/AppController.h
         include/drcheck/gui/ViolationListModel.h
         include/drcheck/gui/LayoutViewModel.h
         include/drcheck/gui/LayerListModel.h
+        include/drcheck/gui/LayoutRenderItem.h
+
     )
 
     target_link_libraries(drcheck_gui

@@ -4,6 +4,9 @@
 #include <QVariantMap>
 #include <optional>
 #include <vector>
+#include <QHash>
+#include <QPointF>
+#include <utility>
 
 #include "drcheck/domain/Shape.h"
 #include "drcheck/geometry/BoundingBox.h"
@@ -13,9 +16,9 @@ namespace drcheck::gui {
 
 class LayoutViewModel : public QObject
 {
+
     Q_OBJECT
 
-    Q_PROPERTY(QVariantList polygons READ getPolygons NOTIFY layoutChanged)
     Q_PROPERTY(bool hasLayout READ hasLayout NOTIFY layoutChanged)
     Q_PROPERTY(double minX READ getMinX NOTIFY layoutChanged)
     Q_PROPERTY(double minY READ getMinY NOTIFY layoutChanged)
@@ -24,10 +27,12 @@ class LayoutViewModel : public QObject
     Q_PROPERTY(QVariantMap violationMarker READ getViolationMarker NOTIFY violationMarkerChanged)
     Q_PROPERTY(bool hasViolationMarker READ hasViolationMarker NOTIFY violationMarkerChanged)
 
+    // unordered map between layers and vector of polygons vertices&IDs
+    using LayerPolygon = std::pair<qulonglong, std::vector<QPointF>>;
+    using LayerPolygonMap = QHash<QString, std::vector<LayerPolygon>>;
+
 public:
     explicit LayoutViewModel(QObject* parent = nullptr);
-
-    const QVariantList& getPolygons() const;
 
     bool hasLayout() const;
 
@@ -35,10 +40,12 @@ public:
     double getMinY() const;
     double getMaxX() const;
     double getMaxY() const;
+    QVariantMap getViolationMarker() const;
+    const LayerPolygonMap& getLayerPolygons() const;
+    const std::vector<qulonglong>& getSelectedViolationShapeIds() const;
+    const std::optional<domain::ViolationMarker>& getSelectedViolationMarker() const;
 
     void setShapes(const std::vector<domain::Shape>& shapes);
-
-    QVariantMap getViolationMarker() const;
 
     bool hasViolationMarker() const;
 
@@ -53,11 +60,14 @@ signals:
     void violationMarkerChanged();
 
 private:
-    QVariantList polygons;
-
     QVariantMap violationMarker;
 
+    LayerPolygonMap layerPolygons;
+
+    std::vector<qulonglong> selectedViolationShapeIds;
+
     std::optional<geometry::BoundingBox> calculateLayoutBounds(const std::vector<domain::Shape>& shapes) const;
+    std::optional<domain::ViolationMarker> selectedViolationMarker;
 
     QString generateLayerColor(std::size_t index) const;
 

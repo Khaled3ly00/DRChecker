@@ -8,14 +8,9 @@ LayoutViewModel::LayoutViewModel(QObject* parent)
 {
 }
 
-const QVariantList& LayoutViewModel::getPolygons() const
-{
-    return polygons;
-}
-
 bool LayoutViewModel::hasLayout() const
 {
-    return !polygons.empty();
+    return !layerPolygons.empty();
 }
 
 double LayoutViewModel::getMinX() const
@@ -43,6 +38,21 @@ QVariantMap LayoutViewModel::getViolationMarker() const
     return violationMarker;
 }
 
+const std::optional<domain::ViolationMarker>& LayoutViewModel::getSelectedViolationMarker() const
+{
+    return selectedViolationMarker;
+}
+
+const LayoutViewModel::LayerPolygonMap& LayoutViewModel::getLayerPolygons() const
+{
+    return layerPolygons;
+}
+
+const std::vector<qulonglong>& LayoutViewModel::getSelectedViolationShapeIds() const
+{
+    return selectedViolationShapeIds;
+}
+
 bool LayoutViewModel::hasViolationMarker() const
 {
     return !violationMarker.isEmpty();
@@ -64,29 +74,29 @@ std::optional<geometry::BoundingBox> LayoutViewModel::calculateLayoutBounds(cons
 
 void LayoutViewModel::setShapes(const std::vector<domain::Shape>& shapes)
 {
-    polygons.clear();
+    layerPolygons.clear();
 
     for (const auto& shape : shapes)
     {
-        QVariantList vertices;
 
-        for (const auto& vertex : shape.getPolygon().getVertices())
+        const QString layerName = QString::fromStdString(shape.getLayer()->getName());
+
+        const auto& polygonVertices = shape.getPolygon().getVertices();
+
+        std::vector<QPointF> renderPolygon;
+
+        renderPolygon.reserve(polygonVertices.size());
+
+        for (std::size_t i = 0; i < polygonVertices.size(); ++i)
         {
-            QVariantMap pointData;
+            const auto& vertex = polygonVertices[i];
 
-            pointData["x"] = vertex.getX();
-            pointData["y"] = vertex.getY();
+            const auto& nextVertex = polygonVertices[ (i + 1) % polygonVertices.size()];
 
-            vertices.append(pointData);
+            renderPolygon.emplace_back(vertex.getX(), vertex.getY());
         }
 
-        QVariantMap polygonData;
-
-        polygonData["layerName"] = QString::fromStdString(shape.getLayer()->getName());
-
-        polygonData["vertices"] = vertices;
-
-        polygons.append(polygonData);
+        layerPolygons[layerName].emplace_back(static_cast<qulonglong>(shape.getId()), std::move(renderPolygon));
     }
 
     const auto bounds = calculateLayoutBounds(shapes);
@@ -111,6 +121,14 @@ void LayoutViewModel::setShapes(const std::vector<domain::Shape>& shapes)
 
 void LayoutViewModel::setSelectedViolation(const domain::Violation& violation)
 {
+    selectedViolationShapeIds.clear();
+    selectedViolationMarker.reset();
+
+    for (const std::size_t shapeId : violation.getShapeIds())
+    {
+        selectedViolationShapeIds.push_back(static_cast<qulonglong>(shapeId));
+    }
+
     const auto& marker = violation.getMarker();
 
     if (!marker.has_value())
@@ -118,6 +136,8 @@ void LayoutViewModel::setSelectedViolation(const domain::Violation& violation)
         clearSelectedViolation();
         return;
     }
+
+    selectedViolationMarker = marker;
 
     QVariantMap markerData;
 
@@ -147,26 +167,28 @@ void LayoutViewModel::setSelectedViolation(const domain::Violation& violation)
     violationMarker = std::move(markerData);
 
     emit violationMarkerChanged();
+
 }
 
 void LayoutViewModel::clearSelectedViolation()
 {
-    if (violationMarker.isEmpty()) {
+    if (violationMarker.isEmpty() && selectedViolationShapeIds.empty()) {
         return;
     }
 
     violationMarker.clear();
-
+    selectedViolationShapeIds.clear();
+    selectedViolationMarker.reset();
     emit violationMarkerChanged();
 }
 
 void LayoutViewModel::clear()
 {
-    if (polygons.empty()) {
+    if (layerPolygons.empty()) {
         return;
     }
 
-    polygons.clear();
+    layerPolygons.clear();
 
     minX = 0.0;
     minY = 0.0;

@@ -1,9 +1,11 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <qqml.h>
 
 #include "drcheck/gui/AppController.h"
 #include "drcheck/gui/ViolationListModel.h"
+#include "drcheck/gui/LayoutRenderItem.h"
 
 int main(int argc, char* argv[])
 {
@@ -27,6 +29,8 @@ int main(int argc, char* argv[])
     engine.rootContext()->setContextProperty("layoutViewModel", &layoutViewModel);
 
     engine.rootContext()->setContextProperty("layerModel", &layerModel);
+
+    qmlRegisterType<drcheck::gui::LayoutRenderItem>("DRCheck", 1, 0, "LayoutRenderItem");
 
     // URI: DRCheck
     engine.loadFromModule("DRCheck", "Main");

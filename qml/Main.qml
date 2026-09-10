@@ -230,6 +230,8 @@ ApplicationWindow {
                             delegate: LayerItem {
                                 layersModel: layerModel
 
+                                highlighted: layerModel.highlightedLayerName === layerName
+
                                 onColorRequested: function(row, currentColor) {
                                     colorLayerRow = row
 

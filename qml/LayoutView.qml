@@ -1,16 +1,16 @@
 import QtQuick
+import DRCheck
 
 Rectangle {
     id: root
+    color: "#111317"
+
+    clip: true
 
     required property var layoutModel
     required property var layersModel
 
-    property var polygons: layoutModel.polygons
-    property var layerStyles: layersModel.layerStyles
     property var violationMarker: layoutModel.violationMarker
-
-    color: "#111317"
 
     property real zoomFactor: 1.0
     property real panX: 0.0
@@ -23,8 +23,8 @@ Rectangle {
 
     readonly property real layoutWidth: layoutModel.maxX - layoutModel.minX
     readonly property real layoutHeight: layoutModel.maxY - layoutModel.minY
-    readonly property real availableWidth: Math.max(0, canvas.width - 2 * drawingPadding)
-    readonly property real availableHeight: Math.max(0, canvas.height - 2 * drawingPadding)
+    readonly property real availableWidth: Math.max(0, root.width - 2 * drawingPadding)
+    readonly property real availableHeight: Math.max(0, root.height - 2 * drawingPadding)
 
     readonly property real fitScale:
         layoutModel.hasLayout && layoutWidth > 0 && layoutHeight > 0
@@ -33,9 +33,9 @@ Rectangle {
     readonly property real fittedWidth: layoutWidth * fitScale
     readonly property real fittedHeight: layoutHeight * fitScale
 
-    readonly property real fitOffsetX: (canvas.width - fittedWidth) / 2
+    readonly property real fitOffsetX: (root.width - fittedWidth) / 2
 
-    readonly property real fitOffsetY: (canvas.height - fittedHeight) / 2
+    readonly property real fitOffsetY: (root.height - fittedHeight) / 2
 
     function worldToScreenX(x) {
         return fitOffsetX + panX + (x - layoutModel.minX) * fitScale * zoomFactor
@@ -49,8 +49,6 @@ Rectangle {
         zoomFactor = 1.0
         panX = 0.0
         panY = 0.0
-
-        canvas.requestPaint()
     }
 
     function zoomAt(screenX, screenY, multiplier) {
@@ -74,26 +72,22 @@ Rectangle {
         panY = screenY - fitOffsetY - fittedY * newZoom
 
         zoomFactor = newZoom
-
-        canvas.requestPaint()
     }
 
     function zoomIn() {
-        zoomAt(canvas.width / 2, canvas.height / 2, 1.2)
+        zoomAt(root.width / 2, root.height / 2, 1.2)
     }
 
     function zoomOut() {
-        zoomAt(canvas.width / 2, canvas.height / 2, 1.0 / 1.2)
+        zoomAt(root.width / 2, root.height / 2, 1.0 / 1.2)
     }
 
     function centerOnWorldPoint(x, y) {
         const screenX = worldToScreenX(x)
         const screenY = worldToScreenY(y)
 
-        panX += canvas.width / 2 - screenX
-        panY += canvas.height / 2 - screenY
-
-        canvas.requestPaint()
+        panX += root.width / 2 - screenX
+        panY += root.height / 2 - screenY
     }
 
     function centerOnViolation() {
@@ -123,144 +117,36 @@ Rectangle {
         }
     }
 
-    function drawViolationMarker(ctx) {
-        if (!layoutModel.hasViolationMarker) {
-            return
+    Connections {
+        target: root.layoutModel
+
+        function onLayoutChanged() {
+            root.fitView()
         }
-
-        const marker = violationMarker
-
-        ctx.globalAlpha = 1.0
-        ctx.strokeStyle = "#ff4d4d"
-        ctx.fillStyle = "#ff4d4d"
-        ctx.lineWidth = 2
-
-        if (marker.hasFirstPoint && marker.hasSecondPoint)
-        {
-            const firstX = worldToScreenX(marker.firstX)
-            const firstY = worldToScreenY(marker.firstY)
-            const secondX = worldToScreenX(marker.secondX)
-            const secondY = worldToScreenY(marker.secondY)
-
-            ctx.beginPath()
-            ctx.moveTo(firstX, firstY)
-            ctx.lineTo(secondX, secondY)
-            ctx.stroke()
-            ctx.beginPath()
-            ctx.arc(firstX, firstY, 5, 0, 2 * Math.PI)
-            ctx.fill()
-
-            ctx.beginPath()
-            ctx.arc(secondX, secondY, 5, 0, 2 * Math.PI)
-            ctx.fill()
-        }
-        if (marker.hasRegion)
-        {
-            const left = worldToScreenX(marker.regionMinX)
-            const right = worldToScreenX(marker.regionMaxX)
-            const top = worldToScreenY(marker.regionMaxY)
-            const bottom = worldToScreenY(marker.regionMinY)
-
-            ctx.globalAlpha = 0.15
-            ctx.fillRect(left, top, right - left, bottom - top)
-            ctx.globalAlpha = 1.0
-            ctx.strokeRect(left, top, right - left, bottom - top)
-        }
-    }
-    onPolygonsChanged: {
-        fitView()
-    }
-
-    onLayerStylesChanged: {
-        canvas.requestPaint()
     }
 
     onViolationMarkerChanged: {
         if (layoutModel.hasViolationMarker) {
             centerOnViolation()
         }
-
-        canvas.requestPaint()
     }
 
-    Canvas {
-        id: canvas
+    LayoutRenderItem {
+        id: layoutRenderer
 
-        anchors.fill: parent
+        layoutModel: root.layoutModel
+        layersModel: root.layersModel
 
-        onWidthChanged: {
-            requestPaint()
-        }
+        width: root.layoutWidth
+        height: root.layoutHeight
 
-        onHeightChanged: {
-            requestPaint()
-        }
+        x: root.fitOffsetX + root.panX
+        y: root.fitOffsetY + root.panY
 
-        onPaint: {
-            const ctx = getContext("2d")
+        scale: root.fitScale * root.zoomFactor
+        viewScale: root.fitScale *root.zoomFactor
 
-            ctx.clearRect(0, 0, width, height)
-
-            if (!root.layoutModel.hasLayout) {
-                return
-            }
-
-            const minX = root.layoutModel.minX
-            const minY = root.layoutModel.minY
-            const maxX = root.layoutModel.maxX
-            const maxY = root.layoutModel.maxY
-
-            const layoutWidth = maxX - minX
-            const layoutHeight = maxY - minY
-
-            if (layoutWidth <= 0 || layoutHeight <= 0) {
-                return
-            }
-
-            for (let i = 0; i < root.polygons.length; ++i)
-            {
-                const polygon = root.polygons[i]
-
-                const vertices = polygon.vertices
-
-                const style = root.layerStyles[polygon.layerName]
-
-                if (vertices.length < 3) {
-                    continue
-                }
-
-                if (!style || !style.visible) {
-                    continue
-                }
-
-                ctx.beginPath()
-
-                let screenX = root.worldToScreenX(vertices[0].x)
-                let screenY = root.worldToScreenY(vertices[0].y)
-
-                ctx.moveTo(screenX, screenY)
-
-                for (let j = 1; j < vertices.length; ++j)
-                {
-                    screenX = root.worldToScreenX(vertices[j].x)
-                    screenY = root.worldToScreenY(vertices[j].y)
-
-                    ctx.lineTo(screenX, screenY)
-                }
-                ctx.closePath()
-
-                ctx.fillStyle = style.color
-                ctx.globalAlpha = 0.3
-                ctx.fill()
-
-                ctx.globalAlpha = 1.0
-
-                ctx.strokeStyle = style.color
-                ctx.lineWidth = 0.5
-                ctx.stroke()
-            }
-            root.drawViolationMarker(ctx)
-        }
+        transformOrigin: Item.TopLeft
     }
 
     MouseArea {
@@ -291,8 +177,6 @@ Rectangle {
 
             lastMouseX = mouse.x
             lastMouseY = mouse.y
-
-            canvas.requestPaint()
         }
 
         onWheel: function(wheel) {
@@ -304,6 +188,7 @@ Rectangle {
             }
         }
     }
+
     Text {
         anchors.centerIn: parent
 

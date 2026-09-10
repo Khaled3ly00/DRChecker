@@ -18,6 +18,8 @@ class LayerListModel : public QAbstractListModel
 
     Q_PROPERTY(bool allVisible READ getAllVisible NOTIFY allVisibleChanged)
 
+    Q_PROPERTY(QString highlightedLayerName READ getHighlightedLayerName NOTIFY highlightedLayerNameChanged)
+
 public:
     enum LayerRole
     {
@@ -42,20 +44,24 @@ public:
 
     void setLayers(const std::vector<domain::Shape>& shapes);
 
-    Q_INVOKABLE void setLayerVisible(int row, bool visible);
-
     bool getAllVisible() const;
+
+    QString getHighlightedLayerName() const;
+
+    Q_INVOKABLE void setLayerVisible(int row, bool visible);
 
     Q_INVOKABLE void setAllLayersVisible(bool visible);
 
     Q_INVOKABLE void setLayerColor(int row, const QColor& color);
 
+    Q_INVOKABLE void toggleLayerHighlight(int row);
     void clear();
 
 signals:
     void countChanged();
     void layerStylesChanged();
     void allVisibleChanged();
+    void highlightedLayerNameChanged();
 
 private:
     struct LayerDisplayData
@@ -68,5 +74,7 @@ private:
     QString generateLayerColor(std::size_t index) const;
 
     std::vector<LayerDisplayData> layers;
+
+    QString highlightedLayerName;
 };
 }

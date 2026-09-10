@@ -215,6 +215,32 @@ bool LayerListModel::getAllVisible() const
     return true;
 }
 
+QString LayerListModel::getHighlightedLayerName() const
+{
+    return highlightedLayerName;
+}
+
+void LayerListModel::toggleLayerHighlight(int row)
+{
+    if (row < 0 || row >= static_cast<int>(layers.size()))
+    {
+        return;
+    }
+
+    const QString& selectedLayerName = layers[row].name;
+
+    if (highlightedLayerName == selectedLayerName)
+    {
+        highlightedLayerName.clear();
+    }
+    else
+    {
+        highlightedLayerName = selectedLayerName;
+    }
+
+    emit highlightedLayerNameChanged();
+}
+
 void LayerListModel::clear()
 {
     if (layers.empty()) {
@@ -223,6 +249,8 @@ void LayerListModel::clear()
 
     beginResetModel();
 
+    const bool hadHighlightedLayer = !highlightedLayerName.isEmpty();
+    highlightedLayerName.clear();
     layers.clear();
 
     endResetModel();
@@ -230,6 +258,9 @@ void LayerListModel::clear()
     emit countChanged();
     emit layerStylesChanged();
     emit allVisibleChanged();
+    if (hadHighlightedLayer) {
+        emit highlightedLayerNameChanged();
+    }
 }
 
 }

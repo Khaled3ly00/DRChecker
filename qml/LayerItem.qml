@@ -10,16 +10,26 @@ Rectangle {
     required property string layerColor
     required property bool layerVisible
     required property var layersModel
+    required property bool highlighted
 
     signal colorRequested(int row, string currentColor)
 
     width: ListView.view.width
     height: 24
 
-    color: "#30343a"
+    color: root.highlighted ? "#3a414a" : "#30343a"
 
     border.width: 1
-    border.color: "#4a4e55"
+    border.color: root.highlighted ? root.layerColor : "#4a4e55"
+
+    MouseArea {
+        anchors.fill: parent
+
+        onClicked: {
+            root.layersModel.toggleLayerHighlight(root.index)
+        }
+    }
+
 
     RowLayout {
         anchors.fill: parent
@@ -46,7 +56,7 @@ Rectangle {
                 radius: 2
 
                 color: root.layerColor
-                opacity: 0.4
+                opacity: 0.6
 
                 MouseArea {
                     anchors.fill: parent
